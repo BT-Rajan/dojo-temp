@@ -4,12 +4,19 @@
 |---|---|
 | Document Number | EA-SYS-SCOPE-01 |
 | Title | Elite Academy System — Scope of Work |
-| Version | 0.1 (Draft for review) |
+| Version | 0.2 (Draft for review) |
 | Date | 28-Sep-2026 |
 | Document Owner | Systems & IT Lead |
 | Reviewed By | Operations Lead (COO); Training Lead; Marketing Lead |
 | Approved By | Chief Executive Officer |
-| Related Documents | EA-OPS-PROC-01 Operations Procedure; EA-INV-PROC-01 Inventory Management Procedure; EA-COMM-PROC-01 Communication Procedure; EA-COMM-PLAY-01 How We Work Together; EA-COMM-REF-01 Org Chart; Customer Management Procedure & One Voice Guide; Marketing Funnel by Branch; Kajukenbo Master Curriculum; Active Members Report (EA-DOC-003) |
+| Related Documents | EA-SYS-DESIGN-01 Website Design Brief (docs/WEBSITE_DESIGN_PROMPT.md); EA-OPS-PROC-01 Operations Procedure; EA-INV-PROC-01 Inventory Management Procedure; EA-COMM-PROC-01 Communication Procedure; EA-COMM-PLAY-01 How We Work Together; EA-COMM-REF-01 Org Chart; Customer Management Procedure & One Voice Guide; Marketing Funnel by Branch; Kajukenbo Master Curriculum; Active Members Report (EA-DOC-003) |
+
+**Change log**
+
+| Version | Date | Change |
+|---|---|---|
+| 0.1 | 28-Sep-2026 | First draft from Elite procedures, reports and meeting notes. |
+| 0.2 | 28-Sep-2026 | Added: website content management (CMS) with events photo gallery (M14); online shop for equipment (M19); payroll for directly hired coaches and staff (M20); Kuwait test data package (M21); first run, test and change requests (Section 7.1). Payroll and online shop moved out of "Out of Scope". |
 
 ---
 
@@ -45,15 +52,15 @@ These come straight from Elite's own documents and shape every screen:
 | **Training Lead** | Abdullah | Programs, curriculum, instructor management, evaluations, promotions, attendance trends | Both branches, training data |
 | **Track Lead** | Carlos (grappling), Ahmed (striking) | Curriculum for their track, evaluations, test days | Both branches, their track |
 | **Instructor** | All instructors | Class rosters, attendance, trial briefs, evaluations, test results, incident reports | Their classes |
-| **Marketing Lead** | Maryam | Campaigns, funnel, group sales, knowledge base (voice & content), website content | Both branches, marketing data (no payments) |
-| **Marketing Implementation** | Ayaa | Campaign tracker, consented media library, website content | As Marketing Lead, no approvals |
+| **Marketing Lead** | Maryam | Campaigns, funnel, group sales, knowledge base (voice & content), **website CMS: approves publishing**, gallery | Both branches, marketing data (no payments) |
+| **Marketing Implementation** | Ayaa | Campaign tracker, consented media library, **website CMS: drafts pages, news and gallery albums** | As Marketing Lead, no approvals |
 | **Systems & IT Lead** | Saud | Users, roles, settings, integrations, AI configuration, audit log, data imports | System-wide admin |
 | **Branch Admin** | Verna (Promenade), Tareq (Bedaya) | Front desk: check-in, trials, registration, sales, renewals follow-up, class changes, daily/weekly forms, stock | Own branch (plus "both branches" duties where the playbook assigns them) |
 | **Operations Support / Coach** | Roaa | Front desk duties at either branch + instructor duties; handles AI handoffs | Both branches; instructions visible to both her leads |
 | **Purchasing / Receiving Coordinator** | (Promenade) | Place approved orders, receive deliveries, discrepancy reports | Inventory, both branches |
-| **Accountant** | (new user) | Cash-up and settlement reconciliation, expenses, income statements, exports | Financial data, both branches, read-only on members |
+| **Accountant** | (new user) | Cash-up and settlement reconciliation, expenses, income statements, **monthly payroll preparation**, exports | Financial and payroll data, both branches, read-only on members |
 | **Member / Parent** | Clients | Portal: schedule, bookings, payments, renewals, progress, consent, family | Own family only |
-| **Public visitor** | Anyone | Website, schedule, prices, trial booking, SAQR chat | Public info only |
+| **Public visitor / online customer** | Anyone | Website, gallery, schedule, prices, trial booking, SAQR chat, online shop | Public info and own orders |
 
 A person can hold more than one role (Roaa is Operations Support **and** Instructor). Every action records *who* did it and *in which role*.
 
@@ -220,15 +227,35 @@ Reports can be scheduled to be emailed automatically. Form reference numbers fol
 - Funnel dashboards by branch (Promenade and Bedaya run different funnels).
 - WhatsApp broadcast lists (with opt-in) for campaigns and announcements.
 
-### M14. Public Website and Online Booking
-*Replaces: the current website admin panel.*
+### M14. Public Website and Content Management (CMS)
+*Replaces: the current website admin panel and EA-OPS-FRM-05 Website Update Log.*
 
+**The public website (reachable by clients)**
+- Home, About (vision "We build better humans", the five principles), each branch, each program, schedule, prices, instructors, events, gallery, news, shop, contact, and trial booking.
 - Branch pages with their own positioning ("Complete Fighter Program" at Promenade; "Choose Your Discipline" and the ladies' class at Bedaya).
-- Programs, schedule and prices shown **live from the system** (no separate website updates).
-- Instructor profiles (rank, years training, competition background).
+- Programs, schedule and prices shown **live from the system** — never typed into the CMS.
 - **Book a trial** with name and phone only → becomes a lead with an owner.
 - **SAQR chat window** on every page (M16).
-- Arabic and English, mobile first.
+- Arabic and English with right-to-left layout, mobile first, fast on phones, search-engine friendly (e.g. "martial arts Hawalli"), Google Business Profile links.
+
+**Content management (CMS) for staff**
+- Edit pages from ready-made blocks (hero, text, image, video, program cards, instructor cards, testimonial, call to action, FAQ, map) — no coding.
+- Every page and block has Arabic and English versions side by side.
+- **Draft → review → publish:** Ayaa (or any content editor) drafts; the Marketing Lead approves and publishes; scheduled publishing and unpublishing (e.g. a promotion that ends on 31 Aug).
+- Version history for every page, with one-click restore.
+- News / announcements and **events** (seminars, camps, tournaments, showcases, Elite Games) with date, branch, description and a registration or trial link.
+- Homepage banners and promotions with start and end dates.
+- Instructor profiles managed in the CMS, linked to the instructor's record.
+- SEO fields (page title, description, share image) per page and language.
+- Every published change is recorded in the audit log (replaces the FRM-05 log).
+
+**Events photo gallery**
+- Albums per event (e.g. "Summer Camp 2026", "Kajukenbo Seminar – Oct", "Belt Test – Bedaya"), with date, branch, program and cover photo.
+- Bulk upload of photos and short videos; automatic resizing and watermark option.
+- **Consent check before publishing:** members in each photo are tagged; a photo can only go public if every tagged member's consent covers "website and marketing" (EA-MKT-FRM-01). Untagged photos of children cannot be published until reviewed.
+- If a member withdraws consent, every public photo they appear in is hidden automatically and flagged for review.
+- Parents can see private albums of their own children's events in the member portal (M15), even where public consent is not given.
+- Gallery photos can be reused in news posts, event pages and social media from the same media library (M13).
 
 ### M15. Member and Parent Portal
 *New.*
@@ -277,6 +304,48 @@ Reports can be scheduled to be emailed automatically. Form reference numbers fol
 - Daily backups; data export.
 - **Mindbody data import** (Section 6).
 
+### M19. Online Shop (E-commerce)
+*New — sells equipment online from the same stock as the front desk.*
+
+- **Catalogue from inventory (M8):** products, sizes, colours, photos and prices are the same records the front desk sells; online prices can differ only with OM approval.
+- Shows only what is in stock; stock is reserved when an order is placed and reduced when it is fulfilled, from the branch that fulfils it — the monthly count stays correct.
+- **Size guides** per product (gloves in oz, uniforms in cm, guards XS–XL) and program kits (e.g. "Kajukenbo starter kit": uniform + gloves + shin guards).
+- Member prices and bundles (e.g. new-member kit discount), and gear credit from the referral program.
+- Cart and checkout with **KNET and Visa/MC** through the chosen gateway; guest checkout or member login.
+- **Fulfilment:** pick up at Promenade or Bedaya (ready-for-pickup message), or home delivery within Kuwait by area with delivery fees (courier to be chosen).
+- Order statuses: Paid → Preparing → Ready for pickup / Out for delivery → Completed; cancellations, returns and exchanges (e.g. wrong size) with OM approval for refunds.
+- Order confirmation, invoice and status updates by WhatsApp / email in Arabic and English.
+- Online sales appear in the Weekly Sales Report (category Equipment, channel Online) and in finance reports.
+- Belts are **not** sold online — they are issued only through promotion (M7).
+- Phased: the provision (data model, catalogue, stock reservation) is built with inventory in Phase 3; the storefront opens in Phase 6.
+
+### M20. Payroll and Staff (Directly Hired Coaches and Staff)
+*New — replaces paying salaries outside the system.*
+
+- **Staff records:** employment type (full-time, part-time, hourly), job title, branch, start date, contract terms, Civil ID, nationality, bank account (IBAN), and **document expiry reminders** (civil ID, residency, work permit, passport, coaching certificates).
+- **Pay structures:** monthly salary; allowances (e.g. transport, housing); **hourly rate per class for directly hired coaches, with hours taken automatically from the classes they actually taught** (M4 attendance and instructor check-in); rates per program if needed.
+- **Monthly payroll run:** the Accountant prepares → the Operations Manager reviews → the CEO approves. No salary is paid without an approved run.
+- Additions and deductions: overtime, extra classes, seminars and camps taught, bonuses (e.g. Instructor of the Month), absence deductions, salary advances and their repayment.
+- **Leave:** annual and sick leave balances and requests (linked to class cover in M4); unpaid leave.
+- **Kuwait rules, configurable and confirmed by the Accountant:** end-of-service indemnity accrual under the Kuwait Private Sector Labour Law, PIFSS social security contributions for Kuwaiti employees, and public holidays.
+- **Outputs:** bilingual payslips (sent to staff in the app / by WhatsApp), bank salary transfer file, payroll summary per branch and per function, and payroll cost feeding the income statement (M11) and the Quarterly Business Report.
+- Freelance or contracted coaches who invoice Elite are **not** on payroll; they are paid as vendors (M11), still using hours from taught classes.
+- Payroll data is visible only to the Accountant, the Operations Manager and the CEO; each employee sees only their own payslips.
+
+### M21. Test Data Package (Kuwait)
+*New — realistic, fictional data for testing, demos and staff training.*
+
+- **Fictional people only** — no real member, child or staff data is ever used for testing.
+- Names in Arabic and English reflecting Elite's actual mix (Kuwaiti, other Arab and expatriate families), families with 1–4 children, ages 5 to adult, boys, girls, men and ladies' class members.
+- **Kuwait formats:** 12-digit Civil IDs in the correct structure (century digit, date of birth, serial, check digit) that match each person's date of birth, mobile numbers in the +965 8-digit format (starting 5, 6 or 9), addresses by governorate, area, block, street and building (e.g. Hawalli, Salmiya, Jabriya, Sabah Al Salem, Mubarak Al-Kabeer).
+- **Money and calendar:** Kuwaiti Dinar with 3 decimals and the real price points (85 KD Promenade, 65 KD kids / 55 KD adults Bedaya, 10 KD trial), a KNET-heavy payment mix, Saturday–Friday weeks, Friday closure, Kuwaiti public holidays, a Ramadan timetable and the summer camp season.
+- **12+ months of history** so every report has data: visits, sales, renewals, freezes, leavers with reasons, trials and conversions, belt tests and promotions, campaigns and leads at every stage.
+- Both branches with Elite's real programs, class timetable, pricing options and product catalogue (sizes and colours from the September 2026 count), local vendors and one international order in USD with landed cost.
+- Staff for payroll testing: salaried and hourly coaches, Kuwaiti and expatriate staff (to test PIFSS and document expiry), leave balances and an advance being repaid.
+- **Edge cases on purpose:** members expiring today and in 5 days, expired 15 days, frozen, active but no visit in 30 days, duplicate names, siblings sharing a guardian, a child incident, open and escalated complaints, negative stock, a delivery short-shipped, a pending transfer, a purchase request over the monthly limit, a photo with a member who has not consented, an online order returned for a wrong size.
+- One-click **reset and reload** in the test environment; the package can never be loaded into the live system.
+- Expected results sheet for key checks (e.g. "active members at Bedaya on the test date = 47") so testers can confirm reports are correct.
+
 ---
 
 ## 5. Business Rules the System Enforces
@@ -299,6 +368,11 @@ Reports can be scheduled to be emailed automatically. Form reference numbers fol
 | 14 | Photos/videos used only within the member's signed consent. | Playbook §7 |
 | 15 | Every lead has exactly one owner (first contact) and a next action. | Playbook §5 |
 | 16 | Departing staff lose all access on their last day. | OPS-PROC §7.4 |
+| 17 | A photo or video goes public only if every tagged member's consent covers that use; consent withdrawal hides it automatically. | Playbook §7 |
+| 18 | Website pages publish only after Marketing Lead approval; programs, schedule and prices on the website always come from the system. | New (CMS) |
+| 19 | Online orders reserve stock at order and reduce it at fulfilment, from the fulfilling branch; refunds need OM approval. | New (Shop), OPS-PROC §3.5 |
+| 20 | Payroll: Accountant prepares, OM reviews, CEO approves; no salary paid without an approved run. Hourly pay uses classes actually taught. | New (Payroll) |
+| 21 | Test data is fictional and can never be loaded into the live system. | New (Test data) |
 
 ---
 
@@ -319,14 +393,23 @@ Each phase ends with a demo to the leads and sign-off before the next begins. Th
 
 | Phase | Name | Contents | Outcome |
 |---|---|---|---|
-| **0** | Foundation | Fix security gaps in the current code; remove Replit dependencies; new data model (branches, programs, members, staff, roles); login and permissions; Arabic/English layout; audit log | A secure base to build on |
+| **0** | Foundation | Fix security gaps in the current code; remove Replit dependencies; new data model (branches, programs, members, staff, roles); login and permissions; Arabic/English layout; audit log; **M21 test data package (first version — grows with every phase)** | A secure base to build on, with realistic Kuwait test data |
 | **1** | Members, Classes and Sales | M1 Programs & pricing, M2 Members & families, M4 Schedule, bookings & check-in, M5 POS, payments, receipts & cash-up, M6 Renewals list | Front desk can run a full day without Mindbody (in test) |
-| **2** | Operations and Reporting | M9 Daily operations forms, M10 Weekly Sales, Weekly Branch, Active Members & dashboards, M11 Finance & Accountant | Weekly reports build themselves; OM verification online |
-| **3** | Inventory and Migration | M8 Inventory, purchasing, vendors, counts; M18 Mindbody import; parallel run; cut-over | **Mindbody replaced** |
+| **2** | Operations, Reporting and Payroll | M9 Daily operations forms, M10 Weekly Sales, Weekly Branch, Active Members & dashboards, M11 Finance & Accountant, **M20 Payroll** | Weekly reports build themselves; OM verification online; first payroll run in test |
+| **3** | Inventory and Migration | M8 Inventory, purchasing, vendors, counts; **online-shop provision (M19 catalogue and stock reservation)**; M18 Mindbody import; parallel run; cut-over | **Mindbody replaced** — then the first run and test (7.1) |
 | **4** | Training and Progression | M7 Curriculum, evaluations, test days, promotions, progress cards | Belt path tracked for every member |
-| **5** | Growth: Leads, Website, AI | M3 Leads & group sales, M13 Marketing, M14 Website, M16 Knowledge base, SAQR chat & Staff Assistant | One funnel from ad to membership; AI on the homepage and inside the app |
-| **6** | Members and Messaging | M15 Member & parent portal, online payments, M17 WhatsApp/SMS notifications | Members self-serve; automatic reminders |
+| **5** | Growth: Leads, Website, CMS, AI | M3 Leads & group sales, M13 Marketing, **M14 Website with CMS and events gallery** (built on the approved design template), M16 Knowledge base, SAQR chat & Staff Assistant | One funnel from ad to membership; staff edit the website themselves; AI on the homepage and inside the app |
+| **6** | Members, Shop and Messaging | M15 Member & parent portal, online payments, **M19 Online shop storefront**, M17 WhatsApp/SMS notifications | Members self-serve; equipment sold online; automatic reminders |
 | **7** | Management | M12 Communication & cascade, meetings, procedure library, Quarterly Business Report (RPT-01) | The whole Elite operating system in one place |
+
+### 7.1 First Run, Test and Change Requests
+
+This scope is the starting point, not the final list. More needs will appear once the team uses the system.
+
+- **Test environment** with the Kuwait test data package (M21) is available from Phase 0; each phase is tested there by the people who will use it before sign-off.
+- **First run:** after Mindbody is replaced (end of Phase 3), a 4-week first-run period at both branches with a short weekly feedback session per function.
+- **Change requests:** anyone can submit one from inside the app (what, why, who benefits, how urgent). Systems & IT logs each request and confirms a timeline, as the Communication Procedure already requires for requests to Systems & IT.
+- The leads prioritise requests monthly in the leads meeting; approved ones are added to the next phase or a follow-up release, and this scope document is updated with a new version number.
 
 ---
 
@@ -350,15 +433,19 @@ Each phase ends with a demo to the leads and sign-off before the next begins. Th
 11. **Check-in hardware** at each front desk (tablet with QR scanner, or staff search only).
 12. **Branding:** logo files, colours and fonts for the system, website and receipts.
 13. **Knowledge base owners** for public and internal articles.
+14. **Online shop fulfilment:** pickup only, or also home delivery (courier and delivery fees by area); return and exchange policy.
+15. **Payroll set-up:** list of directly hired staff vs freelance coaches, salary structures and hourly rates, pay day, salary-transfer bank, PIFSS registration details; the Accountant confirms end-of-service and leave rules.
+16. **Website CMS:** who besides the Marketing Lead may approve publishing; watermark on gallery photos (yes/no).
+17. **Website template:** choose one of the Claude Design options built from the design brief (EA-SYS-DESIGN-01) and supply the logo files.
 
 ---
 
 ## 9. Out of Scope (for now)
 
-- Payroll processing (the system reports instructor hours; salaries are paid outside it).
 - A full double-entry accounting ledger (the system exports to the accountant's tool).
-- Native iPhone/Android apps (the portal is a mobile-friendly web app that can be added to the home screen).
-- Retail e-commerce shop (online sale of gear) — can be added after Phase 6.
+- Native iPhone/Android apps (the portal and shop are a mobile-friendly web app that can be added to the home screen).
+- Payroll for freelance or contracted coaches (they are paid as vendors against their invoices; see M20).
+- Items added after the first run are handled through change requests (Section 7.1).
 
 ---
 
