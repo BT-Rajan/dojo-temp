@@ -156,3 +156,5 @@ a.ea-map-label { text-decoration: none; color: var(--ink); }
   .ea-spine--deep .ea-spine-body > #trial { grid-column: 2; grid-row: 1 / span 4; }
 }
 .ea-spine--deep .ea-rich { color: var(--on-deep); opacity: .9; }
+/* Footer column titles are h2 (correct heading order) styled like the design's small titles */
+.ea-footer .ea-footer-h { font: 600 15px/22px var(--font-display); margin: 0 0 10px; color: var(--on-deep); display: flex; align-items: center; gap: 8px; }

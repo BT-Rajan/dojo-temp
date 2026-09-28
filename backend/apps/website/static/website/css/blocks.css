@@ -273,7 +273,8 @@ a:hover { text-decoration-thickness: 2px; }
 .ea-event-row { display: flex; gap: 14px; padding: 14px; align-items: flex-start; }
 .ea-event-row .ea-card-body { padding: 0; }
 .ea-typebar { display: flex; gap: 8px; align-items: center; }
-.ea-card.is-past { opacity: .7; }
+.ea-card.is-past { background: var(--surface-sunken); } /* was opacity .7, which dropped meta text below 4.5:1 */
+.ea-card.is-past .ea-photo, .ea-card.is-past .ea-date { filter: grayscale(1); }
 
 /* gallery */
 .ea-albums { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; }

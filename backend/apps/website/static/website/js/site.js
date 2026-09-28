@@ -327,8 +327,13 @@
   function ready() {
     initSchedules(); initViewer(); initSaqr(); initTrialForms(); initOtp(); initCheckout();
     $$("section").forEach(function (s) { if ($('[data-filter="groups"]', s)) applyFilters(s); });
-    var focusEl = $("[data-autofocus]") || $('[aria-invalid="true"]');
-    if (focusEl) { focusEl.focus(); if (focusEl.scrollIntoView) focusEl.scrollIntoView({ block: "center" }); }
+    // After the page (and any #fragment jump) settles, move focus to the confirmation or the first error.
+    window.addEventListener("load", function () {
+      setTimeout(function () {
+        var focusEl = $("[data-autofocus]") || $('[aria-invalid="true"]');
+        if (focusEl) { focusEl.focus(); if (focusEl.scrollIntoView) focusEl.scrollIntoView({ block: "center" }); }
+      }, 0);
+    });
   }
   if (doc.readyState === "loading") doc.addEventListener("DOMContentLoaded", ready); else ready();
 })();
