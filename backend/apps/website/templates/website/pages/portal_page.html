@@ -1,0 +1,31 @@
+{% extends "website/base.html" %}{% load elite wagtailcore_tags %}
+{% block content %}
+{% if step == "family" %}
+<section class="ea-band"><div class="ea-band-in"><div style="display:grid;gap:10px"><p class="ea-eyebrow">{% belt "green" %}{% t "Member portal" "بوابة الأعضاء" %}</p><h1 class="ea-h1">{% if lang == "ar" %}أهلاً {{ request.user.full_name|default:"" }}{% else %}Hello{% if request.user.full_name %}, {{ request.user.full_name }}{% endif %}{% endif %}</h1><p class="ea-lead">{% t "Your family's belts, stripes and next classes." "أحزمة عائلتك وأشرطتهم وحصصهم القادمة." %}</p></div></div></section>
+<div class="ea-beltbar" aria-hidden="true">{% for k in "white yellow purple blue green brown brownblack black"|split_words %}<i data-belt="{{ k }}" style="{% belt_var k %}"></i>{% endfor %}</div>
+<section class="ea-block"><div class="ea-wrap">
+{% if family %}<div class="ea-portal-grid">{% for row in family %}{% include "website/partials/portal_child.html" %}{% endfor %}</div>
+{% else %}<div class="ea-empty">{% illo %}<p class="ea-h4">{% t "We couldn't find any active memberships on this number" "لم نجد اشتراكات فعّالة على هذا الرقم" %}</p><p class="ea-meta">{% t "WhatsApp your branch and we'll link your family to your number." "راسل فرعك عبر واتساب وسنربط عائلتك برقمك." %}</p></div>{% endif %}
+<form method="post" style="margin-block-start:32px">{% csrf_token %}<button type="submit" name="action" value="logout" class="ea-btn ea-btn--ghost">{% t "Sign out" "تسجيل الخروج" %}</button></form>
+</div></section>
+{% else %}
+<div class="ea-block" style="padding-block:32px"><div class="ea-wrap" style="max-width:420px">
+{% if test_message %}<div class="ea-testmode" role="note" style="margin-block-end:16px">{% t "TEST MODE — WhatsApp isn't connected yet. The message would say:" "وضع تجريبي — واتساب غير متصل بعد. نص الرسالة:" %} <span dir="auto">{{ test_message }}</span></div>{% endif %}
+{% if step == "code" %}
+<form class="ea-form" method="post" novalidate data-otp-form>{% csrf_token %}<input type="hidden" name="action" value="verify">
+<div style="display:grid;gap:6px"><p class="ea-eyebrow">{% belt "green" %}{% t "Member portal" "بوابة الأعضاء" %}</p><h1 class="ea-h1">{% t "Enter your code" "أدخل الرمز" %}</h1></div>
+<fieldset class="ea-field" style="border:0;padding:0;margin:0"{% if error %} aria-describedby="otp-err"{% endif %}><legend class="ea-label">{% t "Enter the 4-digit code" "أدخل الرمز المكوّن من 4 أرقام" %}</legend><span class="ea-hint" id="otp-hint">{% t "Sent by WhatsApp to" "أُرسل عبر واتساب إلى" %} <span dir="ltr">{{ mobile|slice:":4" }} {{ mobile|slice:"4:8" }} {{ mobile|slice:"8:" }}</span></span>
+<div class="ea-otp">{% for i in "0123" %}<input name="d{{ i }}" inputmode="numeric" autocomplete="{% if forloop.first %}one-time-code{% else %}off{% endif %}" pattern="[0-9]*" aria-label="{% if lang == "ar" %}الرقم {{ forloop.counter }}{% else %}Digit {{ forloop.counter }}{% endif %}"{% if error %} aria-invalid="true"{% endif %}{% if forloop.first %} autofocus{% endif %}>{% endfor %}</div>
+{% if error %}<span class="ea-err" id="otp-err" role="alert">{% icon "alert" %}{{ error }}</span>{% endif %}</fieldset>
+<button type="submit" class="ea-btn ea-btn--primary ea-btn--block">{% t "Sign in" "دخول" %}</button></form>
+<form method="post" style="margin-block-start:8px">{% csrf_token %}<input type="hidden" name="action" value="resend"><button type="submit" class="ea-btn ea-btn--ghost ea-btn--block" data-resend data-wait="42" data-label-en="Resend code" data-label-ar="إعادة إرسال الرمز">{% t "Resend code" "إعادة إرسال الرمز" %}</button></form>
+<p class="ea-meta" style="margin-block-start:12px"><a href="{% pageurl page %}">{% t "Use a different number" "استخدم رقماً آخر" %}</a></p>
+{% else %}
+<form class="ea-form" method="post" novalidate>{% csrf_token %}<input type="hidden" name="action" value="send">
+<div style="display:grid;gap:6px"><p class="ea-eyebrow">{% belt "green" %}{% t "Member portal" "بوابة الأعضاء" %}</p><h1 class="ea-h1">{% t "Welcome back" "أهلاً بعودتك" %}</h1><p class="ea-meta">{% t "Sign in with your mobile number. No passwords: we'll send a code by WhatsApp." "ادخل برقم جوالك. بدون كلمة مرور: سنرسل لك رمزاً عبر واتساب." %}</p></div>
+<div class="ea-field"><label class="ea-label" for="mp">{% t "Mobile number" "رقم الجوال" %}</label><div class="ea-phone"><span class="ea-cc" dir="ltr">+965</span><input class="ea-input" id="mp" name="mobile" type="tel" inputmode="tel" autocomplete="tel-national" dir="ltr" maxlength="20" value="{{ mobile|slice:"4:" }}" placeholder="0000 0000" aria-describedby="mp-hint{% if error %} mp-err{% endif %}"{% if error %} aria-invalid="true"{% endif %}></div><span class="ea-hint" id="mp-hint">{% t "The number you registered with the academy." "الرقم المسجّل لدى الأكاديمية." %}</span>{% if error %}<span class="ea-err" id="mp-err" role="alert">{% icon "alert" %}{{ error }}</span>{% endif %}</div>
+<button type="submit" class="ea-btn ea-btn--primary ea-btn--block">{% t "Send code" "أرسل الرمز" %}</button></form>
+{% endif %}
+</div></div>
+{% endif %}
+{% endblock %}

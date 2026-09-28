@@ -1,0 +1,12 @@
+{% extends "website/base.html" %}{% load elite wagtailcore_tags %}
+{% block content %}
+<section class="ea-hero"><div class="ea-hero-media">{% photo page.hero_image page.hero_image_caption "16/9" "ea-photo--deep" %}</div>
+<div class="ea-hero-in"><p class="ea-eyebrow">{% f page "hero_eyebrow" %}</p>
+<h1 class="ea-display">{% f page "hero_title" %}</h1>
+{% f page "hero_lead" as lead %}{% if lead %}<p class="ea-lead">{{ lead }}</p>{% endif %}
+<div class="ea-btnrow">{% trial_url page "home-hero" as trial_link %}{% if trial_link %}<a class="ea-btn ea-btn--primary" href="{{ trial_link }}">{% t "Book a trial" "احجز حصة تجريبية" %} · {% kd settings.website.SiteSettings.trial_price %}</a>{% endif %}{% if key.schedule_page %}<a class="ea-btn ea-btn--on-deep" href="{% pageurl key.schedule_page %}">{% t "See schedule" "شاهد الجدول" %}</a>{% endif %}</div>
+{% if page.show_branch_line %}<div class="ea-hero-branches">{% for b in branch_pages %}<a href="{% pageurl b %}" data-branch="{{ b.key }}"><i class="ea-branchdot"></i>{% f b "title" %} · {% f b "address" %}</a>{% endfor %}</div>{% endif %}
+</div></section>
+<div class="ea-beltbar" aria-hidden="true">{% for k in "white yellow purple blue green brown brownblack black"|split_words %}<i data-belt="{{ k }}" style="{% belt_var k %}"></i>{% endfor %}</div>
+{% for step in page.journey %}{% include_block step %}{% endfor %}
+{% endblock %}

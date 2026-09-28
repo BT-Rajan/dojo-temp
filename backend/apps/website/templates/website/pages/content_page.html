@@ -1,0 +1,4 @@
+{% extends "website/base.html" %}{% load elite wagtailcore_tags %}
+{% block content %}{% include "website/partials/band.html" %}
+{% for block in page.body %}{% include_block block %}{% endfor %}
+{% endblock %}

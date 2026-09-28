@@ -1,0 +1,9 @@
+{% extends "website/base.html" %}{% load elite wagtailcore_tags %}
+{% block content %}{% include "website/partials/band.html" %}
+<section class="ea-block"><div class="ea-wrap">
+<nav class="ea-filters" aria-label="{% t "Event type" "نوع الفعالية" %}"><a class="ea-chip" href="{% pageurl page %}" {% if not event_type %}aria-current="true"{% endif %}>{% t "All" "الكل" %}</a>{% for code, label in types %}<a class="ea-chip" href="{% pageurl page %}?type={{ code }}" {% if event_type == code %}aria-current="true"{% endif %}>{% if lang == "ar" %}{% type_ar code %}{% else %}{{ label }}{% endif %}</a>{% endfor %}</nav>
+{% if upcoming %}<div class="ea-grid ea-grid--3">{% for e in upcoming %}{% include "website/partials/event_card.html" with layout="feature" %}{% endfor %}</div>
+{% else %}<div class="ea-empty">{% illo %}<p class="ea-h4">{% t "No events on the calendar yet" "لا توجد فعاليات قادمة حالياً" %}</p><p class="ea-meta">{% t "Belt tests and camps are announced here and on Instagram first." "نعلن عن الاختبارات والمعسكرات هنا وعلى إنستغرام أولاً." %}</p>{% if settings.website.SiteSettings.instagram_url %}<a class="ea-btn ea-btn--ghost ea-btn--sm" href="{{ settings.website.SiteSettings.instagram_url }}" rel="noopener">{% icon "ig" %}{% t "Follow on Instagram" "تابعنا على إنستغرام" %}</a>{% endif %}</div>{% endif %}
+{% if past %}<div class="ea-head" style="margin-block-start:56px"><h2 class="ea-h2">{% t "Past events" "فعاليات سابقة" %}</h2></div><div class="ea-grid ea-grid--3">{% for e in past %}{% include "website/partials/event_card.html" with layout="row" %}{% endfor %}</div>{% endif %}
+</div></section>
+{% endblock %}

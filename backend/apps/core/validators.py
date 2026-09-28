@@ -6,6 +6,7 @@ import re
 from django.core.exceptions import ValidationError
 
 CIVIL_ID_WEIGHTS = (2, 1, 6, 3, 7, 9, 10, 5, 8, 4, 2)
+ARABIC_DIGITS = str.maketrans("٠١٢٣٤٥٦٧٨٩۰۱۲۳۴۵۶۷۸۹", "01234567890123456789")
 MOBILE_RE = re.compile(r"^(?:\+965|00965)?([4569]\d{7})$")
 
 
@@ -39,7 +40,8 @@ def validate_civil_id(value: str) -> None:
 
 def normalize_kuwait_mobile(value: str) -> str:
     """Return the number as +965XXXXXXXX or raise ValidationError."""
-    compact = re.sub(r"[\s\-()]", "", value or "")
+    # Parents on Arabic keyboards type Arabic-Indic digits; accept them.
+    compact = re.sub(r"[\s\-()]", "", (value or "").translate(ARABIC_DIGITS))
     match = MOBILE_RE.match(compact)
     if not match:
         raise ValidationError("Enter a Kuwait mobile number: 8 digits starting with 4, 5, 6 or 9.", code="mobile")

@@ -1,0 +1,1 @@
+{% load elite wagtailcore_tags %}{% f value "text" as text %}{% if inner %}<div class="ea-rich">{{ text|richtext }}</div>{% else %}<section class="ea-block"><div class="ea-wrap"><div class="ea-rich">{{ text|richtext }}</div></div></section>{% endif %}

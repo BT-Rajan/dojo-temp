@@ -1,0 +1,158 @@
+/* Site-level layout around the blocks: page container, sticky/fixed pieces, overlays.
+   Everything uses token variables; blocks.css holds the blocks themselves. */
+
+html { scroll-behavior: smooth; }
+@media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } *, *::before, *::after { transition-duration: .01ms !important; animation-duration: .01ms !important; } }
+
+/* Blocks respond to their container: the page wrapper is the container. */
+.ea-page { container-type: inline-size; min-height: 100vh; display: flex; flex-direction: column; background: var(--surface); }
+.ea-main { flex: 1; }
+
+.ea-skip { position: absolute; inset-inline-start: 8px; top: -80px; z-index: 20; background: var(--surface-raised); color: var(--ink); padding: 12px 16px; border-radius: var(--radius-md); box-shadow: var(--shadow-2); }
+.ea-skip:focus { top: 8px; }
+
+/* Header: the drawer sits over the page */
+.ea-header { z-index: 8; }
+.ea-header .ea-btn--primary { min-height: 40px; }
+.ea-cartlink { position: relative; }
+.ea-cartlink .ea-count { position: absolute; top: 6px; inset-inline-end: 4px; min-width: 18px; height: 18px; border-radius: var(--radius-pill); background: var(--action); color: var(--on-action); font: 700 11px/18px var(--font-sans); text-align: center; padding: 0 4px; }
+
+/* SAQR: floating pill from 960px; on phones it lives in the mobile bar */
+.ea-saqr-dock { position: fixed; bottom: 24px; inset-inline-end: 24px; z-index: 30; display: none; flex-direction: column; align-items: flex-end; gap: 12px; }
+@media (min-width: 960px) { .ea-saqr-dock { display: flex; } }
+.ea-saqr-dock .ea-saqr-btn { position: relative; bottom: auto; inset-inline-end: auto; }
+.ea-saqr-dock .ea-saqr { max-height: calc(100vh - 120px); }
+.ea-saqr-overlay { position: fixed; inset: 0; z-index: 40; background: var(--scrim); display: none; }
+.ea-saqr-overlay.is-open { display: block; }
+.ea-saqr-overlay .ea-saqr { position: absolute; inset: 64px 0 0 0; width: 100%; height: auto; border-radius: var(--radius-xl) var(--radius-xl) 0 0; border: 0; }
+@media (min-width: 960px) { .ea-saqr-overlay { display: none !important; } }
+.ea-saqr[hidden] { display: none; }
+.ea-saqr-log .ea-msg a { color: var(--blue-text); font-weight: 600; }
+
+/* Mobile bar: keep it above the footer bottom on phones */
+.ea-mbar { position: sticky; bottom: 0; }
+
+/* Photo viewer as a full-screen overlay */
+.ea-viewer-overlay { position: fixed; inset: 0; z-index: 50; display: none; }
+.ea-viewer-overlay.is-open { display: flex; }
+.ea-viewer-overlay .ea-viewer { flex: 1; min-height: 100%; }
+.ea-viewer-slide img { width: 100%; max-width: 1100px; max-height: calc(100vh - 170px); object-fit: contain; border-radius: 4px; }
+
+/* Real images inside photo slots keep the design's fixed ratios */
+.ea-photo.has-img::before, .ea-photo.has-img > .ea-photo-cap { display: none; }
+.ea-photo > img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+.ea-hero-media .ea-photo > img, .ea-band-media > img { object-fit: cover; }
+.ea-band-media { position: relative; overflow: hidden; }
+
+/* Forms: server-side errors and success notes */
+.ea-form .ea-note { margin: 0; }
+.ea-field .ea-input[aria-invalid="true"] + .ea-err, .ea-err { margin-block-start: 2px; }
+.ea-honeypot { position: absolute; inset-inline-start: -10000px; width: 1px; height: 1px; overflow: hidden; }
+.ea-block--form { max-width: 560px; margin-inline: auto; }
+.ea-choice input:disabled + label { opacity: .55; cursor: not-allowed; }
+
+/* Two-column page body (trial page, checkout) */
+.ea-twocol { display: grid; gap: 32px; }
+@container (min-width: 900px) { .ea-twocol { grid-template-columns: 6fr 5fr; gap: 64px; align-items: start; } }
+
+/* Rich text written in the CMS */
+.ea-rich { max-width: 70ch; }
+.ea-rich p { margin: 0 0 16px; }
+.ea-rich h2, .ea-rich h3 { font-family: var(--font-display); font-weight: 600; margin: 24px 0 8px; }
+
+/* Story timeline (About) */
+.ea-story { display: grid; gap: 32px; }
+@container (min-width: 900px) { .ea-story { grid-template-columns: 4fr 7fr; gap: 64px; } }
+.ea-story-list { list-style: none; margin: 0; padding: 0; }
+.ea-story-list li { display: grid; grid-template-columns: 96px 1fr; gap: 20px; padding: 20px 0; border-block-start: 1px solid var(--line); }
+.ea-story-list li:last-child { border-block-end: 1px solid var(--line); }
+.ea-story-list b.y { font: 600 22px/30px var(--font-display); }
+
+/* Portal and shop layout helpers */
+.ea-portal-grid { display: grid; gap: 16px; }
+@container (min-width: 900px) { .ea-portal-grid { grid-template-columns: repeat(2, 1fr); gap: 24px; } }
+.ea-cart-row { display: grid; grid-template-columns: 72px 1fr auto; gap: 12px; align-items: center; padding: 12px 0; border-block-end: 1px solid var(--line); }
+.ea-cart-row .ea-photo { --ar: 1/1; border-radius: var(--radius-sm); }
+.ea-inline-form { display: inline; }
+.ea-linkbtn { background: none; border: 0; padding: 0; color: var(--blue-text); font: inherit; text-decoration: underline; cursor: pointer; min-height: 32px; }
+.ea-testmode { background: var(--orange-soft); color: var(--warning); font: 600 13px/18px var(--font-sans); padding: 8px 16px; text-align: center; }
+
+/* ---------- additions for the CMS pages (tokens only) ---------- */
+.ea-hero-branches a { color: var(--on-deep); text-decoration: none; display: inline-flex; align-items: center; gap: 8px; min-height: 32px; }
+.ea-hero-branches a:hover { text-decoration: underline; }
+.ea-chip[aria-current="true"] { background: var(--blue-soft); border-color: var(--brand-blue); color: var(--blue-text); font-weight: 600; }
+a.ea-chip { text-decoration: none; }
+.ea-sample { font-size: 12px; line-height: 16px; font-weight: 600; color: var(--warning); text-transform: uppercase; letter-spacing: .04em; }
+[dir="rtl"] .ea-sample { text-transform: none; letter-spacing: 0; }
+
+/* Page band fact strip (branch and program pages) */
+.ea-bandfacts { margin: 8px 0 0; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px 24px; border-block-start: 1px solid rgba(244,241,236,.18); padding-block-start: 16px; }
+.ea-bandfacts dt { font-size: 13px; line-height: 18px; opacity: .8; }
+.ea-bandfacts dd { margin: 2px 0 0; font-weight: 600; font-size: 15px; line-height: 22px; }
+.ea-band .ea-bandfacts .ea-num { color: var(--on-deep); }
+@container (min-width: 900px) { .ea-bandfacts { grid-template-columns: repeat(4, minmax(0, 1fr)); } }
+
+/* Why families stay: four reasons as ruled rows */
+.ea-reasons > div { padding-block: 20px; border-block-start: 1px solid var(--line); display: grid; gap: 6px; }
+.ea-reasons > div:last-child { border-block-end: 1px solid var(--line); }
+.ea-quotes { display: grid; gap: 16px; }
+@container (min-width: 900px) { .ea-quotes { grid-template-columns: 2fr 1fr 1fr; gap: 20px; } .ea-quotes .ea-quote:first-child { background: var(--surface-deep); color: var(--on-deep); border: 0; } .ea-quotes .ea-quote:first-child blockquote { color: var(--on-deep); } .ea-quotes .ea-quote:first-child .ea-meta { color: var(--on-deep); opacity: .85; } }
+.ea-spine--deep .ea-form { background: var(--surface-raised); color: var(--ink); border-radius: var(--radius-xl); padding: 24px; }
+
+/* Schedule */
+.ea-closednote { display: flex; flex-wrap: wrap; gap: 6px 16px; align-items: center; margin-block: 8px 12px; }
+.ea-closednote > span { display: inline-flex; align-items: center; gap: 6px; }
+.ea-daygroup { display: grid; gap: 8px; }
+.ea-daygroup + .ea-daygroup { margin-block-start: 16px; }
+.ea-dayname { margin-block-end: 4px; }
+.js .ea-dayname { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); }
+.ea-slot time small { font-size: 12px; color: var(--ink-muted); }
+a.ea-wc { color: var(--ink); text-decoration: none; }
+a.ea-wc:hover { box-shadow: var(--shadow-1); }
+.ea-wc + .ea-wc { margin-block-start: 4px; }
+.ea-wt time small { font-size: 11px; }
+[hidden] { display: none !important; }
+
+/* Trial page: steps stay a list next to the form */
+.ea-steps--list { grid-template-columns: 1fr !important; }
+.ea-steps--list .ea-step3 { grid-template-columns: 36px 1fr !important; background: none !important; border: 0 !important; padding: 0 !important; }
+
+/* Crumbs on light pages (instructor profile) */
+.ea-crumbs--light { margin-block-end: 16px; }
+.ea-crumbs--light a { color: var(--blue-text); }
+
+/* Event page */
+.ea-eventmeta { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; color: var(--on-deep); opacity: .9; }
+.ea-kvlist { margin: 0; display: grid; gap: 0; }
+.ea-kvlist > div { padding-block: 14px; border-block-start: 1px solid var(--line); display: grid; gap: 2px; }
+.ea-kvlist dt { font-weight: 600; }
+.ea-kvlist dd { margin: 0; color: var(--ink-muted); }
+
+/* Shop: size radios look like the design's size buttons */
+.ea-shopgrid { grid-template-columns: repeat(2, 1fr); }
+@container (min-width: 900px) { .ea-shopgrid { grid-template-columns: repeat(3, 1fr); } }
+.ea-sizes input { position: absolute; opacity: 0; width: 1px; height: 1px; }
+.ea-sizes .ea-size { display: inline-flex; align-items: center; justify-content: center; }
+.ea-sizes input:checked + .ea-size { border-color: var(--ink); box-shadow: inset 0 0 0 1px var(--ink); }
+.ea-sizes input:focus-visible + .ea-size { outline: 2px solid var(--focus-ring); outline-offset: 2px; }
+.ea-sizes input:disabled + .ea-size { color: var(--ink-muted); border-style: dashed; background: var(--surface-sunken); text-decoration: line-through; cursor: not-allowed; }
+.ea-qty input { width: 44px; height: 44px; border: 0; background: none; text-align: center; font: 600 16px/1 var(--font-sans); color: var(--ink); -moz-appearance: textfield; }
+.ea-qty input::-webkit-inner-spin-button, .ea-qty input::-webkit-outer-spin-button { -webkit-appearance: none; margin: 0; }
+.ea-cart-row .ea-qty { height: 40px; }
+.ea-cart-row .ea-qty button { width: 40px; height: 40px; }
+
+/* Photo viewer with real photos */
+.ea-viewer-slide .ea-photo.has-img { aspect-ratio: auto; background: none; display: flex; justify-content: center; }
+.ea-viewer-slide .ea-photo > img { position: static; width: auto; height: auto; max-width: 100%; max-height: calc(100vh - 170px); object-fit: contain; }
+.ea-viewer:focus { outline: none; }
+
+/* Location map label as a link */
+a.ea-map-label { text-decoration: none; color: var(--ink); }
+.ea-twocol .ea-filters { flex-wrap: wrap; overflow: visible; }
+/* Home, black-belt step: text beside the booking form on wide screens (canvas: Path) */
+@container (min-width: 900px) {
+  .ea-spine--deep .ea-spine-body { grid-template-columns: 6fr 5fr; column-gap: 56px; align-items: start; }
+  .ea-spine--deep .ea-spine-body > :not(#trial) { grid-column: 1; }
+  .ea-spine--deep .ea-spine-body > #trial { grid-column: 2; grid-row: 1 / span 4; }
+}
+.ea-spine--deep .ea-rich { color: var(--on-deep); opacity: .9; }

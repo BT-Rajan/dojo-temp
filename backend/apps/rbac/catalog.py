@@ -46,6 +46,7 @@ PERMISSIONS: dict[str, str] = {
     "marketing.manage": "Campaigns, leads and media library",
     "cms.edit": "Draft website content",
     "cms.publish": "Publish website content",
+    "leads.manage": "Follow up website trial requests and contact messages",
     "finance.manage": "Cash-up, expenses and statements",
     "payroll.prepare": "Prepare payroll",
     "payroll.review": "Review payroll",
@@ -222,3 +223,7 @@ ROLES: dict[str, tuple[str, str, str, bool, set[str]]] = {
 _unknown = {p for *_, perms in ROLES.values() for p in perms} - ALL
 if _unknown:
     raise ValueError(f"A role references unknown permissions: {sorted(_unknown)}")
+
+# Website trial requests and messages go to whoever sells or markets (Customer Management Procedure).
+for _code in ("operations_manager", "branch_admin", "operations_support", "marketing_lead", "marketing_staff"):
+    ROLES[_code][4].add("leads.manage")

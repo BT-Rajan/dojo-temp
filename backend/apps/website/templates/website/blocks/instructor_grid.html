@@ -1,0 +1,4 @@
+{% load elite wagtailcore_tags %}{% if not inner %}<section class="ea-block"><div class="ea-wrap"><div class="ea-head">{% f value "eyebrow" as eyebrow %}{% if eyebrow %}<p class="ea-eyebrow">{{ eyebrow }}</p>{% endif %}{% f value "title" as title %}{% if title %}<h2 class="ea-h2">{{ title }}</h2>{% endif %}{% f value "lead" as lead %}{% if lead %}<p class="ea-lead">{{ lead }}</p>{% endif %}</div>{% endif %}
+{% if instructors %}<div class="ea-grid ea-grid--3">{% for i in instructors %}{% include "website/partials/instructor_card.html" %}{% endfor %}</div>
+{% else %}<div class="ea-empty">{% illo %}<p class="ea-h4">{% t "Instructor profiles are coming soon" "ملفات المدرّبين قريباً" %}</p><p class="ea-meta">{% t "Each instructor's rank, years of training and record will be here for every parent to see." "ستظهر هنا درجة كل مدرّب وسنوات تدريبه ومسيرته لكل وليّ أمر." %}</p></div>{% endif %}
+{% if not inner %}</div></section>{% endif %}

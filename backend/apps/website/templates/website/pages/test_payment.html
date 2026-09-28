@@ -1,0 +1,8 @@
+{% load static elite %}<!doctype html>
+<html lang="{{ lang }}" dir="{{ dir }}"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>{% t "Test payment" "دفع تجريبي" %}</title>
+<link rel="stylesheet" href="{% static "website/css/tokens.css" %}"><link rel="stylesheet" href="{% static "website/css/fonts.css" %}"><link rel="stylesheet" href="{% static "website/css/blocks.css" %}"><link rel="stylesheet" href="{% static "website/css/site.css" %}"></head>
+<body><div class="ea-page"><div class="ea-testmode" role="note">{% t "TEST MODE — no bank is connected and no money moves. The real KNET / card provider is chosen before launch." "وضع تجريبي — لا يوجد بنك متصل ولا تتم أي عملية دفع حقيقية. يتم اختيار مزوّد كي نت والبطاقات قبل الإطلاق." %}</div>
+<main class="ea-block"><div class="ea-wrap" style="max-width:480px;display:grid;gap:20px"><h1 class="ea-h2">{% if order.payment_method == "knet" %}KNET{% else %}Visa / Mastercard{% endif %}</h1>
+<div class="ea-card"><div class="ea-card-body"><div class="ea-summary"><div><span>{% t "Order" "الطلب" %}</span><span dir="ltr">{{ order.reference }}</span></div><div class="ea-total"><span>{% t "Amount" "المبلغ" %}</span><span>{% kd order.total %}</span></div></div></div></div>
+<a class="ea-btn ea-btn--primary ea-btn--block" href="{{ outcomes.approve }}">{% t "Approve payment" "الموافقة على الدفع" %}</a><a class="ea-btn ea-btn--ghost ea-btn--block" href="{{ outcomes.decline }}">{% t "Decline (test a failed payment)" "رفض (تجربة دفع فاشل)" %}</a>
+</div></main></div></body></html>

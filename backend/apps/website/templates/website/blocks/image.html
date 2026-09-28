@@ -1,0 +1,1 @@
+{% load elite %}{% f value "caption" as caption %}{% if not inner %}<section class="ea-block"><div class="ea-wrap">{% endif %}<figure style="margin:0;display:grid;gap:8px">{% photo value.image caption "16/9" %}{% if caption %}<figcaption class="ea-caption">{{ caption }}</figcaption>{% endif %}</figure>{% if not inner %}</div></section>{% endif %}

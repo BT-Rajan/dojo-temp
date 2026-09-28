@@ -1,0 +1,4 @@
+{% load elite wagtailcore_tags %}<section class="ea-spine{% if value.tone %} ea-spine--{{ value.tone }}{% endif %}{% if value.belt == "black" %} is-last{% endif %}"><div class="ea-spine-rail"><span class="ea-spine-node" data-belt="{{ value.belt }}" style="{% belt_var value.belt %}" aria-hidden="true"></span></div>
+<div class="ea-spine-body"><p class="ea-spine-eyebrow">{% step_name value.belt %} · {% f value "eyebrow" %}</p><h2 class="ea-h2">{% f value "title" %}</h2>
+{% for child in value.content %}{% include_block child with inner=True %}{% endfor %}
+</div></section>

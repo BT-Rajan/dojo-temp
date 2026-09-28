@@ -41,13 +41,31 @@ INSTALLED_APPS = [
     "apps.members",
     "apps.portal",
     "apps.testdata",
+    "apps.website",
+    "apps.shop",
+    # Wagtail CMS (website content, gallery, events) — EA-SYS-SCOPE-01 M14
+    "wagtail.contrib.forms",
+    "wagtail.contrib.redirects",
+    "wagtail.contrib.settings",
+    "wagtail.contrib.routable_page",
+    "wagtail.embeds",
+    "wagtail.sites",
+    "wagtail.users",
+    "wagtail.snippets",
+    "wagtail.documents",
+    "wagtail.images",
+    "wagtail.search",
+    "wagtail.admin",
+    "wagtail",
+    "modelcluster",
+    "taggit",
 ]
 
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
     "apps.core.middleware.SecurityHeadersMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
-    "django.middleware.locale.LocaleMiddleware",
+    "apps.website.middleware.SiteLocaleMiddleware",  # /en/ and /ar/ for the website only
     "django.middleware.common.CommonMiddleware",
     "django.middleware.csrf.CsrfViewMiddleware",
     "django.contrib.auth.middleware.AuthenticationMiddleware",
@@ -56,6 +74,8 @@ MIDDLEWARE = [
     "apps.core.middleware.RequestContextMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
+    "wagtail.contrib.redirects.middleware.RedirectMiddleware",
+    "apps.website.middleware.CmsAccessMiddleware",
     # Axes must be last: it records failed logins and locks out brute-force attempts (A.8.5).
     "axes.middleware.AxesMiddleware",
 ]
@@ -67,13 +87,15 @@ ASGI_APPLICATION = "config.asgi.application"
 TEMPLATES = [
     {
         "BACKEND": "django.template.backends.django.DjangoTemplates",
-        "DIRS": [],
+        "DIRS": [BASE_DIR / "templates"],
         "APP_DIRS": True,
         "OPTIONS": {
             "context_processors": [
                 "django.template.context_processors.request",
                 "django.contrib.auth.context_processors.auth",
                 "django.contrib.messages.context_processors.messages",
+                "wagtail.contrib.settings.context_processors.settings",
+                "apps.website.context_processors.site",
             ],
         },
     },
@@ -209,12 +231,36 @@ USE_TZ = True
 CURRENCY = "KWD"
 CURRENCY_DECIMALS = 3
 
+LOCALE_PATHS = [BASE_DIR / "locale"]
+
 STATIC_URL = "static/"
 STATIC_ROOT = BASE_DIR / "staticfiles"
 MEDIA_URL = "media/"
 MEDIA_ROOT = BASE_DIR / "media"
 
 ADMIN_URL = env("ADMIN_URL", default="admin/")
+
+# ---------------------------------------------------------------------------
+# Website CMS (Wagtail)
+# ---------------------------------------------------------------------------
+WAGTAIL_SITE_NAME = "Elite Academy"
+WAGTAILADMIN_BASE_URL = env("SITE_BASE_URL", default="http://localhost:8000")
+WAGTAIL_I18N_ENABLED = False  # one page tree; every block carries its own English and Arabic fields
+WAGTAILIMAGES_MAX_UPLOAD_SIZE = 15 * 1024 * 1024
+WAGTAILIMAGES_EXTENSIONS = ["jpg", "jpeg", "png", "webp", "avif"]
+WAGTAILDOCS_EXTENSIONS = ["pdf"]
+WAGTAIL_ENABLE_UPDATE_CHECK = False
+WAGTAILSEARCH_BACKENDS = {"default": {"BACKEND": "wagtail.search.backends.database"}}
+DATA_UPLOAD_MAX_NUMBER_FIELDS = 5000
+
+# Outgoing messages (WhatsApp / SMS). "console" logs messages instead of sending — the
+# provider is chosen before launch (scope decision 6).
+MESSAGING_BACKEND = env("MESSAGING_BACKEND", default="console")
+# Online payments (KNET, Visa/Mastercard). "test" simulates the payment page — the
+# provider is chosen before launch (scope decision 5).
+PAYMENT_GATEWAY = env("PAYMENT_GATEWAY", default="test")
+PORTAL_OTP_TTL_SECONDS = 300
+PORTAL_OTP_MAX_ATTEMPTS = 5
 
 # ---------------------------------------------------------------------------
 # Background jobs (reminders, scheduled reports)

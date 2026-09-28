@@ -33,7 +33,7 @@ def test_update_without_version_is_refused(make_user, client_for, members):
     assert response.status_code == 400
 
 
-@pytest.mark.django_db(transaction=True)
+@pytest.mark.django_db(transaction=True, serialized_rollback=True)  # keep Wagtail's migration data
 def test_simultaneous_saves_only_one_wins(branches):
     """Ten users press Save on the same record at the same moment against real MySQL: exactly one succeeds."""
     member = Member.objects.create(
@@ -62,7 +62,7 @@ def test_simultaneous_saves_only_one_wins(branches):
     assert Member.objects.get(pk=member.pk).version == 2
 
 
-@pytest.mark.django_db(transaction=True)
+@pytest.mark.django_db(transaction=True, serialized_rollback=True)  # keep Wagtail's migration data
 def test_row_lock_keeps_counters_correct(branches):
     """Pattern used for stock and class places: 20 concurrent increments, none lost."""
     member = Member.objects.create(

@@ -1,0 +1,11 @@
+{% extends "website/base.html" %}{% load elite wagtailcore_tags %}
+{% block content %}<section class="ea-block"><div class="ea-wrap">
+<nav class="ea-crumbs ea-crumbs--light" aria-label="{% t "Breadcrumb" "مسار الصفحة" %}">{% for a in page.get_ancestors.specific %}{% if a.depth > 1 %}<a href="{% pageurl a %}">{% if a.depth == 2 %}{% t "Home" "الرئيسية" %}{% else %}{% f a "title" %}{% endif %}</a><span aria-hidden="true">/</span>{% endif %}{% endfor %}<span aria-current="page">{% f page "title" %}</span></nav>
+<div class="ea-profile">{% photo page.photo page.title "4/5" %}
+<div style="display:grid;gap:20px;align-content:start"><div style="display:grid;gap:8px"><p class="ea-eyebrow">{% f page "role" as role %}{% if role %}{{ role }} · {% endif %}{% f page "discipline" %}</p><h1 class="ea-h1">{% f page "title" %}</h1>{% f page "rank" as rank %}{% if rank %}<div class="ea-rank">{% belt page.belt "width:40px" %}{{ rank }}</div>{% endif %}</div>
+<div class="ea-stats">{% if page.years_training %}<div class="ea-stat"><b dir="ltr">{{ page.years_training }}</b><span>{% t "years training" "سنوات تدريب" %}</span></div>{% endif %}{% if page.competitions %}<div class="ea-stat"><b dir="ltr">{{ page.competitions }}</b><span>{% t "competitions" "بطولات" %}</span></div>{% endif %}{% if page.branch %}<div class="ea-stat"><b>{% f page.branch.web_page "title" %}</b><span>{% t "branch" "الفرع" %}</span></div>{% endif %}</div>
+{% f page "statement" as statement %}{% if statement %}<p class="ea-p">{{ statement }}</p>{% endif %}
+{% if page.timeline_rows %}<h2 class="ea-h4">{% t "Background" "المسيرة" %}</h2><ul class="ea-timeline">{% for r in page.timeline_rows %}<li><b dir="ltr">{{ r.year }}</b><span>{% if lang == "ar" and r.text_ar %}{{ r.text_ar }}{% else %}{{ r.text_en }}{% endif %}</span></li>{% endfor %}</ul>{% endif %}
+{% trial_url page "instructor" as tl %}{% if tl %}<div class="ea-btnrow"><a class="ea-btn ea-btn--primary" href="{{ tl }}">{% t "Book a trial with this instructor" "احجز تجربة مع هذا المدرّب" %}</a></div>{% endif %}
+</div></div></div></section>
+{% endblock %}

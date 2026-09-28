@@ -1,0 +1,12 @@
+{% load static elite wagtailcore_tags %}<header class="ea-header"><div class="ea-header-in">
+<a class="ea-logo-link" href="{% if home_page %}{% pageurl home_page %}{% else %}/{{ lang }}/{% endif %}" aria-label="{% t "Elite Academy, home" "أكاديمية إيليت، الرئيسية" %}"><img class="ea-logo" src="{% static "website/img/elite-academy-logo.png" %}" alt="Elite Academy" width="129" height="48"></a>
+<nav class="ea-nav" aria-label="{% t "Main" "القائمة الرئيسية" %}">{% for item in menu_pages %}<a href="{% pageurl item %}"{% if page|in_section:item %} aria-current="page"{% endif %}>{% f item "title" %}</a>{% endfor %}</nav>
+<div class="ea-header-end">
+<a class="ea-lang" href="{% switch_lang_url other_lang %}" lang="{{ other_lang }}" hreflang="{{ other_lang }}">{% if lang == "ar" %}EN<span class="ea-sr"> — English</span>{% else %}عربي<span class="ea-sr"> — العربية</span>{% endif %}</a>
+{% if cart_size and key.shop_page %}<a class="ea-iconbtn ea-cartlink" href="{% pageurl key.shop_page %}cart/" aria-label="{% t "Cart" "السلة" %}, {{ cart_size }}">{% icon "bag" %}<span class="ea-count" aria-hidden="true">{{ cart_size }}</span></a>{% endif %}
+{% if key.portal_page %}<a class="ea-iconbtn" href="{% pageurl key.portal_page %}" aria-label="{% t "Member portal" "بوابة الأعضاء" %}">{% icon "user" %}</a>{% endif %}
+{% if key.trial_page %}<a class="ea-btn ea-btn--primary" href="{% pageurl key.trial_page %}">{% t "Book a trial" "احجز حصة تجريبية" %}</a>{% endif %}
+<button type="button" class="ea-iconbtn ea-menu" data-ea="menu" aria-expanded="false" aria-controls="ea-drawer" aria-label="{% t "Menu" "القائمة" %}">{% icon "menu" %}</button>
+</div></div>
+<div class="ea-drawer" id="ea-drawer">{% for item in menu_pages %}<a href="{% pageurl item %}" style="justify-content:space-between">{% f item "title" %}{% icon "chev" "ea-flip" %}</a>{% endfor %}{% if key.portal_page %}<a href="{% pageurl key.portal_page %}" style="justify-content:space-between">{% t "Member portal" "بوابة الأعضاء" %}{% icon "chev" "ea-flip" %}</a>{% endif %}{% if key.trial_page %}<a class="ea-btn ea-btn--primary ea-btn--block" href="{% pageurl key.trial_page %}">{% t "Book a trial" "احجز حصة تجريبية" %}</a>{% endif %}</div>
+</header>

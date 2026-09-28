@@ -1,0 +1,3 @@
+{% load elite %}{% if not inner %}<section class="ea-block"><div class="ea-wrap" style="max-width:820px"><div class="ea-head"><h2 class="ea-h2">{% f value "title" %}</h2></div>{% endif %}
+<div class="ea-faq">{% for item in value.items %}<details{% if forloop.first and value.first_open %} open{% endif %}><summary>{% f item "question" %}{% icon "plus" %}</summary><div class="ea-faq-a">{% f item "answer" %}</div></details>{% endfor %}</div>
+{% if not inner %}</div></section>{% endif %}

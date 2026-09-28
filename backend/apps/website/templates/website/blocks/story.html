@@ -1,0 +1,3 @@
+{% load elite %}{% if not inner %}<section class="ea-block ea-block--sunken"><div class="ea-wrap">{% endif %}<div class="ea-story"><div style="display:grid;gap:12px;align-content:start">{% if not inner %}{% f value "eyebrow" as eyebrow %}{% if eyebrow %}<p class="ea-eyebrow">{{ eyebrow }}</p>{% endif %}<h2 class="ea-h2">{% f value "title" %}</h2>{% endif %}{% f value "intro" as intro %}{% if intro %}<p class="ea-lead">{{ intro }}</p>{% endif %}</div>
+<ol class="ea-story-list">{% for r in value.rows %}<li><b class="y" dir="ltr">{{ r.year }}</b><div><h3 class="ea-h4">{% f r "title" %}</h3>{% f r "line" as line %}{% if line %}<p class="ea-meta">{{ line }}</p>{% endif %}</div></li>{% endfor %}</ol></div>
+{% if not inner %}</div></section>{% endif %}

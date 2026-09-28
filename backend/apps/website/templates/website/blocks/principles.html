@@ -1,0 +1,5 @@
+{% load elite %}{% if not inner %}<section class="ea-block{% if value.style == "deep" %} ea-block--deep{% endif %}"><div class="ea-wrap ea-principles-layout">{% else %}<div class="ea-principles-layout">{% endif %}
+<div style="display:grid;gap:16px;align-content:start">{% if not inner %}<div class="ea-head" style="margin:0">{% f value "eyebrow" as eyebrow %}{% if eyebrow %}<p class="ea-eyebrow">{{ eyebrow }}</p>{% endif %}<h2 class="ea-h2">{% f value "title" %}</h2>{% f value "lead" as lead %}{% if lead %}<p class="ea-lead">{{ lead }}</p>{% endif %}</div>{% else %}{% f value "lead" as lead %}{% if lead %}<p class="ea-lead">{{ lead }}</p>{% endif %}{% endif %}
+{% if value.illustration %}{% photo value.illustration "" "4/3" %}{% else %}<div class="ea-illo-slot">{% illo %}</div>{% endif %}</div>
+<ol class="ea-principles">{% for item in value.principles %}<li class="ea-principle"><span class="ea-principle-n" dir="ltr">{{ forloop.counter }}</span><div><h3 class="ea-h4">{% f item "title" %}</h3><p>{% f item "line" %}</p></div></li>{% endfor %}</ol>
+{% if not inner %}</div></section>{% else %}</div>{% endif %}

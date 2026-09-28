@@ -27,3 +27,6 @@ CSRF_COOKIE_SECURE = True
 CSRF_TRUSTED_ORIGINS = env.list("CSRF_TRUSTED_ORIGINS", default=[])
 
 ENFORCE_PRIVILEGED_MFA = env.bool("ENFORCE_PRIVILEGED_MFA", default=True)
+
+if PAYMENT_GATEWAY == "test":  # noqa: F405
+    raise ImproperlyConfigured("Choose a real PAYMENT_GATEWAY before going live; 'test' is for development only.")

@@ -14,3 +14,5 @@ django-redis>=5.4,<8
 redis>=5.0,<9
 celery>=5.4,<5.7
 gunicorn>=22,<24
+# Website CMS (pages, gallery, events, shop catalogue) — EA-SYS-SCOPE-01 M14/M19
+wagtail>=7.1,<7.2

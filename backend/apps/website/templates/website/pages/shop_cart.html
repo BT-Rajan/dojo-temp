@@ -1,0 +1,12 @@
+{% extends "website/base.html" %}{% load elite %}
+{% block title %}{% t "Cart" "السلة" %} · {% t "Elite Academy" "أكاديمية إيليت" %}{% endblock %}
+{% block content %}<div class="ea-block" style="padding-block:24px"><div class="ea-wrap" style="max-width:720px;display:grid;gap:20px">
+<a href="{{ page.url }}" style="display:inline-flex;gap:4px;align-items:center">{% icon "chevl" "ea-flip" %}{% t "Continue shopping" "متابعة التسوق" %}</a>
+<h1 class="ea-h1">{% t "Your cart" "سلتك" %}</h1>
+{% if lines %}<div class="ea-card"><div class="ea-card-body" style="gap:0">{% for line in lines %}<div class="ea-cart-row">{% f line.product "name" as pname %}{% photo line.product.image pname "1/1" %}<div style="display:grid;gap:4px"><b>{{ pname }}</b><span class="ea-meta">{% t "Size" "المقاس" %} <span dir="ltr">{{ line.variant.size }}</span> · {% kd line.product.price %}</span>{% if not line.available %}<span class="ea-err">{% icon "alert" %}{% t "Not enough stock left in this size." "لا تتوفر كمية كافية من هذا المقاس." %}</span>{% endif %}
+<div style="display:flex;gap:8px;align-items:center"><form method="post" class="ea-qty">{% csrf_token %}<input type="hidden" name="variant" value="{{ line.variant.pk }}"><button type="submit" name="action" value="dec" aria-label="{% t "One less" "أقل بواحد" %} {{ pname }}">−</button><span dir="ltr" aria-label="{% t "Quantity" "الكمية" %}">{{ line.qty }}</span><button type="submit" name="action" value="inc" aria-label="{% t "One more" "أكثر بواحد" %} {{ pname }}">+</button></form><form method="post" class="ea-inline-form">{% csrf_token %}<input type="hidden" name="variant" value="{{ line.variant.pk }}"><button type="submit" name="action" value="remove" class="ea-linkbtn">{% t "Remove" "إزالة" %}<span class="ea-sr"> {{ pname }}</span></button></form></div></div><span class="ea-price" style="font-size:17px">{% kd line.total %}</span></div>{% endfor %}
+<div class="ea-summary" style="padding-block-start:16px"><div class="ea-total"><span>{% t "Subtotal" "المجموع الفرعي" %}</span><span>{% kd total %}</span></div></div></div></div>
+<a class="ea-btn ea-btn--primary ea-btn--block" href="{{ page.url }}checkout/">{% t "Checkout" "إتمام الطلب" %}</a>
+{% else %}<div class="ea-empty">{% illo %}<p class="ea-h4">{% t "Your cart is empty" "سلتك فارغة" %}</p><a class="ea-btn ea-btn--ghost ea-btn--sm" href="{{ page.url }}">{% t "Browse gear" "تصفّح المعدات" %}</a></div>{% endif %}
+</div></div>{% endblock %}
+{% block mobilebar %}{% endblock %}

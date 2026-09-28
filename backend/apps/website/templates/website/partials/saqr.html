@@ -1,0 +1,10 @@
+{% load elite %}<div class="ea-saqr-dock" data-saqr-dock>
+<div class="ea-saqr" id="ea-saqr" role="dialog" aria-modal="false" aria-labelledby="ea-saqr-title" hidden data-endpoint="/api/v1/saqr/" data-lang="{{ lang }}" data-trial="{% if key.trial_page %}{{ key.trial_page.url }}{% endif %}">
+<div class="ea-saqr-head"><span class="ea-saqr-av" aria-hidden="true">{% t "S" "ص" %}</span><div><b id="ea-saqr-title">{% t "SAQR" "صقر" %}</b><small>{% t "Elite Academy assistant" "مساعد أكاديمية إيليت" %}</small></div><button type="button" class="ea-iconbtn" data-ea="saqr-close" aria-label="{% t "Close chat" "إغلاق المحادثة" %}">{% icon "close" %}</button></div>
+<div class="ea-saqr-log" aria-live="polite" data-saqr-log></div>
+<form class="ea-saqr-in" data-saqr-form><input class="ea-input" name="message" maxlength="500" autocomplete="off" placeholder="{% t "Ask about classes, times or prices" "اسأل عن الحصص أو المواعيد أو الأسعار" %}" aria-label="{% t "Message" "رسالة" %}"><button type="submit" class="ea-send" aria-label="{% t "Send" "إرسال" %}">{% icon "send" "ea-flip" %}</button></form>
+<div class="ea-saqr-foot">{% t "SAQR can make mistakes. For anything urgent, WhatsApp the branch." "قد يخطئ صقر. للأمور العاجلة راسل الفرع عبر واتساب." %}</div>
+</div>
+<button type="button" class="ea-saqr-btn" data-ea="saqr" aria-expanded="false" aria-controls="ea-saqr">{% icon "chat" %}<span>{% t "Ask SAQR" "اسأل صقر" %}</span></button>
+</div>
+<div class="ea-saqr-overlay" data-saqr-overlay></div>

@@ -38,12 +38,55 @@ mysql -uroot -e "CREATE DATABASE elite CHARACTER SET utf8mb4 COLLATE utf8mb4_090
 cp .env.example .env        # then fill in DJANGO_SECRET_KEY and DATABASE_URL
 python manage.py migrate    # also creates the default roles and permissions
 python manage.py seed_kuwait   # fictional test data; prints the test logins
-python manage.py runserver
+python manage.py seed_website  # the website pages (EN/AR), sample timetable and shop
+python manage.py runserver     # website: http://localhost:8000/en/ and /ar/ · CMS: /cms/
 ```
 
 Test logins after `seed_kuwait`: `ops@test.elite.local`, `admin.prm@test.elite.local`,
 `admin.bed@test.elite.local`, `coach.prm@test.elite.local`, `parent@test.elite.local`, … —
 password `Elite-Test-2026!`. These accounts exist only in development and test databases.
+
+## The website (elitemaacademy.com)
+
+Built with Wagtail from the Elite Academy design system (direction B · The Path). Code lives in
+`apps/website` (pages, blocks, forms, portal, SAQR) and `apps/shop` (products, stock, orders, payments).
+
+- **One page tree, two languages.** URLs are `/en/…` and `/ar/…`; every page and CMS block has English and
+  Arabic fields, and empty Arabic falls back to English. Arabic copy is a draft until the academy signs it off.
+- **Design tokens.** `apps/website/design/tokens.json` is the source; run `python scripts/build_design_tokens.py`
+  to regenerate `static/website/css/tokens.css`. `blocks.css` is the design's reference CSS; `site.css` holds
+  the page layout. No hex colours in either — only token variables.
+- **CMS (/cms/).** Open to roles with `cms.edit` (drafts) and `cms.publish` (publish, settings). Wagtail's
+  Editors/Moderators groups follow the RBAC roles on every visit. Privileged users need two-factor sign-in
+  when MFA is enforced.
+- **Blocks.** Every block in the design system is a CMS block (`apps/website/blocks.py`, templates in
+  `templates/website/blocks/`), with its empty and error states.
+- **Book a trial / contact / event sign-up** post to the page itself (CSRF, honeypot, 8 per 10 minutes per
+  address) and land in `TrialRequest`, `ContactMessage`, `EventRegistration`. Staff read trial requests and
+  messages at `/api/v1/website/…` with `leads.manage`, limited to their branch.
+- **Member portal.** Mobile number + 4-digit WhatsApp code (hashed, 5 minutes, 5 attempts, rate-limited,
+  same answer for unknown numbers). Parents see only their own family.
+- **Gallery consent.** A photo is public only when it is marked reviewed and every tagged member's latest
+  media consent allows website use.
+- **Shop.** Stock is reserved with row locks at checkout and released when a payment fails; the cart is
+  kept. Belts are never sold online.
+- **SAQR** (`/api/v1/saqr/`) is a rule-based assistant for now: prices, times and branches from live data,
+  and the Customer Management hand-off (refund, complaint, injury, asking for a person, two misses) to
+  WhatsApp. The AI engine replaces it behind the same interface later.
+- **Content security policy.** Public pages allow only this site's own scripts, styles, fonts and images.
+
+Decisions still open, so the code has stand-ins that production refuses to start with:
+
+| Open decision | Stand-in today | Where to plug in the real one |
+| --- | --- | --- |
+| KNET / card provider | `PAYMENT_GATEWAY=test` (a local approve/decline page) | `apps/shop/payments.py` |
+| WhatsApp provider (portal codes, confirmations) | `MESSAGING_BACKEND=console` (logged; the code is shown on the page in development) | `apps/core/messaging.py` |
+| Hosting | none | settings `prod.py` |
+
+Content still to come from the academy (never invented by `seed_website`): vector logo, official Arabic name,
+Arabic sign-off, real class times (seeded times are marked "sample"), instructor profiles (seeded as unpublished
+drafts), shop prices (marked "sample price"), parent quotes (seeded unapproved, so none shows), belt orders
+other than Kajukenbo.
 
 ## Checks
 

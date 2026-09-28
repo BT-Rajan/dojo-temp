@@ -1,0 +1,9 @@
+{% extends "website/base.html" %}{% load elite wagtailcore_tags %}
+{% block content %}{% include "website/partials/band.html" %}
+<section class="ea-block"><div class="ea-wrap">
+<nav class="ea-filters" aria-label="{% t "Category" "الفئة" %}"><a class="ea-chip" href="{{ page.url }}"{% if not category %} aria-current="true"{% endif %}>{% t "All" "الكل" %}</a>{% for code, label in categories %}<a class="ea-chip" href="{{ page.url }}?cat={{ code }}"{% if category == code %} aria-current="true"{% endif %}>{% if lang == "ar" %}{% category_ar code %}{% else %}{{ label }}{% endif %}</a>{% endfor %}</nav>
+{% if products %}<div class="ea-grid ea-grid--3 ea-shopgrid">{% for product in products %}{% include "website/partials/product_card.html" %}{% endfor %}</div>
+{% else %}<div class="ea-empty">{% illo %}<p class="ea-h4">{% t "Nothing here yet" "لا توجد منتجات هنا بعد" %}</p><p class="ea-meta">{% t "New gear arrives often. Ask at the front desk or WhatsApp the branch." "تصل معدات جديدة باستمرار. اسأل في الاستقبال أو راسل الفرع عبر واتساب." %}</p></div>{% endif %}
+<div class="ea-note ea-note--info" style="margin-block-start:32px">{% icon "pin" %}<span>{% t "Free pick-up at either branch, or delivery across Kuwait. Belts are awarded at belt tests and aren't sold online." "استلام مجاني من أي فرع، أو توصيل داخل الكويت. الأحزمة تُمنح في اختبارات الأحزمة ولا تُباع عبر الإنترنت." %}</span></div>
+</div></section>
+{% endblock %}

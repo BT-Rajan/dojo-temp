@@ -1,0 +1,21 @@
+{% extends "website/base.html" %}{% load elite %}
+{% block title %}{% f product "name" %} · {% t "Elite Academy" "أكاديمية إيليت" %}{% endblock %}
+{% block content %}{% f product "name" as pname %}
+<div class="ea-block" style="padding-block:24px"><div class="ea-wrap">
+<a href="{{ page.url }}" style="display:inline-flex;gap:4px;align-items:center;margin-bottom:12px">{% icon "chevl" "ea-flip" %}{% t "All gear" "كل المعدات" %}</a>
+<div class="ea-profile">{% photo product.image pname "1/1" %}
+<form method="post" style="display:grid;gap:16px;align-content:start" novalidate>{% csrf_token %}
+<div style="display:grid;gap:6px"><p class="ea-eyebrow">{% if lang == "ar" %}{{ product.category_ar }}{% else %}{{ product.get_category_display }}{% endif %}</p><h1 class="ea-h1">{{ pname }}</h1><span class="ea-price">{% kd product.price %}</span>{% if product.is_sample_price %}<span class="ea-sample">{% t "sample price" "سعر توضيحي" %}</span>{% endif %}</div>
+{% f product "description" as desc %}{% if desc %}<p class="ea-p">{{ desc }}</p>{% endif %}
+{% if error == "stock" %}<div class="ea-note ea-note--danger" role="alert">{% icon "alert" %}<span>{% t "Sorry, we don't have that many in this size. Try a smaller quantity." "عذراً، لا تتوفر هذه الكمية من هذا المقاس. جرّب كمية أقل." %}</span></div>{% endif %}
+{% if product.sold_out %}<div class="ea-note ea-note--warning">{% icon "alert" %}<span>{% t "Sold out in every size. Ask SAQR or the front desk when it's back." "نفدت جميع المقاسات. اسأل صقر أو الاستقبال عن موعد توفره." %}</span></div>{% else %}
+<fieldset style="border:0;padding:0;margin:0;display:grid;gap:8px"{% if error == "size" %} aria-describedby="size-err"{% endif %}><div style="display:flex;justify-content:space-between;gap:12px"><legend class="ea-label" style="float:inline-start">{% t "Size" "المقاس" %}</legend>{% if guide %}<a href="?guide=1#guide">{% t "Size guide" "دليل المقاسات" %}</a>{% endif %}</div>
+<div class="ea-sizes">{% for v in variants %}<input type="radio" name="variant" id="v{{ v.pk }}" value="{{ v.pk }}"{% if v.stock == 0 %} disabled{% elif v.pk == selected.pk %} checked{% endif %}><label class="ea-size" for="v{{ v.pk }}" dir="ltr">{{ v.size }}{% if v.stock == 0 %}<span class="ea-sr"> {% t "sold out" "نفد" %}</span>{% endif %}</label>{% endfor %}</div>
+{% if error == "size" %}<span class="ea-err" id="size-err">{% icon "alert" %}{% t "Please choose a size." "يرجى اختيار المقاس." %}</span>{% endif %}
+{% if sold_out_sizes %}<span class="ea-hint">{% for s in sold_out_sizes %}<span dir="ltr">{{ s }}</span>{% if not forloop.last %}, {% endif %}{% endfor %} {% t "is sold out. Ask SAQR to tell you when it's back." "نفد. اطلب من صقر تنبيهك عند توفره." %}</span>{% endif %}</fieldset>
+<div class="ea-btnrow" style="align-items:center"><div class="ea-qty"><button type="button" data-ea="qty" data-step="-1" aria-label="{% t "One less" "أقل بواحد" %}">−</button><label class="ea-sr" for="qty">{% t "Quantity" "الكمية" %}</label><input id="qty" name="qty" type="number" min="1" max="10" value="1" inputmode="numeric" dir="ltr"><button type="button" data-ea="qty" data-step="1" aria-label="{% t "One more" "أكثر بواحد" %}">+</button></div><button type="submit" class="ea-btn ea-btn--primary">{% icon "bag" %}{% t "Add to cart" "أضف إلى السلة" %}</button></div>{% endif %}
+<div class="ea-note ea-note--info">{% icon "pin" %}<span>{% t "Free pick-up at either branch, or delivery across Kuwait." "استلام مجاني من أي فرع، أو توصيل داخل الكويت." %}</span></div>
+{% if guide %}<details id="guide"{% if show_guide %} open{% endif %}><summary class="ea-h4" style="cursor:pointer">{% if lang == "ar" %}دليل المقاسات: {{ product.category_ar }}{% else %}Size guide: {{ product.get_category_display|lower }}{% endif %}</summary><table class="ea-sizeguide"><thead><tr><th scope="col">{% t "Size" "المقاس" %}</th><th scope="col">{% t "Measure" "القياس" %}</th><th scope="col">{% t "Typical student" "الطالب المعتاد" %}</th></tr></thead><tbody>{% for r in guide.rows.all %}<tr><td dir="ltr">{{ r.size }}</td><td dir="ltr">{{ r.measure }}</td><td>{% f r "fits" %}</td></tr>{% endfor %}</tbody></table><p class="ea-caption">{% f guide "note" %}</p></details>{% endif %}
+</form></div></div></div>
+{% endblock %}
+{% block mobilebar %}{% endblock %}

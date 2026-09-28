@@ -1,0 +1,32 @@
+{% load static elite wagtailcore_tags wagtailuserbar %}<!doctype html>
+<html lang="{{ lang }}" dir="{{ dir }}">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>{% block title %}{% if page %}{% if page.seo_title and lang == "en" %}{{ page.seo_title }}{% else %}{% f page "title" %}{% endif %}{% if page.depth > 2 %} · {% t "Elite Academy" "أكاديمية إيليت" %}{% endif %}{% else %}{% t "Elite Academy" "أكاديمية إيليت" %}{% endif %}{% endblock %}</title>
+{% if page %}<meta name="description" content="{% if lang == "ar" and page.search_description_ar %}{{ page.search_description_ar }}{% else %}{{ page.search_description }}{% endif %}">{% endif %}
+<meta name="theme-color" content="#0b2436">
+{% if page %}<link rel="alternate" hreflang="en" href="{% switch_lang_url "en" %}"><link rel="alternate" hreflang="ar" href="{% switch_lang_url "ar" %}">{% endif %}
+<link rel="icon" href="{% static "website/img/elite-academy-logo.png" %}">
+<link rel="preload" href="{% static "website/fonts/ReadexPro-Latin-Variable.woff2" %}" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="{% static "website/css/tokens.css" %}">
+<link rel="stylesheet" href="{% static "website/css/fonts.css" %}">
+<link rel="stylesheet" href="{% static "website/css/blocks.css" %}">
+<link rel="stylesheet" href="{% static "website/css/site.css" %}">
+<script src="{% static "website/js/site.js" %}" defer></script>
+</head>
+<body>
+<div class="ea-page">
+<a class="ea-skip" href="#main">{% t "Skip to content" "تخطَّ إلى المحتوى" %}</a>
+{% if settings.website.SiteSettings.show_promo_bar %}<div class="ea-promo ea-promo--bar"><b>{% f settings.website.SiteSettings "promo_bar" %}</b>{% if key.trial_page %}<a href="{% pageurl key.trial_page %}">{% t "Book now" "احجز الآن" %}</a>{% endif %}</div>{% endif %}
+{% include "website/partials/header.html" %}
+<main id="main" class="ea-main" tabindex="-1">
+{% block content %}{% endblock %}
+</main>
+{% include "website/partials/footer.html" %}
+{% block mobilebar %}{% include "website/partials/mobile_bar.html" %}{% endblock %}
+</div>
+{% include "website/partials/saqr.html" %}
+{% wagtailuserbar %}
+</body>
+</html>

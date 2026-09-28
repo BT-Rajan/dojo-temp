@@ -1,0 +1,14 @@
+{% extends "website/base.html" %}{% load elite wagtailcore_tags %}
+{% block content %}{% f page "title" as atitle %}
+<section class="ea-block"><div class="ea-wrap">
+{% with parent=page.get_parent.specific %}<a href="{% pageurl parent %}" style="display:inline-flex;gap:4px;align-items:center;margin-bottom:12px">{% icon "chevl" "ea-flip" %}{% t "All albums" "كل الألبومات" %}</a>{% endwith %}
+<div class="ea-head"><h1 class="ea-h1">{{ atitle }}</h1><p class="ea-meta"><span dir="ltr">{{ photos|length }}</span> {% t "photos" "صورة" %}{% if page.branch %} · {% f page.branch.web_page "title" %}{% endif %} · {% include "website/partials/date.html" with d=page.date %}</p></div>
+{% if photos %}<div class="ea-photos">{% for p in photos %}{% f p "caption" as cap %}<button type="button" data-ea="open-viewer" data-index="{{ forloop.counter0 }}" aria-label="{% if lang == "ar" %}فتح الصورة {{ forloop.counter }}{% else %}Open photo {{ forloop.counter }}{% endif %}{% if cap %}: {{ cap }}{% endif %}">{% photo p.image cap "1/1" "" "fill-480x480" %}</button>{% endfor %}</div>
+{% else %}<div class="ea-empty">{% illo %}<p class="ea-h4">{% t "Photos are on their way" "الصور في الطريق" %}</p><p class="ea-meta">{% t "We share albums within a week of every event." "ننشر الألبومات خلال أسبوع من كل فعالية." %}</p></div>{% endif %}
+</div></section>
+{% if photos %}<div class="ea-viewer-overlay" role="dialog" aria-modal="true" aria-label="{{ atitle }}" data-viewer-overlay hidden>
+<div class="ea-viewer" data-ea="viewer" data-i="0" data-total="{{ photos|length }}" tabindex="-1"><div class="ea-viewer-top"><button type="button" class="ea-iconbtn" data-ea="viewer-close" aria-label="{% t "Close" "إغلاق" %}">{% icon "close" %}</button><span class="ea-num" dir="ltr" data-ea="count" aria-live="polite">1 / {{ photos|length }}</span><a class="ea-iconbtn" data-ea="viewer-share" href="https://wa.me/?text={{ request.build_absolute_uri|urlencode }}" rel="noopener" aria-label="{% t "Share on WhatsApp" "مشاركة عبر واتساب" %}">{% icon "wa" %}</a></div>
+<div class="ea-viewer-stage"><div class="ea-viewer-track">{% for p in photos %}{% f p "caption" as cap %}<div class="ea-viewer-slide" data-caption="{{ cap }}">{% photo p.image cap "3/2" "ea-photo--deep" "max-1600x1100" %}</div>{% endfor %}</div></div>
+<button type="button" class="ea-viewer-nav prev" data-ea="prev" aria-label="{% t "Previous" "السابق" %}">{% icon "chevl" "ea-flip" %}</button><button type="button" class="ea-viewer-nav next" data-ea="next" aria-label="{% t "Next" "التالي" %}">{% icon "chev" "ea-flip" %}</button>
+<div class="ea-viewer-cap"><span data-ea="caption">{{ atitle }}</span><span>{% t "Swipe for more" "اسحب للمزيد" %}</span></div></div></div>{% endif %}
+{% endblock %}

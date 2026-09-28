@@ -1,0 +1,5 @@
+{% load elite wagtailcore_tags %}<a class="ea-card ea-instructor" href="{% pageurl i %}"{% if i.key %} data-branch="{{ i.key }}"{% endif %}>{% photo i.photo i.title "4/5" %}
+<div class="ea-card-body"><p class="ea-eyebrow">{% f i "discipline" %}</p><h3 class="ea-h3">{% f i "title" %}</h3>
+{% f i "rank" as rank %}{% if rank %}<div class="ea-rank">{% belt i.belt %}{{ rank }}</div>{% endif %}
+{% if i.years_training or i.competitions or i.years_coaching %}<div class="ea-stats">{% if i.years_training %}<div class="ea-stat"><b dir="ltr">{{ i.years_training }}</b><span>{% t "years training" "سنوات تدريب" %}</span></div>{% endif %}{% if i.competitions %}<div class="ea-stat"><b dir="ltr">{{ i.competitions }}</b><span>{% t "competitions" "بطولات" %}</span></div>{% endif %}{% if i.years_coaching %}<div class="ea-stat"><b dir="ltr">{{ i.years_coaching }}</b><span>{% t "years coaching" "سنوات تدريس" %}</span></div>{% endif %}</div>{% endif %}
+</div></a>

@@ -1,0 +1,8 @@
+{% extends "website/base.html" %}{% load elite wagtailcore_tags %}
+{% block content %}{% include "website/partials/band.html" %}
+<section class="ea-block"><div class="ea-wrap">
+{% if albums %}<div class="ea-albums">{% for a in albums %}{% include "website/partials/album_tile.html" %}{% endfor %}</div>
+{% else %}<div class="ea-empty">{% illo %}<p class="ea-h4">{% t "Photos are on their way" "الصور في الطريق" %}</p><p class="ea-meta">{% t "We share albums within a week of every event." "ننشر الألبومات خلال أسبوع من كل فعالية." %}</p></div>{% endif %}
+<p class="ea-caption" style="margin-block-start:24px">{% icon "shield" %} {% t "We publish children's photos only with their parents' consent, and never with a child's full name." "ننشر صور الأطفال بموافقة أولياء أمورهم فقط، ولا نذكر الاسم الكامل للطفل أبداً." %}</p>
+</div></section>
+{% endblock %}

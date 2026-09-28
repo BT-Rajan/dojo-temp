@@ -19,6 +19,8 @@ ignore = ["S101"]  # assert is fine in tests
 "apps/testdata/*" = ["S105", "S311"]
 # Local load-testing tool: fictional test password, seeded random, http to a local server.
 "scripts/*" = ["S105", "S310", "S311"]
+# Bilingual page copy from the design: long English/Arabic sentences are kept whole.
+"apps/website/management/commands/seed_website.py" = ["E501"]
 
 [tool.bandit]
 exclude_dirs = [".venv", "tests"]

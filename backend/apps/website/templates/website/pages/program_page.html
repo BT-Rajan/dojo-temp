@@ -1,0 +1,5 @@
+{% extends "website/base.html" %}{% load elite wagtailcore_tags %}
+{% block content %}{% f page.branch.web_page "title" as bt %}{% t "Program" "برنامج" as prog %}
+{% include "website/partials/band.html" with band_eyebrow=prog|add:" · "|add:bt facts=page|program_facts:lang %}
+{% for block in page.body %}{% include_block block %}{% endfor %}
+{% endblock %}

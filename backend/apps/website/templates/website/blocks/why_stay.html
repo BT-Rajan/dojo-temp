@@ -1,0 +1,7 @@
+{% load elite wagtailcore_tags %}{% if not inner %}<section class="ea-block"><div class="ea-wrap">{% endif %}<div class="ea-twocol">
+<div style="display:grid;gap:20px;align-content:start">{% f value "lead" as lead %}{% if lead %}<p class="ea-lead">{{ lead }}</p>{% endif %}
+{% if value.chips %}<div class="ea-filters" style="margin:0">{% for c in value.chips %}<span class="ea-chip" style="cursor:default"><span dir="ltr">{{ forloop.counter }}</span> · {% f c "label" %}</span>{% endfor %}</div>{% endif %}
+{% if key.about_page %}<a href="{% pageurl key.about_page %}" style="font-weight:600;display:inline-flex;gap:4px;align-items:center">{% t "Read our five principles" "اقرأ مبادئنا الخمسة" %}{% icon "chev" "ea-flip" %}</a>{% endif %}
+{% f value "image_caption" as cap %}{% photo value.image cap "16/9" %}</div>
+<div class="ea-reasons">{% for r in value.reasons %}<div><h3 class="ea-h4">{% f r "title" %}</h3><p class="ea-meta" style="font-size:16px;line-height:26px">{% f r "line" %}</p></div>{% endfor %}</div>
+</div>{% if not inner %}</div></section>{% endif %}

@@ -1,0 +1,7 @@
+{% extends "website/base.html" %}{% load elite wagtailcore_tags %}
+{% block content %}{% f page "title" as bt %}{% f page "address" as addr %}{% f page "promise" as promise %}
+{% include "website/partials/band.html" with band_eyebrow=bt|add:" · "|add:addr band_title=promise crumb_label=bt facts=page|branch_facts:lang %}
+<section class="ea-block"><div class="ea-wrap"><div class="ea-head ea-head--row"><div style="display:grid;gap:8px"><p class="ea-eyebrow">{% belt "purple" "width:28px" %}{% if lang == "ar" %}البرامج في {{ bt }}{% else %}Programs at {{ bt }}{% endif %}</p><h2 class="ea-h2">{% t "Find your program" "اختر برنامجك" %}</h2></div>{% if key.schedule_page %}<a href="{% pageurl key.schedule_page %}?branch={{ page.branch.code }}">{% t "Full schedule" "الجدول الكامل" %}</a>{% endif %}</div>
+{% with programs=branch_programs %}{% if programs %}<div class="ea-grid ea-grid--3">{% for p in programs %}{% include "website/partials/program_card.html" %}{% endfor %}</div>{% else %}<div class="ea-empty">{% illo %}<p class="ea-h4">{% t "Programs are being updated" "يتم تحديث البرامج" %}</p></div>{% endif %}{% endwith %}</div></section>
+{% for block in page.body %}{% include_block block %}{% endfor %}
+{% endblock %}

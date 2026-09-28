@@ -1,0 +1,5 @@
+{% load elite %}{% if not inner %}<section class="ea-block"><div class="ea-wrap">{% endif %}<ol class="ea-steps">
+<li class="ea-step3"><b class="n">1</b><span><b>{% t "Book in a minute." "احجز في دقيقة." %}</b> {% t "Name, phone, branch and program." "الاسم والجوال والفرع والبرنامج." %}</span></li>
+<li class="ea-step3"><b class="n">2</b><span><b>{% t "Try a real class." "جرّب حصة حقيقية." %}</b> {% kd settings.website.SiteSettings.trial_price as price %}{% if lang == "ar" %}{{ price }} تُدفع في الفرع.{% else %}{{ price }}, paid at the branch.{% endif %}</span></li>
+<li class="ea-step3"><b class="n">3</b><span><b>{% t "We place your child." "نضع طفلك في مجموعته." %}</b> {% t "Our instructor will assess their level and suggest the right group." "سيقيّم المدرّب مستواه ويقترح المجموعة المناسبة." %}</span></li>
+</ol>{% if not inner %}</div></section>{% endif %}
