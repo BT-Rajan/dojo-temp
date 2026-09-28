@@ -1,0 +1,16 @@
+# Runtime dependencies — pinned to known-good minor versions.
+# Update deliberately and run `pip-audit` + the test suite after every change (ISO 27001 A.8.8, A.8.25).
+Django>=5.2,<5.3
+djangorestframework>=3.15,<3.19
+drf-spectacular>=0.27,<0.31
+mysqlclient>=2.2,<2.4
+django-environ>=0.11,<0.15
+argon2-cffi>=23.1,<26
+django-axes>=6.5,<9
+django-otp>=1.5,<1.8
+qrcode>=7.4,<9
+cryptography>=43,<51
+django-redis>=5.4,<8
+redis>=5.0,<9
+celery>=5.4,<5.7
+gunicorn>=22,<24

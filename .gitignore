@@ -21,3 +21,16 @@ headers.txt
 .agents/
 node_modules/
 dist/
+
+# Python back end
+backend/.venv/
+__pycache__/
+*.pyc
+.pytest_cache/
+.ruff_cache/
+backend/staticfiles/
+backend/media/
+# Office lock files
+~$*
+dump.rdb
+!.env.example

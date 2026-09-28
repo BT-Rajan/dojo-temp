@@ -1,0 +1,24 @@
+[project]
+name = "elite-academy-backend"
+version = "0.1.0"
+requires-python = ">=3.11"
+
+[tool.ruff]
+line-length = 120
+target-version = "py311"
+extend-exclude = ["**/migrations/*", ".venv"]
+
+[tool.ruff.lint]
+select = ["E", "F", "W", "I", "B", "UP", "S", "DJ", "BLE"]
+ignore = ["S101"]  # assert is fine in tests
+
+[tool.ruff.lint.per-file-ignores]
+"tests/*" = ["S105", "S106", "S311"]
+"config/settings/*" = ["F405"]
+# Fictional test data: fixed dev password and a seeded (non-cryptographic) random generator are intended.
+"apps/testdata/*" = ["S105", "S311"]
+# Local load-testing tool: fictional test password, seeded random, http to a local server.
+"scripts/*" = ["S105", "S310", "S311"]
+
+[tool.bandit]
+exclude_dirs = [".venv", "tests"]

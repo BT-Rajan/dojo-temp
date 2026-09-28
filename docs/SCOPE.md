@@ -4,18 +4,19 @@
 |---|---|
 | Document Number | EA-SYS-SCOPE-01 |
 | Title | Elite Academy System — Scope of Work |
-| Version | 0.2 (Draft for review) |
+| Version | 0.3 (Draft for review) |
 | Date | 28-Sep-2026 |
 | Document Owner | Systems & IT Lead |
 | Reviewed By | Operations Lead (COO); Training Lead; Marketing Lead |
 | Approved By | Chief Executive Officer |
-| Related Documents | EA-SYS-DESIGN-01 Website Design Brief (docs/WEBSITE_DESIGN_PROMPT.md); EA-OPS-PROC-01 Operations Procedure; EA-INV-PROC-01 Inventory Management Procedure; EA-COMM-PROC-01 Communication Procedure; EA-COMM-PLAY-01 How We Work Together; EA-COMM-REF-01 Org Chart; Customer Management Procedure & One Voice Guide; Marketing Funnel by Branch; Kajukenbo Master Curriculum; Active Members Report (EA-DOC-003) |
+| Related Documents | EA-SYS-SEC-01 ISO 27001 Control Mapping (docs/security/ISO27001_CONTROLS.md); EA-SYS-SEC-02 RBAC Matrix (docs/security/RBAC_MATRIX.md); EA-SYS-DESIGN-01 Website Design Brief (docs/WEBSITE_DESIGN_PROMPT.md); EA-OPS-PROC-01 Operations Procedure; EA-INV-PROC-01 Inventory Management Procedure; EA-COMM-PROC-01 Communication Procedure; EA-COMM-PLAY-01 How We Work Together; EA-COMM-REF-01 Org Chart; Customer Management Procedure & One Voice Guide; Marketing Funnel by Branch; Kajukenbo Master Curriculum; Active Members Report (EA-DOC-003) |
 
 **Change log**
 
 | Version | Date | Change |
 |---|---|---|
 | 0.1 | 28-Sep-2026 | First draft from Elite procedures, reports and meeting notes. |
+| 0.3 | 28-Sep-2026 | Added Section 11 Technology and Non-Functional Requirements: Python (Django) back end, MySQL 8 database, front end from the Claude Design template; many simultaneous users; ISO/IEC 27001:2022 alignment; role-based access control. Phase 0 built on the new stack; the clinic codebase becomes a reference only (Section 10). |
 | 0.2 | 28-Sep-2026 | Added: website content management (CMS) with events photo gallery (M14); online shop for equipment (M19); payroll for directly hired coaches and staff (M20); Kuwait test data package (M21); first run, test and change requests (Section 7.1). Payroll and online shop moved out of "Out of Scope". |
 
 ---
@@ -393,7 +394,7 @@ Each phase ends with a demo to the leads and sign-off before the next begins. Th
 
 | Phase | Name | Contents | Outcome |
 |---|---|---|---|
-| **0** | Foundation | Fix security gaps in the current code; remove Replit dependencies; new data model (branches, programs, members, staff, roles); login and permissions; Arabic/English layout; audit log; **M21 test data package (first version — grows with every phase)** | A secure base to build on, with realistic Kuwait test data |
+| **0** | Foundation | New Python/Django back end on MySQL (Section 11); data model for branches, programs, pricing, members and families, staff; login with two-factor authentication; role-based access control; tamper-evident audit log; encryption of sensitive data; **M21 test data package (first version — grows with every phase)** | A secure base to build on, with realistic Kuwait test data — **built** (see backend/README.md) |
 | **1** | Members, Classes and Sales | M1 Programs & pricing, M2 Members & families, M4 Schedule, bookings & check-in, M5 POS, payments, receipts & cash-up, M6 Renewals list | Front desk can run a full day without Mindbody (in test) |
 | **2** | Operations, Reporting and Payroll | M9 Daily operations forms, M10 Weekly Sales, Weekly Branch, Active Members & dashboards, M11 Finance & Accountant, **M20 Payroll** | Weekly reports build themselves; OM verification online; first payroll run in test |
 | **3** | Inventory and Migration | M8 Inventory, purchasing, vendors, counts; **online-shop provision (M19 catalogue and stock reservation)**; M18 Mindbody import; parallel run; cut-over | **Mindbody replaced** — then the first run and test (7.1) |
@@ -451,7 +452,7 @@ This scope is the starting point, not the final list. More needs will appear onc
 
 ## 10. What Carries Over from the Current Codebase
 
-The starting code is a multi-centre clinic management system with the same shape Elite needs:
+The starting code is a multi-centre clinic management system (Node.js, PostgreSQL). Because the system is now built in Python with MySQL (Section 11), the clinic code is kept **as a reference only** — for its screens, workflows and reports — and is not extended. Its concepts map to Elite as follows:
 
 | Current app | Becomes |
 |---|---|
@@ -467,7 +468,52 @@ The starting code is a multi-centre clinic management system with the same shape
 | Doctor of the Month | Instructor / Student of the Month |
 | Department statistics and monitoring dashboards | Branch and program dashboards |
 
-Removed: Replit login, dental procedure fields, browser-side data isolation (moved to the server). The 62 API routes that currently lack login checks are fixed in Phase 0.
+Not carried over: Replit login, dental procedure fields, and browser-side data isolation. The clinic code's security gaps (62 API routes without login checks) do not apply to the new back end, where every endpoint is closed unless it declares a permission.
+
+---
+
+## 11. Technology and Non-Functional Requirements
+
+### 11.1 Technology
+
+| Part | Choice |
+|---|---|
+| Back end | Python 3.11+, Django 5.2 LTS, Django REST Framework |
+| Database | MySQL 8 (utf8mb4 for Arabic) |
+| Sessions, cache, background jobs | Redis; Celery for scheduled jobs (reminders, reports, escalation timers, audit sealing) |
+| Website CMS and gallery (M14) | Wagtail (Django-based CMS) |
+| Front end | Built from the approved Claude Design template (EA-SYS-DESIGN-01); the website renders from the CMS for search engines; the staff system and member portal use the same design system |
+| AI (M16) | Claude, called only from the back end, with the user's permissions applied |
+| Quality gates | Automated tests on MySQL, lint, code security scan (Bandit), dependency vulnerability scan (pip-audit) on every change |
+
+### 11.2 Many users at the same time
+
+Clients, parents, coaches and staff at both branches use the system simultaneously. The system must:
+- keep every save all-or-nothing (one database transaction per request);
+- never lose an edit silently — when two people edit the same record, the second is told the record changed and asked to reload (optimistic locking);
+- keep shared counters exact under load (row locks for stock and class places);
+- scale by adding application servers (sessions in Redis, no per-server state);
+- protect service for everyone with per-user and per-address rate limits.
+
+Acceptance: load test with at least 150 simultaneous users mixing staff, coaches and parents — no server errors, no cross-branch data exposure, all edit collisions rejected safely. Phase 0 result: passed (150 users, 3,283 requests, 0 errors, 0 leaks).
+
+### 11.3 Security — ISO/IEC 27001:2022 alignment
+
+The system implements the technical controls of ISO/IEC 27001:2022 Annex A and produces the evidence an auditor needs; certification itself also requires Elite's own management system (policies, risk assessment, suppliers, training). The control-by-control mapping, with tests, is in EA-SYS-SEC-01. Key requirements:
+- two-factor login for privileged roles; account lockout; session timeouts;
+- encryption of Civil IDs and medical information at rest, TLS in transit;
+- masking of sensitive data for roles that don't need it;
+- append-only, tamper-evident audit log of every change, login and denied access;
+- leaver process that removes all access immediately;
+- separated development, test and production environments; fictional test data only.
+
+### 11.4 Role-based access control
+
+- Access comes only from roles (13 default roles, 38 permissions — EA-SYS-SEC-02 RBAC Matrix); anything not granted is refused.
+- Roles can be limited to one branch; data from other branches is never sent.
+- Sensitive fields need their own permission (full Civil ID, medical notes).
+- No one can change their own access or hand out powers they don't hold; every grant records who, why, from when and until when.
+- Parents and adult members see only their own family through the portal.
 
 ---
 
