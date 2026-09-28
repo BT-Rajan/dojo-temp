@@ -1,0 +1,116 @@
+The Prostho Head Manager app is a departmental operations tool that helps the Head of Prosthodontics efficiently:
+
+Assign doctors to regular and examination clinics.
+
+Track who’s on leave or has permission.
+
+Distribute emergency walk-ins fairly.
+
+Maintain daily coverage visibility.
+
+Streamline recurring weekly schedules.
+
+Ensure accountability and balance in doctor workload.
+
+👩‍⚕️ Doctor Management
+Add, edit, or delete doctors.
+
+Each doctor profile includes:
+
+Name
+
+Title
+
+Civil ID
+
+File number
+
+Phone number
+
+Doctors can be marked automatically as on leave or available based on stored leave dates.
+
+🗓️ Clinic Assignment (Weekly)
+Add, edit, or delete regular clinics.
+
+Assign a doctor to one or more clinics.
+
+For each clinic assignment:
+
+Select one or more weekdays (Sunday–Thursday).
+
+The app repeats these weekly unless changed.
+
+Doctors on leave are excluded automatically from clinic duties during their leave period.
+
+🚨 Emergency Walk-In Management
+Pressing the “Assign Emergency” button:
+
+Suggests the next eligible doctor.
+
+Skips those on leave or with permission.
+
+Rotates fairly based on how many times each doctor has been assigned.
+
+Ensures fair emergency distribution throughout the month.
+
+🌴 Leave Management
+From a doctor’s profile:
+
+Add leave with start and end dates.
+
+App uses this info to:
+
+Block clinic and emergency assignments.
+
+Reinstate doctor automatically once leave ends.
+
+Includes a Leave Summary View to track:
+
+All current and upcoming leaves in one place.
+
+🕐 Permission Tracking
+Doctors can request:
+
+Start-of-Day permission (e.g. 7:30–9:30)
+
+End-of-Day permission (e.g. 12:30–2:30)
+
+App allows up to 4 permissions/month per doctor.
+
+Automatically blocks the doctor during those times.
+
+Includes a Permission History View:
+
+View all permissions by month.
+
+Option to Clear All Permissions monthly.
+
+🧪 Examination Clinic Scheduling
+Separate view to assign doctors to specific time slots (e.g., 10:00–11:00) per weekday.
+
+Allows multiple doctors per time slot.
+
+Saved schedules are repeated weekly.
+
+Doctors on leave are auto-removed from the day’s examination slots.
+
+📅 Daily View
+Shows which clinics are covered today and by whom.
+
+Indicates:
+
+Doctors on leave
+
+Doctors with permissions
+
+Any clinic without coverage (highlighted)
+
+One-tap emergency assignment for today’s coverage.
+
+🔁 Automation Features
+All clinic assignments, examination schedules, and emergency rotations auto-repeat weekly unless updated.
+
+Leave and permissions override availability automatically.
+
+Designed to minimize manual planning and last-minute gaps.
+

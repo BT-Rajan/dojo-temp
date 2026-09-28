@@ -1,0 +1,23 @@
+node_modules
+dist
+.DS_Store
+server/public
+vite.config.ts.*
+*.tar.gz
+.env
+.env.*
+!.env.example
+
+# secrets and local junk
+.env
+.env.*
+cookies.txt
+test_cookies.txt
+headers.txt
+.cache/
+.local/
+.config/
+.upm/
+.agents/
+node_modules/
+dist/
