@@ -4,7 +4,7 @@
 |---|---|
 | Document Number | EA-SYS-SCOPE-01 |
 | Title | Elite Academy System — Scope of Work |
-| Version | 0.7 (Draft for review) |
+| Version | 0.8 (Draft for review) |
 | Date | 29-Sep-2026 |
 | Document Owner | Systems & IT Lead |
 | Reviewed By | Operations Lead (COO); Training Lead; Marketing Lead |
@@ -19,6 +19,7 @@
 | 0.5 | 29-Sep-2026 | Phase 3 started at the CEO's request; Phase 2 demo and every open decision gathered in Section 8.1, to be closed one by one at the end of the project. Phase 3 working decisions P3-1 to P3-10. |
 | 0.6 | 29-Sep-2026 | Phase 3 built in test. Phase 4 (Training and Progression) started; working decisions P4-1 to P4-10; open items O-18 and O-19. |
 | 0.7 | 29-Sep-2026 | Phase 4 built in test. Phase 5 (Growth) started; working decisions P5-1 to P5-13; open items O-20 to O-22. |
+| 0.8 | 29-Sep-2026 | Phase 5 built in test. Phase 6 (Members, Shop and Messaging) started; working decisions P6-1 to P6-10; open item O-23. |
 | 0.4 | 29-Sep-2026 | Phase 1 signed off. Phase 2 decisions P2-1 to P2-17 recorded: pay options for any staff member or coach, OM prepares and Accountant approves payroll, freelance coaches paid through payroll, report layouts from the current forms. |
 | 0.3 | 28-Sep-2026 | Added Section 11 Technology and Non-Functional Requirements: Python (Django) back end, MySQL 8 database, front end from the Claude Design template; many simultaneous users; ISO/IEC 27001:2022 alignment; role-based access control. Phase 0 built on the new stack; the clinic codebase becomes a reference only (Section 10). |
 | 0.2 | 28-Sep-2026 | Added: website content management (CMS) with events photo gallery (M14); online shop for equipment (M19); payroll for directly hired coaches and staff (M20); Kuwait test data package (M21); first run, test and change requests (Section 7.1). Payroll and online shop moved out of "Out of Scope". |
@@ -404,7 +405,7 @@ Each phase ends with a demo to the leads and sign-off before the next begins. Th
 | **3** | Inventory and Migration | M8 Inventory, purchasing, vendors, counts; **online-shop provision (M19 catalogue and stock reservation)**; M18 Mindbody import; parallel run; cut-over | **Mindbody replaced** — then the first run and test (7.1). **Built in test**; demo and sign-off moved to the end of the project (O-16); going live waits on the Mindbody exports and cut-over date (O-11, O-12) |
 | **4** | Training and Progression | M7 Curriculum, evaluations, test days, promotions, progress cards | Belt path tracked for every member — **built in test**; demo and sign-off moved to the end of the project (O-19) |
 | **5** | Growth: Leads, Website, CMS, AI | M3 Leads & group sales, M13 Marketing, **M14 Website with CMS and events gallery** (built on the approved design template), M16 Knowledge base, SAQR chat & Staff Assistant | One funnel from ad to membership; staff edit the website themselves; AI on the homepage and inside the app — **built in test** (the AI engine switches on with O-20); demo and sign-off moved to the end of the project (O-22) |
-| **6** | Members, Shop and Messaging | M15 Member & parent portal, online payments, **M19 Online shop storefront**, M17 WhatsApp/SMS notifications | Members self-serve; equipment sold online; automatic reminders |
+| **6** | Members, Shop and Messaging | M15 Member & parent portal, online payments, **M19 Online shop storefront**, M17 WhatsApp/SMS notifications | Members self-serve; equipment sold online; automatic reminders — **built in test** (live payments and WhatsApp switch on with O-6 and O-7); demo and sign-off moved to the end of the project (O-23) |
 | **7** | Management | M12 Communication & cascade, meetings, procedure library, Quarterly Business Report (RPT-01) | The whole Elite operating system in one place |
 
 ### 7.1 First Run, Test and Change Requests
@@ -508,6 +509,21 @@ This scope is the starting point, not the final list. More needs will appear onc
 | P5-12 | SAQR | Runs on an AI model with the public knowledge base and live programs, times and prices; while no AI provider is set up it uses the rule-based engine. It never takes payments, approvals or complaints. Hand-off (refund, cancel, complaint, injury, asking for a person, two unresolved exchanges) creates a lead with the whole chat in the front desk's queue. Staff spot-check at least 3 conversations per shift. |
 | P5-13 | Staff Assistant | Answers "how do I…" from staff articles and data questions from live data, read-only and limited to what the asking person's role and branch can see; every answer shows its sources and every question is logged. |
 
+**Phase 6 working decisions (29 Sep 2026)** — sensible defaults so building can continue; each can be changed at the end-of-project review. The shop storefront (catalogue, cart, checkout, KNET/card test gateway) was built with the website and connected to branch stock in Phase 3; Phase 6 adds the family portal and the messaging layer around it.
+
+| # | Topic | Working decision |
+|---|---|---|
+| P6-1 | Who sees what | Sign-in stays mobile number + WhatsApp code. A parent sees each of their children; an adult member sees themselves. Records are always reached through the signed-in person's own profile, never by an id from the browser. |
+| P6-2 | Booking from the portal | Classes up to 7 days ahead, for a member whose membership covers the class; a full class puts them on the waiting list. Cancelling is always allowed before the class; within 2 hours it is recorded as late (no penalty, as in Phase 1). |
+| P6-3 | Renew and pay online | The member's current membership option can be renewed online at its listed price by KNET or card; the new period starts the day after the current one ends (or today if it has ended). Discounts stay at the front desk. The sale is recorded at the member's branch as "Online" with the gateway reference, and the receipt is sent by WhatsApp. |
+| P6-4 | Freeze requests | Requested in the portal with a reason and go to the OM's approval queue under the Phase 1 rules (once per membership, 1–4 weeks). |
+| P6-5 | Progress | Current belt and stripe, skills ticked off, what's needed for the next belt, seminar points, upcoming test days, evaluation notes and monthly progress notes. Evaluation notes are visible to families; the evaluation form says so. |
+| P6-6 | Consent and details | Parents change media consent themselves (a new signed record; a withdrawal takes effect at once), their email and the WhatsApp-broadcast choice, and sign the academy rules online (typed name and tick). The mobile number is changed only at the desk, because it is the sign-in. |
+| P6-7 | Message categories | Every outgoing message is logged with a category. Essential (sign-in codes, receipts, payment confirmations, trial confirmations, class changes) always go. Service messages (renewal reminders, test days, progress notes, review requests) can be turned off by the family. Marketing broadcasts need the opt-in (P5-10). Staff alerts are logged too. |
+| P6-8 | Channels | WhatsApp first; SMS when the provider reports the number isn't on WhatsApp; email only for scheduled reports. In-app: the portal shows the family's recent messages. The provider is open item O-7. |
+| P6-9 | Templates | Message texts are written in English and Arabic in the One Voice tone; the Marketing Lead can override any text in the desk without a code change. |
+| P6-10 | Online orders | Staff mark an order "ready for pick-up" (the customer gets a WhatsApp) before handing it over; delivery orders get a message when sent out. |
+
 **Carried from Elite documents**
 1. Receiving owner for group-sales handoffs (Playbook item 1).
 2. Elite Member tier: eligibility rules and rate (Playbook item 3).
@@ -559,6 +575,7 @@ This scope is the starting point, not the final list. More needs will appear onc
 | O-20 | AI provider for SAQR and the Staff Assistant: account, API key, data-processing terms and monthly budget | P5-12, P5-13 |
 | O-21 | Google Business Profile review links for each branch | P5-9 |
 | O-22 | Phase 5 demo and sign-off (leads, group sales, campaigns, referrals, broadcasts, knowledge base, SAQR, Staff Assistant) | Phase 5 |
+| O-23 | Phase 6 demo and sign-off (portal, online renewal, messaging, online orders) | Phase 6 |
 
 ## 9. Out of Scope (for now)
 

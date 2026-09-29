@@ -72,6 +72,7 @@ Document: EA-SYS-SEC-02 · Generated from `backend/apps/rbac/catalog.py` (the si
 | `marketing.approve` | Approve and send WhatsApp broadcasts; reassign leads | ✓ | ✓ |  |  |  | ✓ |  |  |  |  |  |  |  |
 | `kb.edit` | Write and publish knowledge-base articles | ✓ | ✓ |  |  |  | ✓ | ✓ | ✓ |  |  |  |  |  |
 | `assistant.use` | Ask the Staff Assistant (answers limited to what you can already see) | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ |  |
+| `messages.view` | See the log of messages sent to families and staff | ✓ | ✓ |  |  |  | ✓ |  | ✓ |  |  |  |  |  |
 | `finance.manage` | Reconciliation, income statements, vendor invoices and exports | ✓ | ✓ |  |  |  |  |  |  |  |  |  | ✓ |  |
 | `finance.expense` | Record branch expenses with a receipt photo | ✓ | ✓ |  |  |  |  |  |  | ✓ | ✓ |  |  |  |
 | `finance.expense_approve` | Approve branch expenses | ✓ | ✓ |  |  |  |  |  |  |  |  |  | ✓ |  |

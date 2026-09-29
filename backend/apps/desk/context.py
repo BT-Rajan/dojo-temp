@@ -63,6 +63,7 @@ MENU = [
     ("desk:saqr", "SAQR chats", "محادثات صقر", "phone", ["leads.manage"]),
     ("desk:kb", "Knowledge base", "قاعدة المعرفة", "check", ["kb.edit"]),
     ("desk:assistant", "Ask the assistant", "اسأل المساعد", "user", ["assistant.use"]),
+    ("desk:message_log", "Messages", "الرسائل", "phone", ["messages.view", "marketing.approve"]),
     ("desk:my_pay", "My pay", "راتبي", "user", ["payroll.self"]),
 ]
 

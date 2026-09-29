@@ -181,6 +181,9 @@ class Command(BaseCommand):
             from apps.testdata.phase5 import Phase5Data
 
             Phase5Data(self).load()
+            from apps.testdata.phase6 import Phase6Data
+
+            Phase6Data(self).load()
 
         self.stdout.write(
             self.style.SUCCESS(
@@ -200,7 +203,9 @@ class Command(BaseCommand):
         from apps.testdata.phase3 import reset_phase3
         from apps.testdata.phase4 import reset_phase4
         from apps.testdata.phase5 import reset_phase5
+        from apps.testdata.phase6 import reset_phase6
 
+        reset_phase6()
         reset_phase5()
         reset_phase4()
         reset_phase3()

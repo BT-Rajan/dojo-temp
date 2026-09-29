@@ -46,6 +46,7 @@ if settings.DEBUG:
 # The public website: /en/… and /ar/… (the last pattern catches every CMS page).
 urlpatterns += i18n_patterns(
     path("desk/", include("apps.desk.urls")),  # the staff desk (Phase 1), in English and Arabic
+    path("my/", include("apps.portal.site_urls")),  # the family portal pages (Phase 6)
     path("", include(wagtail_urls)),
     prefix_default_language=True,
 )

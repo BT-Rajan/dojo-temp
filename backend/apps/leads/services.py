@@ -200,7 +200,9 @@ def reassign(lead, user, new_owner, reason) -> Lead:
     lead.save()
     _log(user, f"Owner: {old} → {new_owner.full_name}. {reason.strip()}", Activity.Kind.OWNER, lead=lead)
     if new_owner.mobile:
-        transaction.on_commit(lambda: send_message(new_owner.mobile, f"Lead {lead.name} is now yours."))
+        transaction.on_commit(
+            lambda: send_message(new_owner.mobile, f"Lead {lead.name} is now yours.", category="staff")
+        )
     return lead
 
 
@@ -247,9 +249,21 @@ def book_trial(lead, session, user):
     _log(user, f"Trial booked: {session}", Activity.Kind.BOOKING, lead=lead)
     if lead.trial_request_id:
         type(lead.trial_request).objects.filter(pk=lead.trial_request_id).update(status="booked")
+    from apps.notifications.services import render
+
+    title = session.title_ar if lead.language == "ar" and session.title_ar else session.title_en
+    confirm = render(
+        "trial_confirmed",
+        lead.language,
+        name=lead.name.split()[0],
+        branch=lead.branch.name_ar if lead.language == "ar" else lead.branch.name,
+        when=f"{session.date:%d/%m} {session.start:%H:%M}",
+        cls=title,
+    )
+    transaction.on_commit(lambda: send_message(lead.mobile, confirm, kind="trial_confirmed"))
     text = _brief(lead, session)
     mobiles = [u.mobile for u in session.instructors.all() if u.mobile]
-    transaction.on_commit(lambda: [send_message(m, text) for m in mobiles])
+    transaction.on_commit(lambda: [send_message(m, text, category="staff", kind="trial_brief") for m in mobiles])
     return booking
 
 
@@ -486,7 +500,7 @@ def request_review(mobile, branch, reason, member=None, lead=None) -> ReviewRequ
         text = f"شكراً لتدريبكم معنا في {branch.name_ar}! يسعدنا تقييمكم على جوجل: {url}"
     else:
         text = f"Thank you for training with us at {branch.name}! We'd love your Google review: {url}"
-    send_message(mobile, text)
+    send_message(mobile, text, category="service", kind="review_request", member=member)
     return ReviewRequest.objects.create(mobile=mobile, branch=branch, reason=reason, member=member, lead=lead)
 
 
@@ -577,7 +591,7 @@ def send_broadcast(broadcast, user) -> Broadcast:
     b.save()
     record_event(action="broadcast_sent", instance=b, changes={"recipients": len(people)})
     messages = [(mobile, b.message_ar if lang == "ar" else b.message_en) for mobile, lang, _ in people]
-    transaction.on_commit(lambda: [send_message(m, t) for m, t in messages])
+    transaction.on_commit(lambda: [send_message(m, t, category="marketing", kind="broadcast") for m, t in messages])
     return b
 
 

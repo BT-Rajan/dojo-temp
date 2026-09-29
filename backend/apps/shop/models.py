@@ -376,6 +376,29 @@ def place_order(*, cart_lines, customer, fulfilment, payment_method, delivery_fe
     return order
 
 
+def _customer_message(order, key):
+    from apps.core.messaging import send_message
+    from apps.notifications.services import render
+
+    branch = order.pickup_branch or next((i.branch for i in order.items.all() if i.branch_id), None)
+    lang = "ar" if order.language == "ar" else "en"
+    name = (branch.name_ar if lang == "ar" else branch.name) if branch else ""
+    text = render(key, lang, reference=order.reference, branch=name)
+    transaction.on_commit(lambda: send_message(order.mobile, text, kind=key))
+
+
+@transaction.atomic
+def mark_ready(order, user):
+    """P6-10: packed and waiting at the branch; the customer is told."""
+    order = Order.objects.select_for_update().get(pk=order.pk)
+    if order.status != Order.Status.PAID:
+        raise ValueError("Only a paid order can be marked ready.")
+    order.status = Order.Status.READY
+    order.save(update_fields=["status"])
+    _customer_message(order, "order_ready" if order.fulfilment == Order.Fulfilment.PICKUP else "order_sent")
+    return order
+
+
 @transaction.atomic
 def fulfil_order(order, user):
     """Handed over or sent out: the reserved stock leaves the branch shelf (ledger kind 'online')."""
@@ -397,8 +420,11 @@ def fulfil_order(order, user):
                 unit_cost=item.variant.cost,
                 check=False,
             )
+    was_ready = order.status == Order.Status.READY
     order.status, order.fulfilled_at, order.fulfilled_by = Order.Status.COMPLETED, timezone.now(), user
     order.save(update_fields=["status", "fulfilled_at", "fulfilled_by"])
+    if order.fulfilment == Order.Fulfilment.DELIVERY and not was_ready:
+        _customer_message(order, "order_sent")
     return order
 
 

@@ -167,8 +167,11 @@ def book(
     source=Booking.Source.DESK,
     is_trial=False,
     note="",
+    by_family=False,
 ) -> Booking:
-    _need(user, "classes.book", session.branch_id, "You cannot book classes at this branch.")
+    """`by_family`: booked from the portal; the caller has checked the member is the signed-in family's (P6-2)."""
+    if not by_family:
+        _need(user, "classes.book", session.branch_id, "You cannot book classes at this branch.")
     session = ClassSession.objects.select_for_update().get(pk=session.pk)  # one booking at a time per class
     if session.is_cancelled:
         raise ValidationError("This class is cancelled.")
@@ -207,9 +210,10 @@ def book(
 
 
 @transaction.atomic
-def cancel_booking(booking: Booking, user) -> Booking:
+def cancel_booking(booking: Booking, user, by_family=False) -> Booking:
     booking = Booking.objects.select_for_update().select_related("session").get(pk=booking.pk)
-    _need(user, "classes.book", booking.session.branch_id, "You cannot change bookings at this branch.")
+    if not by_family:
+        _need(user, "classes.book", booking.session.branch_id, "You cannot change bookings at this branch.")
     if booking.status in (Booking.Status.CANCELLED, Booking.Status.ATTENDED, Booking.Status.NO_SHOW):
         raise ValidationError("This booking can no longer be cancelled.")
     was_place = booking.status == Booking.Status.BOOKED
@@ -247,7 +251,7 @@ def promote_waitlist(session: ClassSession):
                 if lang == "ar"
                 else f"A place opened up for you: {session.title_en} on {when}."
             )
-            transaction.on_commit(lambda m=mobile, t=text: send_message(m, t))
+            transaction.on_commit(lambda m=mobile, t=text: send_message(m, t, kind="waitlist_place"))
 
 
 # ---------------------------------------------------------------------------
@@ -510,7 +514,7 @@ def decide_change(change: ClassChange, approve: bool, user, note="") -> ClassCha
 
     for mobile, lang in contacts.items():
         text = _change_text(change, lang)
-        transaction.on_commit(lambda m=mobile, t=text: send_message(m, t))
+        transaction.on_commit(lambda m=mobile, t=text: send_message(m, t, kind="class_change"))
     change.status = ClassChange.Status.APPROVED
     change.notified_at, change.notified_channel, change.notified_count = timezone.now(), "whatsapp", len(contacts)
     change.save()

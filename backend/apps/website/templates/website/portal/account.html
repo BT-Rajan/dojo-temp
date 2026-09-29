@@ -1,0 +1,15 @@
+{% extends "website/base.html" %}{% load elite %}
+{% block title %}{% t "Account and messages" "الحساب والرسائل" %}{% endblock %}
+{% block content %}
+<section class="ea-band"><div class="ea-band-in"><div style="display:grid;gap:10px"><p class="ea-eyebrow"><a href="{{ portal_home }}" style="color:inherit;text-decoration:underline">{% t "Member portal" "بوابة الأعضاء" %}</a></p><h1 class="ea-h1">{% t "Account and messages" "الحساب والرسائل" %}</h1></div></div></section>
+<section class="ea-block"><div class="ea-wrap" style="display:grid;gap:24px;max-width:720px">
+{% include "website/portal/_messages.html" %}
+<section class="ea-card" aria-labelledby="h-fam"><div class="ea-card-body" style="display:grid;gap:8px"><h2 class="ea-h3" id="h-fam">{% t "Family" "العائلة" %}</h2>{% for m in family %}<a href="{% url "portal-member" m.pk %}">{% if lang == "ar" and m.first_name_ar %}{{ m.first_name_ar }} {{ m.last_name_ar }}{% else %}{{ m.first_name }} {{ m.last_name }}{% endif %}</a>{% empty %}<p class="ea-meta">—</p>{% endfor %}</div></section>
+<form method="post" class="ea-card ea-form"><div class="ea-card-body" style="display:grid;gap:12px">{% csrf_token %}<h2 class="ea-h3">{% t "Details and messages" "البيانات والرسائل" %}</h2>
+<p class="ea-meta">{% t "Mobile (your sign-in)" "الجوال (للدخول)" %}: <span dir="ltr">{{ mobile }}</span> · {% t "to change it, contact the branch." "لتغييره تواصل مع الفرع." %}</p>
+<div class="ea-field"><label class="ea-label" for="em">{% t "Email" "البريد الإلكتروني" %}</label><input class="ea-input" id="em" name="email" type="email" value="{{ email }}" dir="ltr"></div>
+<fieldset style="border:0;padding:0;margin:0;display:grid;gap:6px"><legend class="ea-label">{% t "WhatsApp messages" "رسائل واتساب" %}</legend><p class="ea-hint">{% t "Receipts, sign-in codes, trial and class-change messages are always sent." "الإيصالات ورموز الدخول ورسائل التجربة وتغيير الحصص تُرسل دائماً." %}</p><label style="display:flex;gap:8px;align-items:center"><input type="checkbox" name="service" value="1"{% if service_on %} checked{% endif %}> {% t "Reminders, test days and progress notes" "التذكيرات وأيام الاختبار وتقارير التقدم" %}</label><label style="display:flex;gap:8px;align-items:center"><input type="checkbox" name="broadcasts" value="1"{% if broadcasts_on %} checked{% endif %}> {% t "News and offers from the academy" "أخبار وعروض الأكاديمية" %}</label></fieldset>
+<button class="ea-btn ea-btn--primary">{% t "Save" "حفظ" %}</button></div></form>
+<section class="ea-card" aria-labelledby="h-msg"><div class="ea-card-body" style="display:grid;gap:8px"><h2 class="ea-h3" id="h-msg">{% t "Recent messages" "الرسائل الأخيرة" %}</h2>{% for m in recent %}<div><p class="ea-meta">{% include "website/partials/date.html" with d=m.at %}</p><p dir="auto" style="white-space:pre-line">{{ m.text }}</p></div>{% empty %}<p class="ea-meta">—</p>{% endfor %}</div></section>
+</div></section>
+{% endblock %}

@@ -11,6 +11,7 @@ from .views import (
     leads,
     manage,
     members,
+    messages,
     mindbody,
     ops,
     payroll,
@@ -180,4 +181,7 @@ urlpatterns = [
     path("saqr/", assistant.saqr, name="saqr"),
     path("saqr/<int:pk>/", assistant.saqr_detail, name="saqr_chat"),
     path("assistant/", assistant.assistant, name="assistant"),
+    # Messages (M17)
+    path("messages/", messages.message_log, name="message_log"),
+    path("messages/wording/", messages.message_templates, name="message_templates"),
 ]

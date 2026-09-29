@@ -26,7 +26,7 @@ from apps.members.models import Guardian, Member
 from apps.rbac.models import Role, RoleAssignment
 from apps.rbac.services import has_perm
 
-from .models import MemberProgress, PortalCode
+from .models import PortalCode
 
 TEXT = {
     "bad_number": ("Please enter an 8-digit Kuwaiti number.", "يرجى إدخال رقم كويتي من 8 أرقام."),
@@ -88,7 +88,7 @@ def _portal_user(profile, kind):
 
 
 def _family(user):
-    """Each child's belt (MemberProgress until the curriculum module), plus live membership and next class."""
+    """Each child's belt (from Training, M7), plus live membership and next class."""
     from apps.classes.models import ClassSession
     from apps.sales.services import member_status
 
@@ -100,7 +100,11 @@ def _family(user):
     if own is not None:
         members = members | Member.objects.filter(pk=own.pk)
     members = members.filter(is_active=True).select_related("branch").distinct()
-    progress = {p.member_id: p for p in MemberProgress.objects.filter(member__in=members)}
+    from apps.training.models import MemberRank
+
+    ranks = {}
+    for mr in MemberRank.objects.filter(member__in=members).select_related("rank", "art").order_by("art__name"):
+        ranks.setdefault(mr.member_id, mr)
     today = timezone.localdate()
     rows = []
     for m in members:
@@ -120,7 +124,7 @@ def _family(user):
         rows.append(
             {
                 "member": m,
-                "progress": progress.get(m.pk),
+                "rank": ranks.get(m.pk),
                 "key": "promenade" if m.branch.code == "PRM" else "bedaya",
                 "status": status,
                 "membership": membership,
@@ -181,7 +185,7 @@ def _send_code(page, request, context, lang):
     profile, _ = _find_account(mobile)
     if profile is not None:
         _, code = PortalCode.issue(mobile)
-        send_message(mobile, tr("sms", lang, code=code))
+        send_message(mobile, tr("sms", lang, code=code), kind="sign_in_code")
     record_event(action="portal_code_requested", object_type="Mobile", object_id=mobile[-4:])
     return HttpResponseRedirect(f"{page.url}?step=code")
 

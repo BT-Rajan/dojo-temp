@@ -56,6 +56,7 @@ INSTALLED_APPS = [
     "apps.training",
     "apps.assistant",
     "apps.leads",
+    "apps.notifications",
     "apps.desk",
     # Wagtail CMS (website content, gallery, events) — EA-SYS-SCOPE-01 M14
     "wagtail.contrib.forms",

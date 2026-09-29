@@ -309,7 +309,7 @@ def decide_request(req: PurchaseRequest, user, decision: str, note="", amended=N
         text = f"Purchase request {req.reference} was {verdict}." + (
             f" {req.decision_note}" if req.decision_note else ""
         )
-        transaction.on_commit(lambda: send_message(requester.mobile, text))
+        transaction.on_commit(lambda: send_message(requester.mobile, text, category="staff"))
     if req.status != PurchaseRequest.Status.REJECTED:
         transaction.on_commit(
             lambda: notify_perm("inventory.purchase", f"{req.reference} approved — ready to order.", exclude=user)

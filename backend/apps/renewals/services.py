@@ -226,7 +226,13 @@ def send_reminders(today=None) -> int:
                     ReminderSent.objects.create(membership=m, days_before=days, sent_to=mobile)
             except IntegrityError:
                 continue  # already sent
-            send_message(mobile, reminder_text(m, contact_language(m.member), days))
+            send_message(
+                mobile,
+                reminder_text(m, contact_language(m.member), days),
+                category="service",
+                kind="renewal_reminder",
+                member=m.member,
+            )
             sent += 1
     return sent
 

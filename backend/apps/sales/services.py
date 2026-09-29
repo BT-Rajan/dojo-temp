@@ -232,8 +232,11 @@ def sell(
     referred_by: Member | None = None,
     receipt_channels=(),
     note="",
+    online=False,
 ) -> Sale:
-    _need(user, "sales.sell", branch.pk, "You cannot sell at this branch.")
+    """`online`: paid through the payment gateway from the portal (P6-3); the caller verified the payment."""
+    if not online:
+        _need(user, "sales.sell", branch.pk, "You cannot sell at this branch.")
     if not cart.items:
         raise ValidationError("Add at least one item.")
     if member is None and not customer_name.strip():
@@ -420,7 +423,7 @@ def send_receipt(sale_id: int):
     channels = sale.receipt_channels or []
     mobile = contact_mobile(sale.member) if sale.member_id else sale.customer_mobile
     if "whatsapp" in channels and mobile:
-        send_message(mobile, receipt_text(sale, lang))
+        send_message(mobile, receipt_text(sale, lang), kind="receipt", member=sale.member)
     email = sale.member.email if sale.member_id else ""
     if "email" in channels and email:
         send_mail(
@@ -445,11 +448,16 @@ def request_change(
     freeze_weeks=None,
     refund_amount=None,
     refund_method="",
+    by_family=False,
 ) -> AccountRequest:
     branch = membership.branch if membership else (sale.branch if sale else None)
     if branch is None:
         raise ValidationError("Choose the membership or sale.")
-    _need(user, "sales.request", branch.pk, "You cannot log requests for this branch.")
+    if by_family:
+        if kind != AccountRequest.Kind.FREEZE:
+            raise PermissionDenied("Families request freezes online; other requests go through the front desk.")
+    else:
+        _need(user, "sales.request", branch.pk, "You cannot log requests for this branch.")
     if not reason.strip():
         raise ValidationError("Give the member's reason.")
     today = timezone.localdate()
@@ -664,7 +672,7 @@ def _notify_cash_up(cash_up_id):
     }
     for u in users:
         if u.mobile:
-            send_message(u.mobile, text)
+            send_message(u.mobile, text, category="staff", kind="cash_up")
 
 
 @transaction.atomic

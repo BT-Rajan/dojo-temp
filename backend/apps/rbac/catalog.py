@@ -65,6 +65,7 @@ PERMISSIONS: dict[str, str] = {
     "marketing.approve": "Approve and send WhatsApp broadcasts; reassign leads",
     "kb.edit": "Write and publish knowledge-base articles",
     "assistant.use": "Ask the Staff Assistant (answers limited to what you can already see)",
+    "messages.view": "See the log of messages sent to families and staff",
     "finance.manage": "Reconciliation, income statements, vendor invoices and exports",
     "finance.expense": "Record branch expenses with a receipt photo",
     "finance.expense_approve": "Approve branch expenses",
@@ -372,3 +373,7 @@ for _code, _perms in PHASE5.items():
 for _code, _role in ROLES.items():
     if _code != "guardian":
         _role[4].add("assistant.use")
+
+# Phase 6 (decisions P6-7, P6-9): who reads the message log.
+for _code in ("operations_manager", "it_admin", "marketing_lead"):
+    ROLES[_code][4].add("messages.view")

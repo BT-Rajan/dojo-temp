@@ -361,7 +361,9 @@ def _promotion_message(promotion) -> str:
 def _tell_family(promotion_id):
     promotion = Promotion.objects.select_related("member", "to_rank", "art").get(pk=promotion_id)
     mobile = contact_mobile(promotion.member)
-    if mobile and send_message(mobile, _promotion_message(promotion)):
+    if mobile and send_message(
+        mobile, _promotion_message(promotion), category="service", kind="promotion", member=promotion.member
+    ):
         Promotion.objects.filter(pk=promotion_id).update(notified=True)
 
 
@@ -493,7 +495,7 @@ def add_candidate(test_day: TestDay, member, user, override_reason="") -> TestCa
         raise ValidationError(f"{member} isn't eligible yet ({missing}). Give a reason to add them anyway.")
     if TestCandidate.objects.filter(test_day=test_day, member=member).exists():
         raise ValidationError(f"{member} is already on this test day.")
-    return TestCandidate.objects.create(
+    candidate = TestCandidate.objects.create(
         test_day=test_day,
         member=member,
         from_rank=e["rank"],
@@ -503,6 +505,23 @@ def add_candidate(test_day: TestDay, member, user, override_reason="") -> TestCa
         created_by=user,
         updated_by=user,
     )
+    from apps.notifications.services import render
+
+    lang = _lang(member)
+    text = render(
+        "test_day_invite",
+        lang,
+        member=display_name(member, lang),
+        art=test_day.art.name_ar if lang == "ar" else test_day.art.name,
+        branch=test_day.branch.name_ar if lang == "ar" else test_day.branch.name,
+        date=f"{test_day.date:%d/%m/%Y}",
+    )
+    mobile = contact_mobile(member)
+    if mobile:
+        transaction.on_commit(
+            lambda: send_message(mobile, text, category="service", kind="test_day_invite", member=member)
+        )
+    return candidate
 
 
 def _can_examine(user, test_day):
@@ -669,7 +688,9 @@ def send_progress_note(note: ProgressNote, user, worked_on: str, next_steps: str
             f"Worked on: {note.worked_on}\nNext: {note.next_steps}\n— Elite Academy"
         )
     if mobile:
-        transaction.on_commit(lambda: send_message(mobile, text))
+        transaction.on_commit(
+            lambda: send_message(mobile, text, category="service", kind="progress_note", member=member)
+        )
     return note
 
 
@@ -687,7 +708,12 @@ def evaluation_reminders(today=None) -> int:
                     due[teacher] += 1
     for teacher, n in due.items():
         if teacher.mobile:
-            send_message(teacher.mobile, f"{n} of your students are due an evaluation — see Training in the desk.")
+            send_message(
+                teacher.mobile,
+                f"{n} of your students are due an evaluation — see Training in the desk.",
+                category="staff",
+                kind="evaluations_due",
+            )
     return len(due)
 
 

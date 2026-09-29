@@ -124,6 +124,6 @@ def notify_perm(code: str, text: str, branch_id: int | None = None, exclude=None
         if exclude is not None and user.pk == getattr(exclude, "pk", exclude):
             continue
         if user.mobile:
-            send_message(user.mobile, text)
+            send_message(user.mobile, text, category="staff")
             sent += 1
     return sent

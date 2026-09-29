@@ -24,7 +24,16 @@ from apps.inventory.models import (
 )
 from apps.organization.models import Branch, Program
 from apps.rbac.services import has_perm, users_with_perm
-from apps.shop.models import CATEGORY_AR, BranchStock, Category, Order, Product, ProductVariant, fulfil_order
+from apps.shop.models import (
+    CATEGORY_AR,
+    BranchStock,
+    Category,
+    Order,
+    Product,
+    ProductVariant,
+    fulfil_order,
+    mark_ready,
+)
 
 from ..access import L, can, desk, lang
 from .finance import export_doc
@@ -762,9 +771,12 @@ def online_fulfil(request, pk):
     if not order.items.filter(branch=request.branch).exists() and order.pickup_branch_id != request.branch.pk:
         raise Http404
     try:
-        fulfil_order(order, request.user)
+        if request.POST.get("action") == "ready":
+            mark_ready(order, request.user)
+            messages.success(request, L("Marked ready; the customer has been told.", "جاهز للاستلام وتم إبلاغ العميل."))
+        else:
+            fulfil_order(order, request.user)
+            messages.success(request, L("Handed over. Stock taken off the shelf.", "تم التسليم وخصم المخزون."))
     except ValueError as exc:
         messages.error(request, str(exc))
-    else:
-        messages.success(request, L("Handed over. Stock taken off the shelf.", "تم التسليم وخصم المخزون."))
     return redirect("desk:online_orders")

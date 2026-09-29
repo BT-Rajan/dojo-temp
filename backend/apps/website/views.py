@@ -17,6 +17,14 @@ def test_payment(request, reference):
     if reference not in request.session.get("orders", []):
         raise Http404
     order = Order.objects.filter(reference=reference).first()
+    if order is None:  # an online membership renewal from the portal (P6-3)
+        from types import SimpleNamespace
+
+        from apps.portal.models import RenewalPayment
+
+        renewal = RenewalPayment.objects.filter(reference=reference).first()
+        if renewal is not None:
+            order = SimpleNamespace(reference=reference, payment_method=renewal.method, total=renewal.amount)
     return_url = request.GET.get("return", "")
     if order is None or not url_has_allowed_host_and_scheme(
         return_url, allowed_hosts={request.get_host()}, require_https=request.is_secure()

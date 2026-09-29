@@ -459,4 +459,4 @@ def _message(users, text):
 
     for u in users:
         if u is not None and u.mobile:
-            send_message(u.mobile, text)
+            send_message(u.mobile, text, category="staff")

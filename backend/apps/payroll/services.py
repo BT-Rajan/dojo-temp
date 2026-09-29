@@ -671,7 +671,9 @@ def return_run(run: PayrollRun, user, note: str) -> PayrollRun:
     submitter = run.submitted_by
     if submitter and submitter.mobile:
         transaction.on_commit(
-            lambda: send_message(submitter.mobile, f"Payroll {run.month:%B %Y} was returned: {run.return_note}")
+            lambda: send_message(
+                submitter.mobile, f"Payroll {run.month:%B %Y} was returned: {run.return_note}", category="staff"
+            )
         )
     return run
 
@@ -717,7 +719,7 @@ def _after_approval(run_id):
                 if lang == "ar"
                 else f"Your payslip for {run.month:%B %Y} is ready in the desk. Net pay {slip.net:.3f} KD."
             )
-            send_message(u.mobile, text)
+            send_message(u.mobile, text, category="staff", kind="payslip")
         Payslip.objects.filter(pk=slip.pk).update(sent_at=timezone.now())
     totals = run_totals(run)
     from apps.operations.services import _ceo_users
@@ -728,6 +730,7 @@ def _after_approval(run_id):
                 ceo.mobile,
                 f"Payroll {run.month:%B %Y} approved: {totals['people']} people, {totals['net']:.3f} KD net, "
                 f"cost to Elite {totals['cost']:.3f} KD.",
+                category="staff",
             )
 
 
@@ -947,7 +950,7 @@ def decide_leave(leave: Leave, user, approve: bool, note="") -> Leave:
         verdict = "approved" if approve else "not approved"
         dates = f"{leave.start:%d/%m}–{leave.end:%d/%m}"
         text = f"Your {leave.get_kind_display().lower()} {dates} was {verdict}. {note}".strip()
-        transaction.on_commit(lambda: send_message(u.mobile, text))
+        transaction.on_commit(lambda: send_message(u.mobile, text, category="staff"))
     return leave
 
 
@@ -1021,7 +1024,7 @@ def remind_expiring_documents(today=None) -> int:
         who = doc.staff.user.full_name
         text = f"{doc.get_kind_display()} of {who} expires on {doc.expires_on:%d/%m/%Y} ({left} days)."
         if doc.staff.user.mobile:
-            send_message(doc.staff.user.mobile, text)
+            send_message(doc.staff.user.mobile, text, category="staff")
         notify_perm("staff.manage", text, exclude=doc.staff.user)
         sent += 1
     return sent

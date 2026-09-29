@@ -153,6 +153,19 @@ fallbacks (`fallbacks: "default"`). Set `AI_ENABLED=true` and `ANTHROPIC_API_KEY
 and whenever the provider is unreachable or declines — SAQR uses the rule-based engine and the Staff Assistant
 routes by keywords over the same tools.
 
+## Phase 6: the family portal and messaging
+
+Code: `apps/portal` (M15: `services.py`, pages in `site_views.py` at `/en/my/…` and `/ar/my/…`, online renewals in
+`RenewalPayment`) and `apps/notifications` (M17: message log, family preferences, wording). The shop storefront
+was built with the website; Phase 6 adds "ready for pick-up" messages for online orders.
+
+| Area | What it does |
+| --- | --- |
+| Family portal | After the mobile + WhatsApp code sign-in, each child (or the adult member) has a page: membership and expiry, this week's classes (book up to 7 days ahead if the membership covers the class; full classes go on the waiting list; cancel any time, within 2 hours recorded as late), recent attendance, belt progress from Training (skills, next-belt requirements, seminar points, test days, evaluation and monthly notes), receipts, photo consent (withdrawal takes effect at once) and signing the academy rules. Records are only ever reached through the signed-in family. |
+| Online renewal | The current membership option at its listed price, paid by KNET or card through the payment gateway (`apps/shop/payments.py`; the test gateway stands in until O-6). A verified payment records the sale at the member's branch, extends the membership from the day after it ends, and sends the receipt. Freeze requests go to the OM's approval queue. |
+| Account and messages | Email, the family's choice of service messages (reminders, test days, progress notes) and broadcasts, and the family's recent messages. The mobile number (the sign-in) is changed at the desk. |
+| Messaging | Every message goes through `apps.core.messaging.send_message` with a category: essential (always sent), service (the family can turn off), marketing (opt-in only) or staff. All are logged (Desk → Messages); the Marketing Lead can reword the family messages (trial confirmation, test-day invitation, booking and waiting-list, online renewal, order ready/sent) without a code change, keeping the placeholders. |
+
 ## The website (elitemaacademy.com)
 
 Built with Wagtail from the Elite Academy design system (direction B · The Path). Code lives in

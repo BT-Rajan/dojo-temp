@@ -1,0 +1,1 @@
+{% if messages %}<div role="status" style="display:grid;gap:8px;margin-block-end:16px">{% for m in messages %}<div class="ea-note{% if m.tags == "error" %} ea-note--warning{% else %} ea-note--success{% endif %}">{{ m }}</div>{% endfor %}</div>{% endif %}
