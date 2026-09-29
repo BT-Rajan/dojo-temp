@@ -600,7 +600,7 @@ def _sum_rows(rows, keys):
 
 
 def weekly_dashboard(branches, start) -> dict:
-    from apps.website.models import TrialRequest
+    from apps.leads.models import Lead
 
     end = start + datetime.timedelta(days=6)
     s0, e1 = _range(start, end)
@@ -619,7 +619,7 @@ def weekly_dashboard(branches, start) -> dict:
             .values("category")
             .annotate(total=Sum("line_total"))
         )
-        leads = TrialRequest.objects.filter(branch=b, created_at__gte=s0, created_at__lt=e1)
+        leads = Lead.objects.filter(branch=b, created_at__gte=s0, created_at__lt=e1)
         rows.append(
             {
                 "branch": b,
@@ -636,7 +636,7 @@ def weekly_dashboard(branches, start) -> dict:
                     session__branch=b, session__date__range=(start, end), status="no_show"
                 ).count(),
                 "mix": {r["category"]: r["total"] or ZERO for r in mix},
-                "leads": {s: leads.filter(status=s).count() for s in TrialRequest.Status.values},
+                "leads": {s: leads.filter(stage=s).count() for s in Lead.Stage.values},
             }
         )
     return {"start": start, "end": end, "rows": rows}
@@ -715,21 +715,40 @@ def training_dashboard(branches, start, end) -> dict:
     }
 
 
-def marketing_dashboard(branches, start, end) -> dict:
-    from apps.website.models import TrialRequest
+def marketing_dashboard(branches, start, end, lang="en") -> dict:
+    """Leads from every source (website, SAQR, walk-in, phone, WhatsApp, referral, events, group sales) — the same
+    records as Desk → Leads — with the funnel, trial conversion and the campaigns running in the period."""
+    from apps.leads import services as ls
+    from apps.leads.labels import label
+    from apps.leads.models import Campaign, Lead
 
     s0, e1 = _range(start, end)
-    leads = TrialRequest.objects.filter(branch__in=branches, created_at__gte=s0, created_at__lt=e1)
-    by_source = leads.values("source").annotate(n=Count("id")).order_by("-n")
+    leads = Lead.objects.filter(branch__in=branches, created_at__gte=s0, created_at__lt=e1)
+    by_source = [dict(r, label=label("source", r["key"], lang)) for r in ls.breakdown(leads, "source")]
     trials = Booking.objects.filter(
         session__branch__in=branches, session__date__range=(start, end), is_trial=True
     ).select_related("session")
     attended = [b for b in trials if b.status == "attended"]
     converted = sum(1 for b in attended if _trial_converted(b))
+    branch_ids = [b.pk for b in branches]
+    campaigns = []
+    for c in Campaign.objects.filter(start__lte=end).filter(Q(end__isnull=True) | Q(end__gte=start)).order_by("-start"):
+        if c.branch_id is not None and c.branch_id not in branch_ids:
+            continue
+        in_period = leads.filter(campaign=c)
+        n, joined = in_period.count(), in_period.filter(stage=Lead.Stage.JOINED).count()
+        campaigns.append({"c": c, "leads": n, "joined": joined, **{k: v for k, v in ls.campaign_stats(c).items()
+                                                                  if k.startswith("cost")}})  # fmt: skip
+    lost = [
+        (label("lost", r["lost_reason"], lang), r["n"])
+        for r in leads.filter(stage=Lead.Stage.LOST).values("lost_reason").annotate(n=Count("id")).order_by("-n")
+    ]
     return {
+        "funnel": ls.funnel(leads),
         "leads": leads.count(),
-        "by_source": list(by_source),
-        "by_status": {s: leads.filter(status=s).count() for s in TrialRequest.Status.values},
+        "by_source": by_source,
+        "campaigns": campaigns,
+        "lost": lost,
         "trials": trials.exclude(status="cancelled").count(),
         "attended": len(attended),
         "converted": converted,

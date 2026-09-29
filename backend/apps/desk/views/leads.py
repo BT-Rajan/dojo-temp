@@ -164,7 +164,9 @@ def lead_report(request):
         qs = qs.filter(branch__code=branch_code)
     owners = {u.pk: u.full_name for u in get_user_model().objects.filter(owned_leads__in=qs).distinct()}
     campaigns = {c.pk: c.name for c in Campaign.objects.filter(leads__in=qs).distinct()}
-    sources = dict(Lead.Source.choices)
+    from apps.leads.labels import label
+
+    sources = {code: label("source", code, lang()) for code in Lead.Source.values}
     return render(
         request,
         "desk/leads/report.html",

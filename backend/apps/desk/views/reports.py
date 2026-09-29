@@ -201,7 +201,7 @@ def dashboards(request):
     elif tab == "marketing":
         end = _date(request.GET.get("end"), today)
         start = end - datetime.timedelta(days=27)
-        ctx.update(data=rep.marketing_dashboard(branches, start, end), start=start, end=end)
+        ctx.update(data=rep.marketing_dashboard(branches, start, end, lang()), start=start, end=end)
     else:
         tab = ctx["tab"] = "daily"
         day = _date(request.GET.get("day"), today)

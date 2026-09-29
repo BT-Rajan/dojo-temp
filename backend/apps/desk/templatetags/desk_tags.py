@@ -71,3 +71,11 @@ def choice(context, obj, field, group):
     if context.get("lang") == "ar":
         return AR.get(group, {}).get(value, value)
     return getattr(obj, f"get_{field}_display")()
+
+
+@register.simple_tag(takes_context=True)
+def lead_label(context, kind, code):
+    """A lead source, stage or lost reason in the page language."""
+    from apps.leads.labels import label
+
+    return label(kind, code, context.get("lang", "en"))
