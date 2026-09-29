@@ -4,7 +4,7 @@
 |---|---|
 | Document Number | EA-SYS-SCOPE-01 |
 | Title | Elite Academy System — Scope of Work |
-| Version | 0.8 (Draft for review) |
+| Version | 0.9 (Draft for review) |
 | Date | 29-Sep-2026 |
 | Document Owner | Systems & IT Lead |
 | Reviewed By | Operations Lead (COO); Training Lead; Marketing Lead |
@@ -20,6 +20,7 @@
 | 0.6 | 29-Sep-2026 | Phase 3 built in test. Phase 4 (Training and Progression) started; working decisions P4-1 to P4-10; open items O-18 and O-19. |
 | 0.7 | 29-Sep-2026 | Phase 4 built in test. Phase 5 (Growth) started; working decisions P5-1 to P5-13; open items O-20 to O-22. |
 | 0.8 | 29-Sep-2026 | Phase 5 built in test. Phase 6 (Members, Shop and Messaging) started; working decisions P6-1 to P6-10; open item O-23. |
+| 0.9 | 29-Sep-2026 | Phase 6 built in test. Phase 7 (Management) built in test — the last planned phase; working decisions P7-1 to P7-10; open items O-24 and O-25. |
 | 0.4 | 29-Sep-2026 | Phase 1 signed off. Phase 2 decisions P2-1 to P2-17 recorded: pay options for any staff member or coach, OM prepares and Accountant approves payroll, freelance coaches paid through payroll, report layouts from the current forms. |
 | 0.3 | 28-Sep-2026 | Added Section 11 Technology and Non-Functional Requirements: Python (Django) back end, MySQL 8 database, front end from the Claude Design template; many simultaneous users; ISO/IEC 27001:2022 alignment; role-based access control. Phase 0 built on the new stack; the clinic codebase becomes a reference only (Section 10). |
 | 0.2 | 28-Sep-2026 | Added: website content management (CMS) with events photo gallery (M14); online shop for equipment (M19); payroll for directly hired coaches and staff (M20); Kuwait test data package (M21); first run, test and change requests (Section 7.1). Payroll and online shop moved out of "Out of Scope". |
@@ -406,7 +407,7 @@ Each phase ends with a demo to the leads and sign-off before the next begins. Th
 | **4** | Training and Progression | M7 Curriculum, evaluations, test days, promotions, progress cards | Belt path tracked for every member — **built in test**; demo and sign-off moved to the end of the project (O-19) |
 | **5** | Growth: Leads, Website, CMS, AI | M3 Leads & group sales, M13 Marketing, **M14 Website with CMS and events gallery** (built on the approved design template), M16 Knowledge base, SAQR chat & Staff Assistant | One funnel from ad to membership; staff edit the website themselves; AI on the homepage and inside the app — **built in test** (the AI engine switches on with O-20); demo and sign-off moved to the end of the project (O-22) |
 | **6** | Members, Shop and Messaging | M15 Member & parent portal, online payments, **M19 Online shop storefront**, M17 WhatsApp/SMS notifications | Members self-serve; equipment sold online; automatic reminders — **built in test** (live payments and WhatsApp switch on with O-6 and O-7); demo and sign-off moved to the end of the project (O-23) |
-| **7** | Management | M12 Communication & cascade, meetings, procedure library, Quarterly Business Report (RPT-01) | The whole Elite operating system in one place |
+| **7** | Management | M12 Communication & cascade, meetings, procedure library, Quarterly Business Report (RPT-01) | The whole Elite operating system in one place — **built in test**; demo and sign-off moved to the end of the project (O-25) |
 
 ### 7.1 First Run, Test and Change Requests
 
@@ -524,6 +525,21 @@ This scope is the starting point, not the final list. More needs will appear onc
 | P6-9 | Templates | Message texts are written in English and Arabic in the One Voice tone; the Marketing Lead can override any text in the desk without a code change. |
 | P6-10 | Online orders | Staff mark an order "ready for pick-up" (the customer gets a WhatsApp) before handing it over; delivery orders get a message when sent out. |
 
+**Phase 7 working decisions (29 Sep 2026)** — sensible defaults so building can continue; each can be changed at the end-of-project review. They follow the Communication Procedure (EA-COMM-PROC-01 v2.3), the Org Chart (EA-COMM-REF-01), the Monthly Leads Meeting MOM template and the Operations Procedure §6 (RPT-01).
+
+| # | Topic | Working decision |
+|---|---|---|
+| P7-1 | Reporting lines | Each staff record names the person's lead and, where there is one, a second (dotted-line) lead. The staff directory and org chart are built from these records and the roles; nothing is drawn by hand. |
+| P7-2 | Working days | Deadlines in working days count Sunday to Thursday (Friday and Saturday are the weekend). |
+| P7-3 | Announcements and the cascade | The CEO or a function lead posts once to named people. Each person confirms receipt in the desk; a lead forwards the same text to their team with one button (the system copies it, so it can't be paraphrased). The deadline is 2 working days; late confirmations and forwards are reminded daily; the sender sees who has confirmed at every level. The OM, who keeps the communication records (§8), sees them all. Staff alerts go by WhatsApp and are logged. |
+| P7-4 | Handoffs and IT requests | Every §5.2 handoff between leads is a request the receiver confirms within 1 working day. Requests to Systems & IT (including change requests, scope 7.1: what, why, who benefits, how urgent) need a committed date before work starts; Systems & IT's change notices go to the affected lead with the go-live date. Updates to the CEO between monthly reports use the same screen. |
+| P7-5 | Dual reporting line | An instruction to someone with two leads is copied automatically to the other lead, in a shared log in the system (resolves Communication open item 1; the two leads confirm it at the end of the project, O-24). |
+| P7-6 | Monthly reports to the CEO | Each function lead's report is pre-filled from the system (Training: attendance, evaluations, promotions, incidents; Operations: leads, conversion, renewals, retention; Marketing: campaigns, broadcasts, opt-ins; Systems & IT: requests received, done and overdue), with the lead's summary and unresolved concerns. Due by the 5th of the next month; the figures are frozen when sent; the CEO acknowledges. Systems & IT reports monthly until its cadence is confirmed (Section 8 item 4). |
+| P7-7 | Monthly leads meeting | The OM records the minutes in the MOM layout: attendance, agenda and discussion, decisions with owners, action items (owner, due date, status) and the next meeting. Open actions from earlier meetings are shown when the new minutes are written. Minutes can't be changed once sent; attendees acknowledge them (the CEO's acknowledgement is the review). Action items appear on each owner's task list. |
+| P7-8 | Escalation log | Anyone logs a safety or conduct concern; it goes to their lead the same day, and the lead names an owner. Member safety or a possible removal reaches the CEO within 24 hours, or the system sends it automatically. "I called the CEO directly" (§6.3) is recorded with the time, and that entry is seen only by the person who raised it and the CEO. The OM keeps the log and sees the rest; branch incidents that needed the CEO (FRM-09) are listed alongside. |
+| P7-9 | Procedure library | Every procedure, form, policy and reference has a document number, owner, version, effective date, what changed and an optional file (PDF or photo, private storage). The OM, CEO or Systems & IT prepares a version; the CEO approves it (never the person who prepared it). The people it applies to (by role, or all staff) are alerted and confirm they have read it; the owner sees who hasn't. |
+| P7-10 | Quarterly Business Report | All 11 RPT-01 sections for Promenade, Bedaya and Combined, from the same live data as the weekly reports and the accounts. Live while in draft, frozen when submitted. The OM writes sections 1 and 2 and may comment on each section; a difference between headline sales and trading income (or unverified weeks) must be explained before submitting. The CEO approves or returns it. Reminders go 1, 10 and 14 days after quarter end and daily from the due date (15 days). PDF and Excel, and a "quarter so far" view. |
+
 **Carried from Elite documents**
 1. Receiving owner for group-sales handoffs (Playbook item 1).
 2. Elite Member tier: eligibility rules and rate (Playbook item 3).
@@ -576,6 +592,8 @@ This scope is the starting point, not the final list. More needs will appear onc
 | O-21 | Google Business Profile review links for each branch | P5-9 |
 | O-22 | Phase 5 demo and sign-off (leads, group sales, campaigns, referrals, broadcasts, knowledge base, SAQR, Staff Assistant) | Phase 5 |
 | O-23 | Phase 6 demo and sign-off (portal, online renewal, messaging, online orders) | Phase 6 |
+| O-24 | Confirm the Phase 7 working rules: the shared-log mechanism for dual-line instructions (Training Lead and OM together), the Sunday–Thursday working week for deadlines, the 5th-of-the-month due date for monthly reports, and who approves procedures | P7-2, P7-5, P7-6, P7-9 |
+| O-25 | Phase 7 demo and sign-off (announcements and cascade, handoffs and IT requests, leads meeting, monthly reports, escalation log, procedure library, directory and org chart, Quarterly Business Report) | Phase 7 |
 
 ## 9. Out of Scope (for now)
 

@@ -57,6 +57,7 @@ INSTALLED_APPS = [
     "apps.assistant",
     "apps.leads",
     "apps.notifications",
+    "apps.management",
     "apps.desk",
     # Wagtail CMS (website content, gallery, events) — EA-SYS-SCOPE-01 M14
     "wagtail.contrib.forms",
@@ -303,6 +304,9 @@ CELERY_BEAT_SCHEDULE = {
         "task": "apps.reports.tasks.friday_snapshot",
         "schedule": crontab(hour=23, minute=30, day_of_week="fri"),
     },
+    # Phase 7 (M12, RPT-01): the 24-hour escalation rule; cascade, handoff and quarterly-report reminders
+    "p7-hourly": {"task": "apps.management.tasks.hourly_jobs", "schedule": crontab(minute=25)},
+    "p7-daily": {"task": "apps.management.tasks.daily_jobs", "schedule": crontab(hour=7, minute=0)},
     "p2-weekly-reports-due": {
         "task": "apps.reports.tasks.weekly_reports_due",
         "schedule": crontab(hour=9, minute=0, day_of_week="sat"),

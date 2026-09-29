@@ -315,10 +315,11 @@ def _python_open_days(branch):
 # ---------------------------------------------------------------------------
 # FRM-07 Weekly Branch Report
 # ---------------------------------------------------------------------------
-def _week_measures(branch, start) -> dict:
+def _week_measures(branch, start, end=None) -> dict:
+    """FRM-07 measures for a week (or any period when `end` is given, e.g. a month or a quarter)."""
     from apps.operations.models import Complaint, Incident
 
-    end = start + datetime.timedelta(days=6)
+    end = end or start + datetime.timedelta(days=6)
     s0, e1 = _range(start, end)
     lines = SaleLine.objects.filter(
         sale__branch=branch, sale__kind=Sale.Kind.SALE, sale__created_at__gte=s0, sale__created_at__lt=e1

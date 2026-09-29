@@ -26,6 +26,14 @@ class StaffProfile(BaseModel):
         "organization.Branch", null=True, blank=True, on_delete=models.PROTECT, related_name="staff"
     )
     reports_to = models.ForeignKey("self", null=True, blank=True, on_delete=models.SET_NULL, related_name="reports")
+    second_lead = models.ForeignKey(
+        "self",
+        null=True,
+        blank=True,
+        on_delete=models.SET_NULL,
+        related_name="dotted_reports",
+        help_text="A second lead (dotted line), e.g. operations staff who also coach. Both leads see instructions.",
+    )
     nationality = models.CharField(max_length=60, blank=True)
     civil_id = EncryptedTextField(blank=True)
     start_date = models.DateField(null=True, blank=True)

@@ -80,6 +80,15 @@ PERMISSIONS: dict[str, str] = {
     "ops.incident": "Report incidents",
     "ops.complaint": "Log and handle complaints",
     "ops.manage": "Follow up incidents and complaints, name cover and handovers",
+    # Management (M12, RPT-01)
+    "mgmt.use": "Announcements, handoffs, escalations, procedures and the staff directory",
+    "mgmt.announce": "Post decisions and announcements to be cascaded",
+    "mgmt.report": "Send the monthly lead report to the CEO",
+    "mgmt.meetings": "Record the monthly leads meeting",
+    "mgmt.escalations": "Keep the escalation log (safety and conduct concerns)",
+    "mgmt.procedures": "Draft procedures, forms and policies for approval",
+    "mgmt.approve": "Approve procedures and the Quarterly Business Report; acknowledge lead reports",
+    "mgmt.qbr": "Prepare the Quarterly Business Report (RPT-01)",
     # Member / parent portal
     "portal.own_family": "See and manage own family in the portal",
 }
@@ -377,3 +386,20 @@ for _code, _role in ROLES.items():
 # Phase 6 (decisions P6-7, P6-9): who reads the message log.
 for _code in ("operations_manager", "it_admin", "marketing_lead"):
     ROLES[_code][4].add("messages.view")
+
+# Phase 7 (M12, RPT-01; decisions P7-1 to P7-10). Everyone who works at Elite uses the management screens; the four
+# function leads post, report and ask; the OM keeps the records; the CEO approves.
+PHASE7 = {
+    "operations_manager": {"mgmt.announce", "mgmt.report", "mgmt.meetings", "mgmt.escalations", "mgmt.procedures",
+                           "mgmt.qbr"},
+    "training_lead": {"mgmt.announce", "mgmt.report"},
+    "marketing_lead": {"mgmt.announce", "mgmt.report"},
+    "it_admin": {"mgmt.announce", "mgmt.report", "mgmt.procedures"},
+}  # fmt: skip
+for _code, _perms in PHASE7.items():
+    ROLES[_code][4].update(_perms)
+for _code, _role in ROLES.items():
+    if _code != "guardian":
+        _role[4].add("mgmt.use")
+# The CEO receives the reports rather than writing them (the OM prepares the RPT-01, the CEO approves).
+ROLES["ceo"][4].difference_update({"mgmt.qbr", "mgmt.report"})

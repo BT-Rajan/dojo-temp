@@ -263,6 +263,16 @@ def staff_pay(request, pk):
             doc.full_clean()
             doc.save()
             messages.success(request, L("Document saved.", "تم حفظ المستند."))
+        elif action == "line":
+            from apps.management.services import set_reporting_line
+
+            set_reporting_line(
+                request.user,
+                staff,
+                StaffProfile.objects.filter(pk=p.get("reports_to") or 0).first(),
+                StaffProfile.objects.filter(pk=p.get("second_lead") or 0).first(),
+            )
+            messages.success(request, L("Reporting line saved.", "تم حفظ خط التبعية."))
         elif action == "leaving":
             if not has_perm(request.user, "staff.manage"):
                 raise PermissionDenied
@@ -279,6 +289,7 @@ def staff_pay(request, pk):
         "editable": editable,
         "documents": staff.documents.all(),
         "can_docs": has_perm(request.user, "staff.manage"),
+        "leads": StaffProfile.objects.filter(user__is_active=True).exclude(pk=staff.pk).select_related("user"),
         "doc_kinds": [(v, DOC_AR[v] if lang() == "ar" else label) for v, label in StaffDocument.Kind.choices],
     }
     if sees_pay:

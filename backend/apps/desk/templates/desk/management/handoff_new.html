@@ -1,0 +1,15 @@
+{% extends "desk/base.html" %}{% load elite %}
+{% block title %}{% t "New handoff" "تسليم جديد" %}{% endblock %}
+{% block content %}<div class="dk-head"><div><h1>{% if kind == "it_request" %}{% t "Request to Systems & IT" "طلب للأنظمة والتقنية" %}{% else %}{% t "New handoff" "تسليم جديد" %}{% endif %}</h1><p>{% t "The receiver confirms within 1 working day. Requests to Systems & IT get a committed date before work starts." "يؤكد المستلم خلال يوم عمل واحد. وتحصل طلبات التقنية على موعد ملتزم به قبل البدء." %}</p></div></div>
+{% include "desk/management/_nav.html" %}
+<form method="post" class="dk-card dk-form" style="max-width:820px">{% csrf_token %}<div class="dk-fields">
+<div class="ea-field dk-wide"><label for="ki">{% t "What is it?" "ما نوعه؟" %}</label><select id="ki" name="kind">{% for v, l in kinds %}<option value="{{ v }}"{% if v == kind %} selected{% endif %}>{{ l }}</option>{% endfor %}</select></div>
+<div class="ea-field"><label for="re">{% t "To" "إلى" %}</label><select id="re" name="receiver"><option value="">{% t "Systems & IT / the CEO (automatic)" "التقنية / الرئيس التنفيذي (تلقائي)" %}</option>{% for u in staff %}<option value="{{ u.pk }}">{{ u.full_name }}</option>{% endfor %}</select></div>
+<div class="ea-field"><label for="ur">{% t "How urgent" "درجة الاستعجال" %}</label><select id="ur" name="urgency">{% for v, l in urgencies %}<option value="{{ v }}"{% if v == "normal" %} selected{% endif %}>{{ l }}</option>{% endfor %}</select></div>
+<div class="ea-field dk-wide"><label for="su">{% t "Subject" "الموضوع" %}</label><input id="su" name="subject" maxlength="200" required></div>
+<div class="ea-field dk-wide"><label for="de">{% t "What is being handed over or asked for" "ما الذي يُسلَّم أو يُطلب" %}</label><textarea id="de" name="detail" rows="5" required></textarea></div>
+<div class="ea-field dk-wide"><label for="wh">{% t "Why (needed for IT requests)" "لماذا (مطلوب لطلبات التقنية)" %}</label><textarea id="wh" name="why" rows="2"></textarea></div>
+<div class="ea-field"><label for="be">{% t "Who benefits" "من المستفيد" %}</label><input id="be" name="benefits" maxlength="255"></div>
+<div class="ea-field"><label for="gl">{% t "Go-live date (IT change notices)" "تاريخ التطبيق (إشعارات التقنية)" %}</label><input id="gl" type="date" name="go_live"></div>
+</div><button class="ea-btn ea-btn--primary">{% t "Send" "إرسال" %}</button></form>
+{% endblock %}

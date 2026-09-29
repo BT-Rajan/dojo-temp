@@ -86,6 +86,14 @@ Document: EA-SYS-SEC-02 · Generated from `backend/apps/rbac/catalog.py` (the si
 | `ops.incident` | Report incidents | ✓ | ✓ | ✓ | ✓ | ✓ |  |  |  | ✓ | ✓ |  |  |  |
 | `ops.complaint` | Log and handle complaints | ✓ | ✓ |  |  |  | ✓ |  |  | ✓ | ✓ |  |  |  |
 | `ops.manage` | Follow up incidents and complaints, name cover and handovers | ✓ | ✓ |  |  |  |  |  |  |  |  |  |  |  |
+| `mgmt.use` | Announcements, handoffs, escalations, procedures and the staff directory | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ |  |
+| `mgmt.announce` | Post decisions and announcements to be cascaded | ✓ | ✓ | ✓ |  |  | ✓ |  | ✓ |  |  |  |  |  |
+| `mgmt.report` | Send the monthly lead report to the CEO |  | ✓ | ✓ |  |  | ✓ |  | ✓ |  |  |  |  |  |
+| `mgmt.meetings` | Record the monthly leads meeting | ✓ | ✓ |  |  |  |  |  |  |  |  |  |  |  |
+| `mgmt.escalations` | Keep the escalation log (safety and conduct concerns) | ✓ | ✓ |  |  |  |  |  |  |  |  |  |  |  |
+| `mgmt.procedures` | Draft procedures, forms and policies for approval | ✓ | ✓ |  |  |  |  |  | ✓ |  |  |  |  |  |
+| `mgmt.approve` | Approve procedures and the Quarterly Business Report; acknowledge lead reports | ✓ |  |  |  |  |  |  |  |  |  |  |  |  |
+| `mgmt.qbr` | Prepare the Quarterly Business Report (RPT-01) |  | ✓ |  |  |  |  |  |  |  |  |  |  |  |
 | `portal.own_family` | See and manage own family in the portal |  |  |  |  |  |  |  |  |  |  |  |  | ✓ |
 
 ## Rules that apply on top of the matrix

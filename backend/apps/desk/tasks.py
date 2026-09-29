@@ -386,6 +386,10 @@ def my_tasks(request) -> list[dict]:
         if n:
             out.append(_task("Broadcasts to approve", "رسائل جماعية للاعتماد", reverse("desk:broadcasts"), None, n))
 
+    # Management (M12, RPT-01)
+    if can(request, "mgmt.use"):
+        out += management_tasks(request, user, today)
+
     def key(t):
         due = t["due"]
         if isinstance(due, datetime.datetime):
@@ -393,3 +397,157 @@ def my_tasks(request) -> list[dict]:
         return (not t["overdue"], not t["urgent"], due or datetime.date.max)
 
     return sorted(out, key=key)
+
+
+def management_tasks(request, user, today) -> list[dict]:
+    from apps.management import quarterly as qbr
+    from apps.management import services as ms
+    from apps.management.models import (
+        ActionItem,
+        Escalation,
+        Handoff,
+        LeadReport,
+        Meeting,
+        ProcedureVersion,
+        QuarterlyReport,
+        Recipient,
+    )
+
+    out = []
+    for r in Recipient.objects.filter(user=user, is_copy=False, confirmed_at__isnull=True).select_related(
+        "announcement"
+    ):
+        a = r.announcement
+        out.append(
+            _task(
+                f"Confirm: {a.title}",
+                f"أكّد الاستلام: {a.title}",
+                reverse("desk:announcement", args=[a.pk]),
+                a.confirm_by,
+            )
+        )
+    for r in Recipient.objects.filter(user=user, is_copy=False, confirmed_at__isnull=False).select_related(
+        "announcement"
+    ):
+        if ms.needs_forward(user, r.announcement):
+            a = r.announcement
+            out.append(
+                _task(
+                    f"Forward to your team: {a.title}",
+                    f"أعد الإرسال لفريقك: {a.title}",
+                    reverse("desk:announcement", args=[a.pk]),
+                    a.confirm_by,
+                )
+            )
+    for h in Handoff.objects.filter(receiver=user, status="sent"):
+        out.append(
+            _task(
+                f"Confirm handoff {h.reference}: {h.subject}",
+                f"أكّد التسليم {h.reference}: {h.subject}",
+                reverse("desk:handoff", args=[h.pk]),
+                h.confirm_by,
+            )
+        )
+    for h in Handoff.objects.filter(receiver=user, status="confirmed", committed_date__isnull=False):
+        out.append(
+            _task(
+                f"IT request {h.reference}: {h.subject}",
+                f"طلب التقنية {h.reference}: {h.subject}",
+                reverse("desk:handoff", args=[h.pk]),
+                h.committed_date,
+            )
+        )
+    for a in ActionItem.objects.filter(owner=user, status="open", meeting__status="published"):
+        out.append(
+            _task(
+                f"Action item: {a.action[:80]}",
+                f"بند عمل: {a.action[:80]}",
+                reverse("desk:meeting", args=[a.meeting_id]),
+                a.due,
+            )
+        )
+    for m in Meeting.objects.filter(status="published", attendees__user=user, attendees__acknowledged_at__isnull=True):
+        out.append(
+            _task(
+                f"Acknowledge the leads meeting minutes ({m.date:%d/%m})",
+                f"اطّلع على محضر اجتماع القادة ({m.date:%d/%m})",
+                reverse("desk:meeting", args=[m.pk]),
+            )
+        )
+    for v in ms.pending_reads(user):
+        out.append(
+            _task(
+                f"Read {v.procedure.code} v{v.version}",
+                f"اقرأ {v.procedure.code} الإصدار {v.version}",
+                reverse("desk:procedure", args=[v.procedure_id]),
+                v.effective_date,
+            )
+        )
+    for e in Escalation.objects.filter(status="open", lead=user, owner__isnull=True):
+        out.append(
+            _task(
+                f"Name an owner for {e.reference}",
+                f"حدّد مسؤولاً عن {e.reference}",
+                reverse("desk:escalation", args=[e.pk]),
+                timezone.localtime(e.raised_at).date(),
+                urgent=True,
+            )
+        )
+    for e in Escalation.objects.filter(status="open", needs_ceo=True, ceo_informed_at__isnull=True, lead=user):
+        out.append(
+            _task(
+                f"Tell the CEO about {e.reference}",
+                f"أبلغ الرئيس التنفيذي بـ {e.reference}",
+                reverse("desk:escalation", args=[e.pk]),
+                e.ceo_due_at,
+                urgent=True,
+            )
+        )
+    for e in Escalation.objects.filter(status="open", owner=user).exclude(lead=user):
+        out.append(
+            _task(f"Escalation {e.reference}", f"التصعيد {e.reference}", reverse("desk:escalation", args=[e.pk]))
+        )
+    if can(request, "mgmt.report"):
+        function = ms.function_of(user)
+        last = ms.previous_month(today)
+        if function and not LeadReport.objects.filter(month=last, function=function).exclude(status="draft").exists():
+            out.append(
+                _task(
+                    f"Monthly report to the CEO ({last:%m/%Y})",
+                    f"التقرير الشهري للرئيس التنفيذي ({last:%m/%Y})",
+                    reverse("desk:lead_reports"),
+                    ms.lead_report_due(last),
+                )
+            )
+    if can(request, "mgmt.approve"):
+        n = LeadReport.objects.filter(status="submitted").count()
+        if n:
+            out.append(_task("Monthly reports to read", "تقارير شهرية للقراءة", reverse("desk:lead_reports"), None, n))
+        n = ProcedureVersion.objects.filter(status="draft").exclude(prepared_by=user).count()
+        if n:
+            out.append(
+                _task("Procedure versions to approve", "إصدارات إجراءات للاعتماد", reverse("desk:procedures"), None, n)
+            )
+        for r in QuarterlyReport.objects.filter(status="submitted").exclude(prepared_by=user):
+            out.append(
+                _task(
+                    f"Approve the Quarterly Business Report {r.label}",
+                    f"اعتمد تقرير الأعمال الربع سنوي {r.label}",
+                    reverse("desk:quarterly_report", args=[r.pk]),
+                    r.due_date,
+                )
+            )
+    if can(request, "mgmt.qbr"):
+        last_q = qbr.last_finished_quarter(today)
+        r = QuarterlyReport.objects.filter(quarter_start=last_q).first()
+        if r is None or r.status in ("draft", "returned"):
+            due = qbr.quarter_end(last_q) + datetime.timedelta(days=QuarterlyReport.DUE_DAYS)
+            out.append(
+                _task(
+                    f"Quarterly Business Report {qbr.label(last_q)} to the CEO",
+                    f"تقرير الأعمال الربع سنوي {qbr.label(last_q)} للرئيس التنفيذي",
+                    reverse("desk:quarterly_report", args=[r.pk]) if r else reverse("desk:quarterly"),
+                    due,
+                )
+            )
+    return out

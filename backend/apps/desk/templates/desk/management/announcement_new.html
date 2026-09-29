@@ -1,0 +1,10 @@
+{% extends "desk/base.html" %}{% load elite %}
+{% block title %}{% t "New announcement" "إعلان جديد" %}{% endblock %}
+{% block content %}<div class="dk-head"><div><h1>{% t "New announcement" "إعلان جديد" %}</h1><p>{% t "Write it once. Each person confirms receipt, and each lead forwards the same text to their team within 2 working days. Anyone with two leads is copied to the other lead automatically." "اكتبه مرة واحدة. يؤكد كل شخص الاستلام، ويعيد كل قائد إرسال النص نفسه لفريقه خلال يومي عمل. ومن له قائدان تصل نسخة لقائده الآخر تلقائياً." %}</p></div></div>
+{% include "desk/management/_nav.html" %}
+<form method="post" class="dk-card dk-form" style="max-width:820px">{% csrf_token %}
+<div class="ea-field"><label for="ti">{% t "Title" "العنوان" %}</label><input id="ti" name="title" maxlength="200" required></div>
+<div class="ea-field"><label for="bo">{% t "The decision or update, in full" "القرار أو التحديث كاملاً" %}</label><textarea id="bo" name="body" rows="8" required></textarea></div>
+<fieldset class="ea-field"><legend>{% t "Send to" "أرسل إلى" %}</legend><div class="dk-fields">{% for u in staff %}<label class="dk-check"><input type="checkbox" name="to" value="{{ u.pk }}"{% if u.pk in preselected %} checked{% endif %}> {{ u.full_name }}</label>{% endfor %}</div></fieldset>
+<button class="ea-btn ea-btn--primary">{% t "Send" "إرسال" %}</button></form>
+{% endblock %}

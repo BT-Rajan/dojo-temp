@@ -1,0 +1,21 @@
+{% extends "desk/base.html" %}{% load elite %}
+{% block title %}{% t "Management" "الإدارة" %}{% endblock %}
+{% block content %}<div class="dk-head"><div><h1>{% t "Management" "الإدارة" %}</h1><p>{% t "Every message has a sender and someone who confirms it: nothing is assumed from silence (EA-COMM-PROC-01)." "لكل رسالة مرسل ومستلم يؤكدها: لا يُفترض الاستلام من الصمت (EA-COMM-PROC-01)." %}</p></div><div class="dk-row">{% if mp.announce %}<a class="ea-btn ea-btn--primary ea-btn--sm" href="{% url "desk:announcement_new" %}">{% icon "plus" %}{% t "Announcement" "إعلان" %}</a>{% endif %}<a class="ea-btn ea-btn--ghost ea-btn--sm" href="{% url "desk:handoff_new" %}">{% t "Handoff or IT request" "تسليم أو طلب تقنية" %}</a><a class="ea-btn ea-btn--ghost ea-btn--sm" href="{% url "desk:escalation_new" %}">{% icon "alert" %}{% t "Raise a concern" "رفع مخاوف" %}</a></div></div>
+{% include "desk/management/_nav.html" %}
+<div class="dk-grid dk-grid--2">
+<section class="dk-card"><h2>{% t "Waiting for you" "بانتظارك" %}</h2><ul class="dk-list">
+{% for r in to_confirm %}<li><a href="{% url "desk:announcement" r.announcement_id %}">{% t "Confirm" "أكّد" %}: {{ r.announcement.title }}</a> <span class="dk-muted">· {{ r.announcement.sender.full_name }} · <span dir="ltr">{{ r.announcement.confirm_by|date:"d/m" }}</span></span></li>{% endfor %}
+{% for a in to_forward %}<li><a href="{% url "desk:announcement" a.pk %}">{% t "Forward to your team" "أعد الإرسال لفريقك" %}: {{ a.title }}</a> <span class="dk-muted">· <span dir="ltr">{{ a.confirm_by|date:"d/m" }}</span></span></li>{% endfor %}
+{% for h in handoffs %}<li><a href="{% url "desk:handoff" h.pk %}" dir="ltr">{{ h.reference }}</a> {{ h.subject }} <span class="dk-muted">· {{ h.sender.full_name }}</span>{% if h.overdue %} <span class="dk-badge dk-badge--danger">{% t "overdue" "متأخر" %}</span>{% endif %}</li>{% endfor %}
+{% for m in minutes %}<li><a href="{% url "desk:meeting" m.pk %}">{% t "Acknowledge the minutes of" "اطّلع على محضر" %} <span dir="ltr">{{ m.date|date:"d/m/Y" }}</span></a></li>{% endfor %}
+{% for a in actions %}<li><a href="{% url "desk:meeting" a.meeting_id %}">{{ a.action|truncatechars:90 }}</a> <span class="dk-muted">· {% t "due" "الموعد" %} <span dir="ltr">{{ a.due|date:"d/m" }}</span></span></li>{% endfor %}
+{% for v in reads %}<li><a href="{% url "desk:procedure" v.procedure_id %}">{% t "Read" "اقرأ" %} {{ v.procedure.code }} v{{ v.version }}</a> <span class="dk-muted">· {{ v.procedure.title }}</span></li>{% endfor %}
+{% if not to_confirm and not to_forward and not handoffs and not minutes and not actions and not reads %}<li class="dk-muted">{% t "Nothing waiting." "لا شيء بانتظارك." %}</li>{% endif %}
+</ul></section>
+<section class="dk-card"><h2>{% t "Your reporting line" "خط التبعية" %}</h2>
+<p><b>{% t "You report to" "تتبع لـ" %}:</b> {% for u in leads %}{{ u.full_name }}{% if not forloop.last %} · {% endif %}{% empty %}—{% endfor %}</p>
+<p><b>{% t "Your team" "فريقك" %}:</b> {% for u in team %}{{ u.full_name }}{% if not forloop.last %}, {% endif %}{% empty %}—{% endfor %}</p>
+<div class="ea-note ea-note--info">{% icon "phone" %}<span>{% t "Safety or conduct concern? Tell your lead the same day. If your lead isn't answering or acting, call the CEO directly and log it here." "مخاوف تتعلق بالسلامة أو السلوك؟ أبلغ قائدك في اليوم نفسه. إن لم يرد أو يتصرف، اتصل بالرئيس التنفيذي مباشرة وسجّل ذلك هنا." %}</span></div>
+{% if escalations %}<h3 style="font-size:15px">{% t "Open escalations you can see" "تصعيدات مفتوحة" %}</h3><ul class="dk-list">{% for e in escalations %}<li><a href="{% url "desk:escalation" e.pk %}" dir="ltr">{{ e.reference }}</a> {{ e.description|truncatechars:70 }}{% if e.ceo_overdue %} <span class="dk-badge dk-badge--danger">{% t "CEO overdue" "تأخر إبلاغ الرئيس" %}</span>{% endif %}</li>{% endfor %}</ul>{% endif %}
+</section></div>
+{% endblock %}

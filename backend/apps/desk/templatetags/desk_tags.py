@@ -60,3 +60,14 @@ def methods(context, value):
     if context.get("lang") != "ar" or not value:
         return value
     return " + ".join(METHODS_AR.get(part, part) for part in value.split(" + "))
+
+
+@register.simple_tag(takes_context=True)
+def choice(context, obj, field, group):
+    """A choice field's label in the page language (Arabic from apps.management.labels)."""
+    from apps.management.labels import AR
+
+    value = getattr(obj, field)
+    if context.get("lang") == "ar":
+        return AR.get(group, {}).get(value, value)
+    return getattr(obj, f"get_{field}_display")()

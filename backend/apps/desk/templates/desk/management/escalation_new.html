@@ -1,0 +1,14 @@
+{% extends "desk/base.html" %}{% load elite %}
+{% block title %}{% t "Raise a concern" "رفع مخاوف" %}{% endblock %}
+{% block content %}<div class="dk-head"><div><h1>{% t "Raise a safety or conduct concern" "رفع مخاوف تتعلق بالسلامة أو السلوك" %}</h1><p>{% t "It goes to your lead" "تُرسل إلى قائدك" %}{% if leads %}: {{ leads.0.full_name }}{% endif %}. {% t "Anything about a member's safety or a possible removal reaches the CEO within 24 hours." "وأي أمر يتعلق بسلامة عضو أو استبعاد محتمل يصل للرئيس التنفيذي خلال 24 ساعة." %}</p></div></div>
+{% include "desk/management/_nav.html" %}
+<div class="ea-note ea-note--warning">{% icon "alert" %}<span>{% t "Someone in danger now? Stop the activity and call 112 first. Report injuries at a branch as an incident (FRM-09) too." "هل هناك خطر الآن؟ أوقف النشاط واتصل بـ 112 أولاً. وسجّل الإصابات في الفرع كحادثة (FRM-09) أيضاً." %}</span></div>
+<form method="post" class="dk-card dk-form" style="max-width:820px">{% csrf_token %}<div class="dk-fields">
+<div class="ea-field"><label for="ki">{% t "Type" "النوع" %}</label><select id="ki" name="kind">{% for v, l in kinds %}<option value="{{ v }}">{% if lang == "ar" %}{% if v == "safety" %}سلامة{% elif v == "conduct" %}سلوك{% else %}مسألة عاجلة أخرى{% endif %}{% else %}{{ l }}{% endif %}</option>{% endfor %}</select></div>
+<div class="ea-field"><label for="br">{% t "Branch (if any)" "الفرع (إن وجد)" %}</label><select id="br" name="branch"><option value="">—</option>{% for b in branches %}<option value="{{ b.pk }}">{% if lang == "ar" %}{{ b.name_ar }}{% else %}{{ b.name }}{% endif %}</option>{% endfor %}</select></div>
+<div class="ea-field dk-wide"><label for="de">{% t "What happened, who is involved, what has been done" "ما الذي حدث ومن المعني وما الذي تم" %}</label><textarea id="de" name="description" rows="6" required></textarea></div>
+<label class="dk-check dk-wide"><input type="checkbox" name="needs_ceo" value="1"> {% t "Involves a member's safety or a possible removal (the CEO must know within 24 hours)" "يتعلق بسلامة عضو أو استبعاد محتمل (يجب إبلاغ الرئيس خلال 24 ساعة)" %}</label>
+<label class="dk-check dk-wide"><input type="checkbox" name="direct" value="1"> {% t "My lead isn't answering or acting, so I called the CEO directly" "قائدي لا يرد أو لا يتصرف، فاتصلت بالرئيس التنفيذي مباشرة" %}</label>
+<div class="ea-field"><label for="ca">{% t "When you called the CEO" "وقت الاتصال بالرئيس" %}</label><input id="ca" type="datetime-local" name="call_at" value="{{ now }}"></div>
+</div><button class="ea-btn ea-btn--primary">{% t "Log the concern" "تسجيل المخاوف" %}</button></form>
+{% endblock %}

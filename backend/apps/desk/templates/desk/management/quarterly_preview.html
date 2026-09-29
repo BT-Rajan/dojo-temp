@@ -1,0 +1,6 @@
+{% extends "desk/base.html" %}{% load elite %}
+{% block title %}{% t "Quarter so far" "الربع حتى الآن" %}{% endblock %}
+{% block content %}<div class="dk-head"><div><h1>{{ doc.title }}</h1><p>{{ doc.subtitle }} · {% t "quarter so far — live figures, not a submitted report" "الربع حتى الآن — أرقام مباشرة وليست تقريراً مرسلاً" %}</p></div><div class="dk-row dk-noprint"><a class="ea-btn ea-btn--ghost ea-btn--sm" href="?format=pdf">PDF</a><a class="ea-btn ea-btn--ghost ea-btn--sm" href="?format=xlsx">Excel</a></div></div>
+{% include "desk/management/_nav.html" %}
+{% include "desk/management/_doc.html" %}
+{% endblock %}

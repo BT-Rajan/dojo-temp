@@ -1,0 +1,16 @@
+{% extends "desk/base.html" %}{% load elite desk_tags %}
+{% block title %}{{ h.reference }}{% endblock %}
+{% block content %}<div class="dk-head"><div><h1><span dir="ltr">{{ h.reference }}</span> · {{ h.subject }}</h1><p>{% choice h "kind" "handoff.kind" %} · {{ h.sender.full_name }} → {{ h.receiver.full_name }} · <span dir="ltr">{{ h.created_at|date:"d/m/Y H:i" }}</span></p></div><a class="ea-btn ea-btn--ghost ea-btn--sm" href="{% url "desk:handoffs" %}">{% t "All handoffs" "كل التسليمات" %}</a></div>
+{% include "desk/management/_nav.html" %}
+<div class="dk-grid dk-grid--2"><section class="dk-card"><h2>{% t "Details" "التفاصيل" %}</h2><p dir="auto" style="white-space:pre-line">{{ h.detail }}</p>
+{% if h.why %}<p><b>{% t "Why" "لماذا" %}:</b> {{ h.why }}</p>{% endif %}{% if h.benefits %}<p><b>{% t "Who benefits" "المستفيد" %}:</b> {{ h.benefits }}</p>{% endif %}
+<p><b>{% t "Urgency" "الاستعجال" %}:</b> {% choice h "urgency" "handoff.urgency" %}{% if h.go_live %} · <b>{% t "Go-live" "التطبيق" %}:</b> <span dir="ltr">{{ h.go_live|date:"d/m/Y" }}</span>{% endif %}</p></section>
+<section class="dk-card"><h2>{% t "Status" "الحالة" %}: {% choice h "status" "handoff.status" %}</h2>
+<p>{% t "Confirm by" "التأكيد قبل" %} <span dir="ltr">{{ h.confirm_by|date:"d/m/Y" }}</span>{% if h.overdue %} <span class="dk-badge dk-badge--danger">{% t "overdue" "متأخر" %}</span>{% endif %}</p>
+{% if h.confirmed_at %}<p>{% t "Confirmed" "أُكّد" %} <span dir="ltr">{{ h.confirmed_at|date:"d/m/Y H:i" }}</span>{% if h.committed_date %} · {% t "committed date" "الموعد الملتزم به" %} <b dir="ltr">{{ h.committed_date|date:"d/m/Y" }}</b>{% endif %}</p>{% endif %}
+{% if h.response %}<p dir="auto" style="white-space:pre-line"><b>{% t "Reply" "الرد" %}:</b> {{ h.response }}</p>{% endif %}
+{% if h.status == "sent" and h.receiver_id == request.user.pk %}<form method="post" class="dk-form">{% csrf_token %}<div class="dk-fields">{% if h.kind == "it_request" %}<div class="ea-field"><label for="cd">{% t "Committed date" "الموعد الملتزم به" %}</label><input id="cd" type="date" name="committed_date" min="{{ today|date:"Y-m-d" }}" required></div>{% endif %}<div class="ea-field dk-wide"><label for="no">{% t "Note to the sender" "ملاحظة للمرسل" %}</label><textarea id="no" name="note" rows="2"></textarea></div></div><div class="dk-row"><button class="ea-btn ea-btn--primary ea-btn--sm" name="action" value="confirm">{% icon "check" %}{% t "Confirm" "تأكيد" %}</button><button class="ea-btn ea-btn--ghost ea-btn--sm" name="action" value="decline" formnovalidate>{% t "Decline (say why)" "رفض (اذكر السبب)" %}</button></div></form>
+{% endif %}
+{% if h.status == "confirmed" %}{% if h.receiver_id == request.user.pk or h.sender_id == request.user.pk %}<form method="post" class="dk-form">{% csrf_token %}<div class="ea-field"><label for="dn">{% t "What was done" "ما الذي تم" %}</label><input id="dn" name="note"></div><button class="ea-btn ea-btn--primary ea-btn--sm" name="action" value="done">{% t "Mark done" "تعليم كمنجز" %}</button></form>{% endif %}{% endif %}
+</section></div>
+{% endblock %}

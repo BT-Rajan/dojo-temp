@@ -64,6 +64,8 @@ MENU = [
     ("desk:kb", "Knowledge base", "قاعدة المعرفة", "check", ["kb.edit"]),
     ("desk:assistant", "Ask the assistant", "اسأل المساعد", "user", ["assistant.use"]),
     ("desk:message_log", "Messages", "الرسائل", "phone", ["messages.view", "marketing.approve"]),
+    ("desk:mgmt", "Management", "الإدارة", "arrow", ["mgmt.use"]),
+    ("desk:quarterly", "Quarterly report", "التقرير الربع سنوي", "cal", ["mgmt.qbr", "mgmt.approve"]),
     ("desk:my_pay", "My pay", "راتبي", "user", ["payroll.self"]),
 ]
 
@@ -91,4 +93,9 @@ def desk(request):
         "desk_branches": allowed_branches(request.user).order_by("code").reverse(),
         "desk_branch": request.branch,
         "desk_counts": waiting_counts(request),
+        # Management permissions for the management screens' navigation and buttons.
+        "mp": {
+            code: can(request, f"mgmt.{code}")
+            for code in ("use", "announce", "report", "meetings", "escalations", "procedures", "approve", "qbr")
+        },
     }

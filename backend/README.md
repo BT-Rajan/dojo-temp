@@ -166,6 +166,24 @@ was built with the website; Phase 6 adds "ready for pick-up" messages for online
 | Account and messages | Email, the family's choice of service messages (reminders, test days, progress notes) and broadcasts, and the family's recent messages. The mobile number (the sign-in) is changed at the desk. |
 | Messaging | Every message goes through `apps.core.messaging.send_message` with a category: essential (always sent), service (the family can turn off), marketing (opt-in only) or staff. All are logged (Desk → Messages); the Marketing Lead can reword the family messages (trial confirmation, test-day invitation, booking and waiting-list, online renewal, order ready/sent) without a code change, keeping the placeholders. |
 
+## Phase 7: management and the Quarterly Business Report
+
+Code: `apps/management` (M12: `services.py`; RPT-01: `quarterly.py`; scheduled jobs in `tasks.py`) and the desk
+screens under Desk → Management. Reporting lines come from the staff records (`StaffProfile.reports_to` and
+`second_lead`). Everything follows the Communication Procedure (EA-COMM-PROC-01): the next person accepts a message
+before the sender lets go of it.
+
+| Area | What it does |
+| --- | --- |
+| Announcements | The CEO or a function lead posts once; each person confirms receipt; leads forward the same text, unchanged, to their team within 2 working days (Sunday–Thursday); the sender sees who has confirmed at every level; daily reminders after the deadline. Anyone with two leads is copied to the other lead automatically. |
+| Handoffs and IT requests | The §5.2 handoffs between leads, requests to Systems & IT (what, why, who benefits, how urgent — also the change requests of scope 7.1), IT change notices with a go-live date, and updates to the CEO between monthly reports. The receiver confirms within 1 working day; Systems & IT must give a committed date. |
+| Leads meeting | Minutes in the MOM layout (attendance, agenda, decisions with owners, action items, next meeting); open actions from earlier meetings shown; locked once sent; attendees acknowledge; action items go on the owners' task lists. |
+| Monthly reports | Each function lead's monthly report to the CEO, pre-filled from the system and frozen when sent; the CEO acknowledges. |
+| Escalation log | Safety and conduct concerns: same day to the lead, an owner named, the CEO within 24 hours for member safety or a removal (automatic after 24 hours), and the "called the CEO directly" route, seen only by the person and the CEO. |
+| Procedure library | Document number, owner, version, effective date, what changed, file; approved by the CEO (never the preparer); the people it applies to confirm they have read it. |
+| Directory and org chart | Built from the staff records and roles, including dotted lines. |
+| Quarterly Business Report | RPT-01, all 11 sections for Promenade, Bedaya and Combined; live while in draft, frozen when the OM submits it; the headline-sales check must be explained; the CEO approves or returns it; PDF and Excel; a "quarter so far" view; reminders up to the due date (15 days after quarter end). |
+
 ## The website (elitemaacademy.com)
 
 Built with Wagtail from the Elite Academy design system (direction B · The Path). Code lives in

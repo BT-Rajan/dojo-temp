@@ -107,3 +107,14 @@ a.ea-chip { text-decoration: none; }
   .dk-side select { width: auto; }
 }
 .dk-stat b .ea-num { font-size: inherit; line-height: inherit; }
+
+/* Management (M12): plain lists, tick boxes, the org chart and report sections */
+.dk-list { margin: 0; padding-inline-start: 18px; display: grid; gap: 6px; }
+.dk-check { display: flex; gap: 8px; align-items: center; font-weight: 400; }
+fieldset.ea-field { border: 0; padding: 0; margin: 0; }
+.dk-org, .dk-org ul { list-style: none; margin: 0; padding-inline-start: 0; }
+.dk-org ul { padding-inline-start: 18px; border-inline-start: 2px solid var(--line); margin-block: 6px; }
+.dk-org li { padding-block: 4px; }
+.dk-rpt h2 { font-size: 17px; margin-block-start: 18px; }
+.dk-rpt h3 { font-size: 15px; }
+.dk-rpt td:not(:first-child), .dk-rpt th:not(:first-child) { text-align: end; }
