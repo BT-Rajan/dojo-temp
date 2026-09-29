@@ -21,6 +21,11 @@ class PrivateStorage(LazyObject):
 private_storage = PrivateStorage()
 
 
+def get_private_storage():
+    """Used as a callable so migrations record this function, not a machine-specific path."""
+    return private_storage
+
+
 def new_qr_token() -> str:
     return secrets.token_urlsafe(12)
 
@@ -102,7 +107,7 @@ class Member(BaseModel):
     is_active = models.BooleanField(default=True)
     photo = models.ImageField(
         upload_to=member_photo_path,
-        storage=private_storage,
+        storage=get_private_storage,
         blank=True,
         help_text="Shown to the member's instructors on the class list.",
     )
