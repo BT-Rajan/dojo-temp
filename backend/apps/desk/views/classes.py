@@ -12,9 +12,10 @@ from django.views.decorators.http import require_POST
 
 from apps.classes import services as classes
 from apps.classes.models import WEEKDAYS, Attendance, Booking, ClassChange, ClassSession, ClassSlot
+from apps.leads import services as lead_services
+from apps.leads.models import Lead
 from apps.organization.models import PricingOption, Program, Room
 from apps.rbac.services import has_perm, scope_queryset
-from apps.website.models import TrialRequest
 
 from ..access import L, can, desk, safe_next
 from ..lookup import search_members, visible_members
@@ -225,7 +226,7 @@ def session_detail(request, pk):
             "can_checkin": has_perm(request.user, "classes.checkin", session.branch_id),
             "can_change": has_perm(request.user, "classes.change_request", session.branch_id),
             "changes": session.changes.select_related("created_by", "decided_by"),
-            "trials": TrialRequest.objects.filter(branch=session.branch, status__in=["new", "contacted"])[:20],
+            "trials": Lead.objects.filter(branch=session.branch, stage__in=["new", "contacted"])[:30],
             "instructors": staff_users(),
         },
     )
@@ -268,21 +269,28 @@ def session_book(request, pk):
     if p.get("member"):
         member = get_object_or_404(visible_members(request.user), pk=p["member"])
         booking = classes.book(session, request.user, member=member, source="desk")
+    elif p.get("lead"):
+        lead = get_object_or_404(Lead, pk=p["lead"], branch=session.branch)
+        booking = lead_services.book_trial(lead, session, request.user)
+    elif has_perm(request.user, "leads.manage", session.branch_id):
+        # A walk-in or phone trial is a lead too (decision P5-1); the person booking owns it.
+        lead = lead_services.intake(
+            name=p.get("guest_name", ""),
+            mobile=p.get("guest_mobile", ""),
+            branch=session.branch,
+            source=p.get("source") or "walk_in",
+            user=request.user,
+        )
+        booking = lead_services.book_trial(lead, session, request.user)
     else:
-        trial = TrialRequest.objects.filter(pk=p.get("trial_request") or 0).first()
         booking = classes.book(
             session,
             request.user,
-            guest_name=p.get("guest_name") or (trial.name if trial else ""),
-            guest_mobile=p.get("guest_mobile") or (trial.mobile if trial else ""),
-            trial_request=trial,
-            source="trial" if trial else "desk",
+            guest_name=p.get("guest_name", ""),
+            guest_mobile=p.get("guest_mobile", ""),
+            source="desk",
             is_trial=True,
         )
-        if trial is not None:
-            trial.status = TrialRequest.Status.BOOKED
-            trial.owner = trial.owner or request.user  # first contact owns the lead
-            trial.save(update_fields=["status", "owner"])
     if booking.status == Booking.Status.WAITLISTED:
         messages.warning(
             request, L("The class is full: added to the waiting list.", "الحصة ممتلئة: أُضيف إلى قائمة الانتظار.")
@@ -403,3 +411,12 @@ def change_decide(request, pk):
     else:
         messages.info(request, L("Rejected.", "تم الرفض."))
     return redirect(safe_next(request, "desk:changes"))
+
+
+@require_POST
+@desk(any_of=["classes.checkin", "leads.manage"])
+def trial_feedback(request, pk):
+    booking = get_object_or_404(Booking.objects.select_related("session"), pk=pk, is_trial=True)
+    lead_services.record_feedback(booking, request.user, request.POST.get("score") or 0, request.POST.get("note", ""))
+    messages.success(request, L("Thanks — feedback saved for the follow-up.", "شكراً — حُفظ التقييم للمتابعة."))
+    return redirect("desk:session", pk=booking.session_id)

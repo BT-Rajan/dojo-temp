@@ -81,7 +81,7 @@ def test_every_screen_renders_in_both_languages(data):
             "renewals/?tab=at_risk",
             "pricing/",
             "reports/",
-            "trials/",
+            "leads/",
         ]:
             response = client.get(url(path, lang))
             assert response.status_code == 200, (lang, path)

@@ -391,6 +391,9 @@ def promote(member, art, to_rank: Rank, user, *, kind=Promotion.Kind.DIRECT, can
     mr.save()
     record_event(action="belt_promotion", instance=promotion, branch_id=branch.pk, changes={"to": to_rank.name})
     transaction.on_commit(lambda: _tell_family(promotion.pk))
+    from apps.leads.services import on_promotion
+
+    transaction.on_commit(lambda: on_promotion(promotion.pk))  # Google review request (P5-9)
     if promotion.belt_status == Promotion.Belt.TO_ISSUE:
         text = f"Belt to hand over at {branch.name}: {member} — {to_rank}."
         transaction.on_commit(lambda: notify_perm("sales.sell", text, branch.pk, exclude=user))

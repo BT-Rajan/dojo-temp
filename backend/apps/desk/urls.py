@@ -1,12 +1,14 @@
 from django.urls import path
 
 from .views import (
+    assistant,
     auth,
     checkin,
     classes,
     finance,
     home,
     inventory,
+    leads,
     manage,
     members,
     mindbody,
@@ -76,7 +78,6 @@ urlpatterns = [
     path("pricing/discounts/<int:pk>/toggle/", manage.discount_toggle, name="discount_toggle"),
     path("reports/", manage.reports, name="reports"),
     path("trials/", manage.trial_requests, name="trials"),
-    path("trials/<int:pk>/", manage.trial_update, name="trial_update"),
     # Daily operations (M9)
     path("tasks/", ops.tasks, name="tasks"),
     path("shift/", ops.shift_opening, name="shift"),
@@ -161,4 +162,22 @@ urlpatterns = [
     path("training/test-days/<int:pk>/", training.test_day, name="test_day"),
     path("training/belts/", training.belts, name="belts"),
     path("training/progress-notes/", training.notes, name="progress_notes"),
+    # Leads, group sales and marketing (M3, M13)
+    path("leads/", leads.leads, name="leads"),
+    path("leads/report/", leads.lead_report, name="lead_report"),
+    path("leads/<int:pk>/", leads.lead_detail, name="lead"),
+    path("group-sales/", leads.deals, name="deals"),
+    path("group-sales/<int:pk>/", leads.deal_detail, name="deal"),
+    path("marketing/campaigns/", leads.campaigns, name="campaigns"),
+    path("marketing/broadcasts/", leads.broadcasts, name="broadcasts"),
+    path("members/<int:pk>/referral-card/", leads.referral_card, name="referral_card"),
+    path("members/<int:pk>/whatsapp/", leads.member_opt_in, name="member_opt_in"),
+    path("classes/trial/<int:pk>/feedback/", classes.trial_feedback, name="trial_feedback"),
+    # Knowledge base and assistants (M16)
+    path("knowledge-base/", assistant.kb, name="kb"),
+    path("knowledge-base/new/", assistant.kb_edit, name="kb_new"),
+    path("knowledge-base/<int:pk>/", assistant.kb_edit, name="kb_edit"),
+    path("saqr/", assistant.saqr, name="saqr"),
+    path("saqr/<int:pk>/", assistant.saqr_detail, name="saqr_chat"),
+    path("assistant/", assistant.assistant, name="assistant"),
 ]

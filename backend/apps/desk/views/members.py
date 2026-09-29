@@ -219,6 +219,12 @@ def member_detail(request, pk):
 
         ranks = [(art, member_rank(member, art, create=False)) for art in arts_for(member)]
         ctx["belts"] = [(art, mr.rank if mr else art.first_rank()) for art, mr in ranks]
+    ctx["marketing"] = {
+        "opted_in": member.messaging_opt_ins.first().opted_in if member.messaging_opt_ins.exists() else False,
+        "referred": member.referred_leads.filter(stage="joined").count(),
+        "can_change": has_perm(request.user, "members.update", member.branch_id)
+        or has_perm(request.user, "marketing.manage"),
+    }
     return render(request, "desk/members/detail.html", ctx)
 
 

@@ -15,7 +15,7 @@ MENU = [
     ("desk:my_classes", "My classes", "حصصي", "shield", ["training.teach"]),
     ("desk:timetable", "Timetable", "الجدول الأسبوعي", "cal", ["classes.view"]),
     ("desk:renewals", "Renewals", "التجديدات", "phone", ["renewals.follow_up"]),
-    ("desk:trials", "Trial requests", "طلبات التجربة", "plus", ["leads.manage"]),
+    ("desk:leads", "Leads", "العملاء المحتملون", "plus", ["leads.manage", "marketing.manage"]),
     ("desk:sales", "Sales", "المبيعات", "bag", ["sales.view"]),
     ("desk:cashup", "Cash-up", "الإغلاق اليومي", "check", ["sales.cashup"]),
     (
@@ -59,6 +59,10 @@ MENU = [
     ("desk:online_orders", "Online orders", "الطلبات الإلكترونية", "bag", ["inventory.manage"]),
     ("desk:imports", "Mindbody", "مايندبودي", "arrow", ["data.import"]),
     ("desk:training", "Training", "التدريب", "check", ["training.view", "training.teach", "training.manage"]),
+    ("desk:campaigns", "Marketing", "التسويق", "photo", ["marketing.manage", "marketing.approve"]),
+    ("desk:saqr", "SAQR chats", "محادثات صقر", "phone", ["leads.manage"]),
+    ("desk:kb", "Knowledge base", "قاعدة المعرفة", "check", ["kb.edit"]),
+    ("desk:assistant", "Ask the assistant", "اسأل المساعد", "user", ["assistant.use"]),
     ("desk:my_pay", "My pay", "راتبي", "user", ["payroll.self"]),
 ]
 

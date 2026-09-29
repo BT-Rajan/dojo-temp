@@ -129,6 +129,30 @@ reminders (Sundays) and the monthly progress-note drafts (the 1st) run with the 
 | Belts | A promotion tells the family by WhatsApp and puts the belt on the branch's hand-over list; the front desk issues it from stock as a 0 KD free issue ("Grading belt"). |
 | Progress notes | Drafted on the 1st for each child who trained last month (classes, new skills, what's next); the instructor edits and sends it to the guardian. |
 
+## Phase 5: leads, marketing and the assistants
+
+Code: `apps/leads` (M3 leads, trials and group sales; M13 campaigns, referrals, reviews, broadcasts) and
+`apps/assistant` (M16 knowledge base, SAQR and the Staff Assistant); screens in `apps/desk/views/{leads,assistant}.py`.
+
+| Area | What the desk does |
+| --- | --- |
+| Leads | Every enquiry — website form, SAQR, walk-in, phone, referral — becomes one lead (a second enquiry from the same mobile updates the open lead). The first person to contact it owns it; only the OM or Marketing Lead reassigns, with a reason. Every open lead has a next action and due time; new web leads are due within 2 hours, overdue ones show on the owner's task list. Stages New → Contacted → Trial booked → Trial done → Joined, or Lost with a reason. |
+| Trials | Booked from the lead (name and phone only); the instructor gets a trial brief by WhatsApp and gives feedback (1–5) on the class list; the follow-up is due 24 hours after the class. The lead is marked Joined automatically when the family's first membership is sold. |
+| Group sales | Schools and companies from Contact to Delivery; a named receiving owner in Operations confirms before Training delivers, and Training is told. |
+| Conversion | Leads, trials, joins and conversion rate by source, campaign, owner and branch. |
+| Campaigns | Code for links (`?c=CODE`, or `utm_campaign`), spend, leads and joins counted automatically, cost per lead and per join. |
+| Referrals and reviews | A referral code and printable QR card per member; a lead arriving with it records the referrer, and the Phase 1 referral reward follows. Google review requests after a trial rated 4–5 and after a belt promotion (at most once per family every 90 days; links set per branch). |
+| WhatsApp broadcasts | Only to families who opted in (recorded on the member page); by branch, program and age; drafted by Marketing, approved and sent by the Marketing Lead (never their own draft). A withdrawn media consent sends that member's gallery photos back to review. |
+| Knowledge base | Articles in English and Arabic, public or staff-only, with an owner and every version kept (restore in one click). Only published articles are used. |
+| SAQR | Every chat is stored (session key hashed; kept 90 days unless it became a lead). Refunds, cancellations, complaints, injuries, asking for a person or two misses hand over to the desk's queue; staff take the chat, create the lead and spot-check answers (3 per shift). |
+| Staff Assistant | "How do I…" from articles and numbers from live data (active members, expiring members, payments by method, leads) — read-only, limited to the asking person's role and branch, with sources shown and every question logged. |
+
+**The AI engine** (open item O-20) uses the Anthropic API (`anthropic` SDK, model `AI_MODEL`, default
+`claude-opus-5-5`) with a manual tool loop over read-only tools, strict tool schemas and server-side refusal
+fallbacks (`fallbacks: "default"`). Set `AI_ENABLED=true` and `ANTHROPIC_API_KEY` to switch it on. Until then —
+and whenever the provider is unreachable or declines — SAQR uses the rule-based engine and the Staff Assistant
+routes by keywords over the same tools.
+
 ## The website (elitemaacademy.com)
 
 Built with Wagtail from the Elite Academy design system (direction B · The Path). Code lives in

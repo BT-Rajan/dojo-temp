@@ -1,10 +1,10 @@
 """
 SAQR — the website chat assistant (EA-SYS-SCOPE-01 M16).
 
-This first engine is rule-based: it answers from live data (branches, prices, timetable)
-in the One Voice tone and applies the Customer Management Procedure's hand-off rules.
-The Claude-powered engine (knowledge base + live data) replaces `RuleEngine` behind the
-same `reply()` interface in Phase 5; nothing in the page changes.
+`RuleEngine` answers from live data (branches, prices, timetable) in the One Voice tone and
+applies the Customer Management Procedure's hand-off rules. Since Phase 5 the chat goes through
+`apps.assistant.services.saqr_message`, which stores the conversation, uses the AI engine
+(knowledge base + live data) when a provider is configured, and falls back to this engine.
 
 Hand-off rule (Customer Management Procedure): refund, cancel, complaint, injury, asking
 for a person, or two unresolved exchanges → hand over to a human on WhatsApp.
@@ -13,7 +13,6 @@ for a person, or two unresolved exchanges → hand over to a human on WhatsApp.
 import re
 from decimal import Decimal, InvalidOperation
 
-from django.core.cache import cache
 from rest_framework import serializers
 from rest_framework.response import Response
 from rest_framework.throttling import AnonRateThrottle
@@ -257,11 +256,9 @@ class SaqrView(APIView):
         data.is_valid(raise_exception=True)
         if not request.session.session_key:
             request.session.save()  # each visitor gets their own conversation state
-        session_key = request.session.session_key
-        state_key = f"saqr:{session_key}"
-        state = cache.get(state_key, {})
-        answer = RuleEngine().reply(data.validated_data["message"], data.validated_data["lang"], state)
-        cache.set(state_key, state, 3600)
+        from apps.assistant.services import saqr_message
+
+        answer = saqr_message(request.session.session_key, data.validated_data["message"], data.validated_data["lang"])
         return Response(answer)
 
 

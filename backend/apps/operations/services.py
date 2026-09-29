@@ -283,11 +283,11 @@ def remind_overdue_complaints(now=None) -> int:
 def handover_items(branch, outgoing, today=None) -> list[dict]:
     """The open-items list, built from live data (scope M9)."""
     from apps.classes.models import Booking
+    from apps.leads.models import Lead
     from apps.renewals.models import InstructorHandoff
     from apps.renewals.services import follow_up_list
     from apps.sales.models import AccountRequest, CashUp
     from apps.sales.services import expected_totals
-    from apps.website.models import TrialRequest
 
     today = today or timezone.localdate()
     cash_today = expected_totals(branch, today)["cash"]
@@ -295,7 +295,7 @@ def handover_items(branch, outgoing, today=None) -> list[dict]:
     unsubmitted = CashUp.objects.filter(branch=branch, status=CashUp.Status.DRAFT).count()
     pending_requests = AccountRequest.objects.filter(branch=branch, status=AccountRequest.Status.PENDING).count()
     follow_ups = follow_up_list(branch, today)
-    leads = TrialRequest.objects.filter(branch=branch, status__in=["new", "contacted"]).count()
+    leads = Lead.objects.filter(branch=branch, stage__in=Lead.OPEN).count()
     trials = Booking.objects.filter(
         session__branch=branch, session__date__gte=today, is_trial=True, status=Booking.Status.BOOKED
     ).count()

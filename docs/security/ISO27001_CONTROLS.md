@@ -68,6 +68,10 @@ For certification, Elite Academy needs an ISMS around the system. These are orga
 - **ISMS foundations (clauses 4–10):** scope, information security policy, risk assessment and treatment, Statement of Applicability, internal audit, management review.
 - **5.1 Policies**, **5.2 Roles and responsibilities** (the RBAC matrix is a good starting point), **5.10 Acceptable use**.
 - **5.19–5.23 Suppliers and cloud services:** security terms with the hosting provider, payment gateway, WhatsApp/SMS provider and AI provider.
+  The AI provider (SAQR and the Staff Assistant, open item O-20) receives only the chat text and the results of
+  read-only tools; the Staff Assistant's tools check the asking user's role and branch before returning data, and
+  SAQR never receives member records. Conversations are kept 90 days unless they became a lead; the feature stays
+  off (`AI_ENABLED=false`) until the terms are agreed.
 - **5.24–5.28 Incident management:** a written process for reporting and handling security incidents (the system's audit log is the evidence source).
 - **5.29–5.30 Business continuity:** backup schedule, restore tests and recovery time targets (**8.13 Information backup** is operated by hosting).
 - **6.1–6.8 People controls:** screening, confidentiality agreements, security awareness training, and the leaver process (the system automates access removal).

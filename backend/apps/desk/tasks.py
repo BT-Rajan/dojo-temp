@@ -46,7 +46,6 @@ def my_tasks(request) -> list[dict]:
     from apps.reports.services import _python_open_days
     from apps.sales.models import AccountRequest, CashUp
     from apps.staff.models import StaffDocument
-    from apps.website.models import TrialRequest
 
     user, branch, today = request.user, request.branch, timezone.localdate()
     out = []
@@ -360,9 +359,32 @@ def my_tasks(request) -> list[dict]:
             )
 
     if branch is not None and can(request, "leads.manage"):
-        n = TrialRequest.objects.filter(branch=branch, status="new").count()
+        from apps.assistant.models import Conversation
+        from apps.leads.models import Lead
+        from apps.leads.services import overdue_leads
+
+        n = Lead.objects.filter(branch=branch, stage="new", owner__isnull=True).count()
         if n:
-            out.append(_task("New trial requests", "طلبات تجربة جديدة", reverse("desk:trials"), None, n))
+            out.append(
+                _task("New leads to contact", "عملاء محتملون جدد للتواصل", reverse("desk:leads"), None, n, urgent=True)
+            )
+        n = overdue_leads(user).count()
+        if n:
+            url = reverse("desk:leads") + "?show=overdue"
+            out.append(_task("Your overdue leads", "عملاؤك المحتملون المتأخرون", url, None, n, urgent=True))
+        n = Conversation.objects.filter(channel="saqr", handed_off_at__isnull=False, taken_at__isnull=True).count()
+        if n:
+            out.append(
+                _task(
+                    "SAQR chats waiting for a person", "محادثات صقر بانتظار موظف", reverse("desk:saqr"), None, n, True
+                )
+            )
+    if can(request, "marketing.approve"):
+        from apps.leads.models import Broadcast
+
+        n = Broadcast.objects.filter(status="draft").exclude(created_by=user).count()
+        if n:
+            out.append(_task("Broadcasts to approve", "رسائل جماعية للاعتماد", reverse("desk:broadcasts"), None, n))
 
     def key(t):
         due = t["due"]

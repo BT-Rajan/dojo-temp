@@ -9,7 +9,7 @@
 <a class="dk-card dk-stat" href="{% url "desk:renewals" %}?tab=at_risk"><b dir="ltr">{{ at_risk }}</b><span>{% t "at risk (no visit in 14 days)" "معرّضون للانقطاع (لا زيارة منذ 14 يوماً)" %}</span></a>{% endif %}
 {% if sales_today is not None %}<a class="dk-card dk-stat" href="{% url "desk:sales" %}"><b>{% kd sales_total %}</b><span dir="auto">{{ sales_today }} {% t "sales today" "مبيعات اليوم" %}</span></a>{% endif %}
 {% if counts.approvals %}<a class="dk-card dk-stat dk-card--warn" href="{% url "desk:approvals" %}"><b dir="ltr">{{ counts.approvals }}</b><span>{% t "waiting for your approval" "بانتظار موافقتك" %}</span></a>{% endif %}
-{% if counts.trials %}<a class="dk-card dk-stat" href="{% url "desk:trials" %}"><b dir="ltr">{{ counts.trials }}</b><span>{% t "new trial requests" "طلبات تجربة جديدة" %}</span></a>{% endif %}
+{% if counts.trials %}<a class="dk-card dk-stat" href="{% url "desk:leads" %}"><b dir="ltr">{{ counts.trials }}</b><span>{% t "new leads to contact" "عملاء محتملون جدد للتواصل" %}</span></a>{% endif %}
 </div>
 {% if shift_needed %}<div class="ea-note ea-note--warning">{% icon "alert" %}<span>{% t "The shift opening checklist isn't done yet — complete it before the first class." "لم تُكمل قائمة فتح النوبة بعد — أكملها قبل الحصة الأولى." %} <a href="{% url "desk:shift" %}">{% t "Open the checklist" "فتح القائمة" %}</a></span></div>{% endif %}
 {% if tasks %}<section><h2 class="ea-h4" style="margin-block:8px">{% t "Waiting for you" "بانتظارك" %} · <a href="{% url "desk:tasks" %}">{% t "all tasks" "كل المهام" %}</a></h2>{% include "desk/ops/_task_list.html" %}</section>{% endif %}

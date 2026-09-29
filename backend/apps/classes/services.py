@@ -352,6 +352,9 @@ def check_in_guest(booking: Booking, user) -> Attendance:
     booking.status = Booking.Status.ATTENDED
     booking.save(update_fields=["status", "updated_at"])
     record_event(action="trial_attended", instance=booking, branch_id=booking.session.branch_id)
+    from apps.leads.services import trial_attended
+
+    trial_attended(booking)
     return attendance
 
 

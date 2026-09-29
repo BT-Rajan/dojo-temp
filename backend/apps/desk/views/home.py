@@ -10,7 +10,6 @@ from apps.organization.models import PriceChange, PricingOption
 from apps.renewals.models import InstructorHandoff
 from apps.renewals.services import at_risk, follow_up_list
 from apps.sales.models import AccountRequest, CashUp, Sale
-from apps.website.models import TrialRequest
 
 from ..access import can, desk
 
@@ -31,7 +30,9 @@ def waiting_counts(request):
     if can(request, "reports.verify") or can(request, "finance.manage"):
         out["cashups"] = CashUp.objects.filter(status="submitted").count()
     if branch is not None and can(request, "leads.manage"):
-        out["trials"] = TrialRequest.objects.filter(branch=branch, status="new").count()
+        from apps.leads.models import Lead
+
+        out["trials"] = Lead.objects.filter(branch=branch, stage="new").count()
     out["approvals"] = sum(out.get(k, 0) for k in ("requests", "prices", "changes", "cashups"))
     return out
 

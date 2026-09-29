@@ -58,7 +58,9 @@ def reset_phase4():
         Art,
     ):
         model.objects.all().delete()
-    ClassSession.objects.filter(kind=ClassSession.Kind.SEMINAR, title_en__endswith="(test)").delete()
+    seminars = ClassSession.objects.filter(kind=ClassSession.Kind.SEMINAR, title_en__endswith="(test)")
+    Attendance.objects.filter(session__in=seminars).delete()
+    seminars.delete()
 
 
 class Phase4Data:

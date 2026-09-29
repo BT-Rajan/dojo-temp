@@ -381,6 +381,12 @@ def sell(
     sale.subtotal, sale.discount_total, sale.total = subtotal, discount_total, total
     sale.save(update_fields=["subtotal", "discount_total", "total"])
 
+    if new_membership_line is not None and member is not None:
+        from apps.leads.services import link_new_member, referrer_for
+
+        if referred_by is None and new_membership_line.category == SaleLine.Category.NEW:
+            referred_by = referrer_for(member)  # decision P5-8: the referral link or card
+        link_new_member(member, sale)
     if referred_by is not None and new_membership_line is not None and referred_by.pk != member.pk:
         reward = Discount.objects.filter(kind=Discount.Kind.REFERRAL, is_enabled=True).first()
         if reward is not None and reward.amount:

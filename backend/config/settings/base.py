@@ -54,6 +54,8 @@ INSTALLED_APPS = [
     "apps.inventory",
     "apps.mindbody",
     "apps.training",
+    "apps.assistant",
+    "apps.leads",
     "apps.desk",
     # Wagtail CMS (website content, gallery, events) — EA-SYS-SCOPE-01 M14
     "wagtail.contrib.forms",
@@ -84,6 +86,7 @@ MIDDLEWARE = [
     "django_otp.middleware.OTPMiddleware",
     "apps.core.middleware.IdleSessionTimeoutMiddleware",
     "apps.core.middleware.RequestContextMiddleware",
+    "apps.leads.middleware.CampaignMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
     "wagtail.contrib.redirects.middleware.RedirectMiddleware",
@@ -271,6 +274,11 @@ DATA_UPLOAD_MAX_NUMBER_FIELDS = 5000
 # Outgoing messages (WhatsApp / SMS). "console" logs messages instead of sending — the
 # provider is chosen before launch (scope decision 6).
 MESSAGING_BACKEND = env("MESSAGING_BACKEND", default="console")
+
+# SAQR and the Staff Assistant (M16, open item O-20). Without a key the rule-based engines answer.
+AI_ENABLED = env.bool("AI_ENABLED", default=False)
+ANTHROPIC_API_KEY = env("ANTHROPIC_API_KEY", default="")
+AI_MODEL = env("AI_MODEL", default="claude-opus-5-5")
 # Online payments (KNET, Visa/Mastercard). "test" simulates the payment page — the
 # provider is chosen before launch (scope decision 5).
 PAYMENT_GATEWAY = env("PAYMENT_GATEWAY", default="test")

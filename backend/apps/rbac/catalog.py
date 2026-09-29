@@ -61,7 +61,10 @@ PERMISSIONS: dict[str, str] = {
     "marketing.manage": "Campaigns, leads and media library",
     "cms.edit": "Draft website content",
     "cms.publish": "Publish website content",
-    "leads.manage": "Follow up website trial requests and contact messages",
+    "leads.manage": "Own and follow up leads and trials, group sales, and SAQR hand-offs",
+    "marketing.approve": "Approve and send WhatsApp broadcasts; reassign leads",
+    "kb.edit": "Write and publish knowledge-base articles",
+    "assistant.use": "Ask the Staff Assistant (answers limited to what you can already see)",
     "finance.manage": "Reconciliation, income statements, vendor invoices and exports",
     "finance.expense": "Record branch expenses with a receipt photo",
     "finance.expense_approve": "Approve branch expenses",
@@ -356,3 +359,16 @@ PHASE4 = {
 }
 for _code, _perms in PHASE4.items():
     ROLES[_code][4].update(_perms)
+
+# Phase 5 (decisions P5-2, P5-10 to P5-13).
+PHASE5 = {
+    "operations_manager": {"marketing.approve", "kb.edit"},
+    "marketing_lead": {"marketing.approve", "kb.edit", "leads.manage"},
+    "marketing_staff": {"kb.edit"},
+    "it_admin": {"kb.edit"},
+}
+for _code, _perms in PHASE5.items():
+    ROLES[_code][4].update(_perms)
+for _code, _role in ROLES.items():
+    if _code != "guardian":
+        _role[4].add("assistant.use")

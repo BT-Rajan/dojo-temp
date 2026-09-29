@@ -18,6 +18,7 @@ class Branch(BaseModel):
     # Weekday numbers the branch is open, Kuwait style: 0=Saturday … 6=Friday
     open_days = models.JSONField(default=list, blank=True)
     positioning = models.CharField(max_length=150, blank=True, help_text="e.g. The Complete Fighter Program")
+    google_review_url = models.URLField(blank=True, help_text="Google Business Profile review link (decision P5-9).")
     is_active = models.BooleanField(default=True)
 
     class Meta:

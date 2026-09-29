@@ -142,6 +142,9 @@ def handle_page_form(page, request):
                 source_path=request.path[:255],
             )
             record_event(action="trial_requested", instance=item, changes={"branch": data["branch"].code})
+            from apps.leads.services import intake_from_trial_request
+
+            intake_from_trial_request(item, request.session)
             # Shown on the confirmation screen only (first name, branch, program — no phone number).
             request.session["last_trial"] = {
                 "name": data["name"].split()[0],

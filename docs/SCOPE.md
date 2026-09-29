@@ -4,7 +4,7 @@
 |---|---|
 | Document Number | EA-SYS-SCOPE-01 |
 | Title | Elite Academy System — Scope of Work |
-| Version | 0.6 (Draft for review) |
+| Version | 0.7 (Draft for review) |
 | Date | 29-Sep-2026 |
 | Document Owner | Systems & IT Lead |
 | Reviewed By | Operations Lead (COO); Training Lead; Marketing Lead |
@@ -18,6 +18,7 @@
 | 0.1 | 28-Sep-2026 | First draft from Elite procedures, reports and meeting notes. |
 | 0.5 | 29-Sep-2026 | Phase 3 started at the CEO's request; Phase 2 demo and every open decision gathered in Section 8.1, to be closed one by one at the end of the project. Phase 3 working decisions P3-1 to P3-10. |
 | 0.6 | 29-Sep-2026 | Phase 3 built in test. Phase 4 (Training and Progression) started; working decisions P4-1 to P4-10; open items O-18 and O-19. |
+| 0.7 | 29-Sep-2026 | Phase 4 built in test. Phase 5 (Growth) started; working decisions P5-1 to P5-13; open items O-20 to O-22. |
 | 0.4 | 29-Sep-2026 | Phase 1 signed off. Phase 2 decisions P2-1 to P2-17 recorded: pay options for any staff member or coach, OM prepares and Accountant approves payroll, freelance coaches paid through payroll, report layouts from the current forms. |
 | 0.3 | 28-Sep-2026 | Added Section 11 Technology and Non-Functional Requirements: Python (Django) back end, MySQL 8 database, front end from the Claude Design template; many simultaneous users; ISO/IEC 27001:2022 alignment; role-based access control. Phase 0 built on the new stack; the clinic codebase becomes a reference only (Section 10). |
 | 0.2 | 28-Sep-2026 | Added: website content management (CMS) with events photo gallery (M14); online shop for equipment (M19); payroll for directly hired coaches and staff (M20); Kuwait test data package (M21); first run, test and change requests (Section 7.1). Payroll and online shop moved out of "Out of Scope". |
@@ -402,7 +403,7 @@ Each phase ends with a demo to the leads and sign-off before the next begins. Th
 | **2** | Operations, Reporting and Payroll | M9 Daily operations forms, M10 Weekly Sales, Weekly Branch, Active Members & dashboards, M11 Finance & Accountant, **M20 Payroll** | Weekly reports build themselves; OM verification online; first payroll run in test — **built**; demo and sign-off moved to the end of the project (Section 8.1) |
 | **3** | Inventory and Migration | M8 Inventory, purchasing, vendors, counts; **online-shop provision (M19 catalogue and stock reservation)**; M18 Mindbody import; parallel run; cut-over | **Mindbody replaced** — then the first run and test (7.1). **Built in test**; demo and sign-off moved to the end of the project (O-16); going live waits on the Mindbody exports and cut-over date (O-11, O-12) |
 | **4** | Training and Progression | M7 Curriculum, evaluations, test days, promotions, progress cards | Belt path tracked for every member — **built in test**; demo and sign-off moved to the end of the project (O-19) |
-| **5** | Growth: Leads, Website, CMS, AI | M3 Leads & group sales, M13 Marketing, **M14 Website with CMS and events gallery** (built on the approved design template), M16 Knowledge base, SAQR chat & Staff Assistant | One funnel from ad to membership; staff edit the website themselves; AI on the homepage and inside the app |
+| **5** | Growth: Leads, Website, CMS, AI | M3 Leads & group sales, M13 Marketing, **M14 Website with CMS and events gallery** (built on the approved design template), M16 Knowledge base, SAQR chat & Staff Assistant | One funnel from ad to membership; staff edit the website themselves; AI on the homepage and inside the app — **built in test** (the AI engine switches on with O-20); demo and sign-off moved to the end of the project (O-22) |
 | **6** | Members, Shop and Messaging | M15 Member & parent portal, online payments, **M19 Online shop storefront**, M17 WhatsApp/SMS notifications | Members self-serve; equipment sold online; automatic reminders |
 | **7** | Management | M12 Communication & cascade, meetings, procedure library, Quarterly Business Report (RPT-01) | The whole Elite operating system in one place |
 
@@ -489,6 +490,24 @@ This scope is the starting point, not the final list. More needs will appear onc
 | P4-9 | Monthly progress note | Drafted automatically on the 1st of the month for each child who trained the month before (skills ticked, what's next); the instructor edits it and sends it to the guardian. |
 | P4-10 | Tournament eligibility | Shown from the belt: striking level = belt; BJJ equivalent from the stripe; Kajukenbo rank. |
 
+**Phase 5 working decisions (29 Sep 2026)** — sensible defaults so building can continue; each can be changed at the end-of-project review. The website, CMS (drafts, review, scheduled publishing, version history), events and gallery consent were built with the website; Phase 5 adds what is missing around them.
+
+| # | Topic | Working decision |
+|---|---|---|
+| P5-1 | One lead per enquiry | Website trial form, SAQR, walk-in, phone, referral and group enquiries all become a lead through the same rules. A new enquiry from a mobile that already has an open lead updates that lead instead of creating a second one. Stages: New → Contacted → Trial booked → Trial done → Joined, or Lost (with a reason). Renewals stay in M6. |
+| P5-2 | Owner | Whoever first records a contact with the lead becomes its owner (Playbook tie-breaker). Only the OM or the Marketing Lead can reassign, with a reason. Every open lead has a next action and a due date; overdue leads show on the owner's task list. |
+| P5-3 | Speed | A new website or SAQR lead gets the next action "Call or WhatsApp" due 2 hours later; after a trial, the follow-up is due 24 hours after the class. |
+| P5-4 | Trials | Booked from the lead into a class with name and phone only. The class instructor gets a trial brief by WhatsApp; the instructor (or desk) marks attendance and gives feedback (1–5 and a note). |
+| P5-5 | Joined | A lead is marked Joined automatically when a first membership is sold to a member with the lead's mobile (or the guardian's), and the conversion is credited to its owner, source and campaign. |
+| P5-6 | Group sales | Schools and companies: Contact → Meeting → Proposal → Agreement → Paid → Delivery. A named receiving owner in Operations must confirm before the deal goes to delivery, and Training is told. |
+| P5-7 | Campaigns | Each campaign has a code; website links carrying it (`?c=CODE` or `utm_campaign`) tag the lead; the desk can pick it too. Cost per lead = spend ÷ leads; cost per conversion = spend ÷ joined. |
+| P5-8 | Referrals | Every member has a referral code (link and card). A lead arriving with it records the referrer; the reward is the Phase 1 referral credit on the new member's first membership. |
+| P5-9 | Review requests | After a trial rated 4 or 5 and after a belt promotion, a Google review request is sent by WhatsApp — at most once per family every 90 days. |
+| P5-10 | WhatsApp broadcasts | Only to families who opted in (recorded with date and who). Audience by branch, program and age group. Marketing staff draft; the Marketing Lead approves and sends. A withdrawn media consent hides the member's public photos at once (as built) and flags them to Marketing for review. |
+| P5-11 | Knowledge base | Articles in English and Arabic, public or staff-only, with an owner; every save keeps a version. Only published articles are used by the assistants. Programs, schedules and prices always come live from the system, never from articles. |
+| P5-12 | SAQR | Runs on an AI model with the public knowledge base and live programs, times and prices; while no AI provider is set up it uses the rule-based engine. It never takes payments, approvals or complaints. Hand-off (refund, cancel, complaint, injury, asking for a person, two unresolved exchanges) creates a lead with the whole chat in the front desk's queue. Staff spot-check at least 3 conversations per shift. |
+| P5-13 | Staff Assistant | Answers "how do I…" from staff articles and data questions from live data, read-only and limited to what the asking person's role and branch can see; every answer shows its sources and every question is logged. |
+
 **Carried from Elite documents**
 1. Receiving owner for group-sales handoffs (Playbook item 1).
 2. Elite Member tier: eligibility rules and rate (Playbook item 3).
@@ -537,6 +556,9 @@ This scope is the starting point, not the final list. More needs will appear onc
 | O-17 | Stock settings to confirm: customs/clearance % and target margin (P3-5), reorder and maximum levels per item, which items are sold online | P3-5, P3-1 |
 | O-18 | Training Lead confirms the Phase 4 numbers (classes, weeks, seminar totals, evaluation cadence and scores), the suggested additions, and the belt lists for Kyokushin, Shin-Kyokushin and Taekwondo | P4-1 to P4-4 |
 | O-19 | Phase 4 demo and sign-off (curriculum, progress cards, evaluations, test days, promotions, progress notes) | Phase 4 |
+| O-20 | AI provider for SAQR and the Staff Assistant: account, API key, data-processing terms and monthly budget | P5-12, P5-13 |
+| O-21 | Google Business Profile review links for each branch | P5-9 |
+| O-22 | Phase 5 demo and sign-off (leads, group sales, campaigns, referrals, broadcasts, knowledge base, SAQR, Staff Assistant) | Phase 5 |
 
 ## 9. Out of Scope (for now)
 

@@ -20,5 +20,6 @@ wagtail>=7.4.3,<7.5
 Pillow>=12.3.0,<13
 # PDF exports with Arabic (M10); fonts are IBM Plex Sans Arabic (SIL Open Font License), in apps/reports/fonts
 reportlab>=4.4,<6
+anthropic>=1.9,<2
 arabic-reshaper>=3.0,<4
 python-bidi>=0.6,<0.7

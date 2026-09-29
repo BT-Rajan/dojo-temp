@@ -68,7 +68,10 @@ Document: EA-SYS-SEC-02 · Generated from `backend/apps/rbac/catalog.py` (the si
 | `marketing.manage` | Campaigns, leads and media library | ✓ |  |  |  |  | ✓ | ✓ |  |  |  |  |  |  |
 | `cms.edit` | Draft website content | ✓ |  |  |  |  | ✓ | ✓ |  |  |  |  |  |  |
 | `cms.publish` | Publish website content | ✓ |  |  |  |  | ✓ |  |  |  |  |  |  |  |
-| `leads.manage` | Follow up website trial requests and contact messages | ✓ | ✓ |  |  |  | ✓ | ✓ |  | ✓ | ✓ |  |  |  |
+| `leads.manage` | Own and follow up leads and trials, group sales, and SAQR hand-offs | ✓ | ✓ |  |  |  | ✓ | ✓ |  | ✓ | ✓ |  |  |  |
+| `marketing.approve` | Approve and send WhatsApp broadcasts; reassign leads | ✓ | ✓ |  |  |  | ✓ |  |  |  |  |  |  |  |
+| `kb.edit` | Write and publish knowledge-base articles | ✓ | ✓ |  |  |  | ✓ | ✓ | ✓ |  |  |  |  |  |
+| `assistant.use` | Ask the Staff Assistant (answers limited to what you can already see) | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ |  |
 | `finance.manage` | Reconciliation, income statements, vendor invoices and exports | ✓ | ✓ |  |  |  |  |  |  |  |  |  | ✓ |  |
 | `finance.expense` | Record branch expenses with a receipt photo | ✓ | ✓ |  |  |  |  |  |  | ✓ | ✓ |  |  |  |
 | `finance.expense_approve` | Approve branch expenses | ✓ | ✓ |  |  |  |  |  |  |  |  |  | ✓ |  |

@@ -22,6 +22,7 @@ def hourly_jobs():
 
 @shared_task
 def daily_jobs():
+    from apps.assistant.services import purge_old_conversations
     from apps.inventory.services import auto_create_counts
     from apps.operations.services import close_leaver_accounts
     from apps.payroll.services import remind_expiring_documents
@@ -32,6 +33,7 @@ def daily_jobs():
         "document_reminders": remind_expiring_documents(),
         "stock_counts_created": auto_create_counts(),
         **training_jobs(),
+        "saqr_chats_purged": purge_old_conversations(),
     }
 
 

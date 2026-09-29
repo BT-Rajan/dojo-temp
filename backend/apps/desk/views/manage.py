@@ -22,7 +22,6 @@ from apps.renewals import services as renewals
 from apps.renewals.models import FollowUp, InstructorHandoff
 from apps.sales import services as sales
 from apps.sales.models import AccountRequest, CashUp, Discount, SaleLine
-from apps.website.models import TrialRequest
 
 from ..access import L, can, desk, lang, safe_next
 from .sales import _money
@@ -370,26 +369,5 @@ def reports(request):
 # ---------------------------------------------------------------------------
 @desk("leads.manage")
 def trial_requests(request):
-    qs = TrialRequest.objects.filter(branch=request.branch).select_related("program", "owner")[:100]
-    upcoming = ClassSession.objects.filter(
-        branch=request.branch,
-        date__gte=timezone.localdate(),
-        date__lte=timezone.localdate() + datetime.timedelta(days=7),
-        status="scheduled",
-    ).order_by("date", "start")
-    return render(
-        request,
-        "desk/manage/trials.html",
-        {"trials": qs, "sessions": upcoming, "statuses": TrialRequest.Status.choices},
-    )
-
-
-@require_POST
-@desk("leads.manage")
-def trial_update(request, pk):
-    trial = get_object_or_404(TrialRequest, pk=pk, branch=request.branch)
-    trial.status = request.POST.get("status", trial.status)
-    trial.owner = trial.owner or request.user
-    trial.notes = request.POST.get("notes", trial.notes)[:2000]
-    trial.save(update_fields=["status", "owner", "notes"])
-    return redirect("desk:trials")
+    """Website trial requests are leads since Phase 5 (decision P5-1)."""
+    return redirect("desk:leads")

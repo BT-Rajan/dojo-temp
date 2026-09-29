@@ -1,0 +1,5 @@
+{% extends "desk/base.html" %}{% load elite desk_tags %}
+{% block title %}{% t "Referral card" "بطاقة الإحالة" %}{% endblock %}
+{% block content %}<div class="dk-head dk-noprint"><div><h1>{% t "Referral card" "بطاقة الإحالة" %}</h1><p><a href="{% url "desk:member" member.pk %}">{% name member %}</a></p></div><button class="ea-btn ea-btn--secondary" type="button" data-print>{% t "Print" "طباعة" %}</button></div>
+<div class="dk-card" style="max-width:420px;text-align:center"><p style="font-size:18px"><strong>{% t "Train with a friend" "تدرّب مع صديق" %}</strong></p><div style="max-width:220px;margin:0 auto">{{ qr }}</div><p>{% t "Referral code" "رمز الإحالة" %}: <strong dir="ltr" style="font-size:20px;letter-spacing:2px">{{ code.code }}</strong></p><p class="dk-muted" dir="ltr" style="word-break:break-all">{{ link }}</p><p class="dk-muted">{% t "When a friend joins with this code, the member earns the referral reward." "عند انضمام صديق بهذا الرمز يحصل العضو على مكافأة الإحالة." %}</p></div>
+{% endblock %}
