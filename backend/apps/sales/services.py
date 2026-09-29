@@ -567,6 +567,25 @@ def expected_totals(branch, day):
     return totals
 
 
+def cash_paid_out(branch, day):
+    """Expenses paid from the drawer that day (decision P2-12). Rejected ones must go back in the drawer."""
+    from apps.finance.models import Expense
+
+    return (
+        Expense.objects.filter(branch=branch, date=day, paid_from=Expense.PaidFrom.DRAWER)
+        .exclude(status=Expense.Status.REJECTED)
+        .aggregate(t=Sum("amount"))["t"]
+        or ZERO
+    )
+
+
+def _apply_expected(cash_up):
+    totals = expected_totals(cash_up.branch, cash_up.date)
+    cash_up.cash_paid_out = cash_paid_out(cash_up.branch, cash_up.date)
+    cash_up.expected_cash = totals["cash"] - cash_up.cash_paid_out
+    cash_up.expected_knet, cash_up.expected_card = totals["knet"], totals["card"]
+
+
 @transaction.atomic
 def open_cash_up(branch, day, user) -> CashUp:
     _need(user, "sales.cashup", branch.pk, "You cannot do the cash-up for this branch.")
@@ -574,13 +593,8 @@ def open_cash_up(branch, day, user) -> CashUp:
         branch=branch, date=day, defaults={"created_by": user, "updated_by": user}
     )
     if cash_up.status == CashUp.Status.DRAFT:
-        totals = expected_totals(branch, day)
-        cash_up.expected_cash, cash_up.expected_knet, cash_up.expected_card = (
-            totals["cash"],
-            totals["knet"],
-            totals["card"],
-        )
-        cash_up.save(update_fields=["expected_cash", "expected_knet", "expected_card", "updated_at"])
+        _apply_expected(cash_up)
+        cash_up.save(update_fields=["expected_cash", "cash_paid_out", "expected_knet", "expected_card", "updated_at"])
     return cash_up
 
 
@@ -590,8 +604,7 @@ def submit_cash_up(cash_up: CashUp, user, *, counted_cash, terminal_knet, termin
     _need(user, "sales.cashup", cash_up.branch_id, "You cannot do the cash-up for this branch.")
     if cash_up.status != CashUp.Status.DRAFT:
         raise ValidationError("This cash-up has already been submitted.")
-    totals = expected_totals(cash_up.branch, cash_up.date)  # recalculate: sales may have happened since opening
-    cash_up.expected_cash, cash_up.expected_knet, cash_up.expected_card = totals["cash"], totals["knet"], totals["card"]
+    _apply_expected(cash_up)  # recalculate: sales and expenses may have happened since opening
     cash_up.counted_cash, cash_up.terminal_knet, cash_up.terminal_card = counted_cash, terminal_knet, terminal_card
     cash_up.reason = reason.strip()
     if cash_up.needs_reason and not cash_up.reason:

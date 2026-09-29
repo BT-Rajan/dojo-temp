@@ -30,7 +30,8 @@
 .dk-card h3 { margin: 0; font: 600 16px/22px var(--font-display); }
 .dk-stat b { display: block; font: 600 30px/36px var(--font-display); }
 .dk-stat span { color: var(--ink-muted); font-size: 14px; }
-.dk-table-wrap { overflow-x: auto; }
+.dk-table-wrap { overflow-x: auto; position: relative; }
+.dk-table-wrap:focus-visible { outline: 2px solid var(--brand-blue); outline-offset: 2px; }
 .dk-table { width: 100%; border-collapse: collapse; font-size: 14px; line-height: 20px; }
 .dk-table th, .dk-table td { text-align: start; padding: 10px 8px; border-block-end: 1px solid var(--line); vertical-align: top; }
 .dk-table th { font-weight: 600; color: var(--ink-muted); background: var(--surface-sunken); position: sticky; top: 0; }
@@ -105,3 +106,4 @@ a.ea-chip { text-decoration: none; }
   .dk-side-foot > span { display: none; }
   .dk-side select { width: auto; }
 }
+.dk-stat b .ea-num { font-size: inherit; line-height: inherit; }

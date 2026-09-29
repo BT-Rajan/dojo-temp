@@ -1,0 +1,5 @@
+{% extends "desk/base.html" %}{% load elite %}
+{% block title %}{% t "My tasks" "مهامي" %}{% endblock %}
+{% block content %}<div class="dk-head"><div><h1>{% t "My tasks" "مهامي" %}</h1><p>{% t "Everything waiting for you, most urgent first." "كل ما ينتظرك، الأكثر إلحاحاً أولاً." %}</p></div></div>
+{% include "desk/ops/_task_list.html" %}
+{% endblock %}

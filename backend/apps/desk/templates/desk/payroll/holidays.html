@@ -1,0 +1,7 @@
+{% extends "desk/base.html" %}{% load elite %}
+{% block title %}{% t "Public holidays" "العطل الرسمية" %}{% endblock %}
+{% block content %}<div class="dk-head"><div><h1>{% t "Public holidays" "العطل الرسمية" %}</h1><p>{% t "Used for overtime on holidays and to count leave days. Add them as the government announces them." "تُستخدم للعمل الإضافي في العطل ولاحتساب أيام الإجازة. أضفها عند إعلانها." %}</p></div></div>
+{% include "desk/payroll/_nav.html" %}
+<form method="post" class="dk-card dk-row dk-form">{% csrf_token %}<label for="hd">{% t "Date" "التاريخ" %}</label><input id="hd" type="date" name="date" required style="max-width:170px"><label for="hn">{% t "Name" "الاسم" %}</label><input id="hn" name="name" required maxlength="100" style="max-width:220px"><label for="hna">{% t "Arabic name" "الاسم بالعربية" %}</label><input id="hna" name="name_ar" maxlength="100" dir="rtl" style="max-width:220px"><button class="ea-btn ea-btn--primary ea-btn--sm">{% t "Add" "إضافة" %}</button></form>
+<div class="dk-card"><table class="dk-table"><tbody>{% for h in holidays %}<tr><td dir="ltr">{{ h.date|date:"D d/m/Y" }}</td><td>{% if lang == "ar" and h.name_ar %}{{ h.name_ar }}{% else %}{{ h.name }}{% endif %}</td><td><form method="post">{% csrf_token %}<input type="hidden" name="remove" value="{{ h.pk }}"><button class="ea-btn ea-btn--ghost ea-btn--sm">{% t "Remove" "إزالة" %}</button></form></td></tr>{% empty %}<tr><td class="dk-muted">—</td></tr>{% endfor %}</tbody></table></div>
+{% endblock %}

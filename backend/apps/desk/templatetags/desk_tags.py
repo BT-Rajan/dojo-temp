@@ -36,3 +36,27 @@ def name(context, member):
     if member is None:
         return ""
     return display_name(member, context.get("lang", "en"))
+
+
+@register.filter
+def dmy(value):
+    """'2026-09-19' (as stored in a frozen report) or a date → 19/09/2026."""
+    import datetime
+
+    if isinstance(value, str) and len(value) == 10:
+        try:
+            value = datetime.date.fromisoformat(value)
+        except ValueError:
+            return value
+    return value.strftime("%d/%m/%Y") if hasattr(value, "strftime") else value
+
+
+METHODS_AR = {"KNET": "كي نت", "Visa / Mastercard": "فيزا / ماستركارد", "Cash": "نقداً"}
+
+
+@register.simple_tag(takes_context=True)
+def methods(context, value):
+    """'KNET + Cash' in the page language."""
+    if context.get("lang") != "ar" or not value:
+        return value
+    return " + ".join(METHODS_AR.get(part, part) for part in value.split(" + "))

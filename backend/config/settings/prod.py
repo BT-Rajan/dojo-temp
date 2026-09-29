@@ -30,3 +30,6 @@ ENFORCE_PRIVILEGED_MFA = env.bool("ENFORCE_PRIVILEGED_MFA", default=True)
 
 if PAYMENT_GATEWAY == "test":  # noqa: F405
     raise ImproperlyConfigured("Choose a real PAYMENT_GATEWAY before going live; 'test' is for development only.")
+
+if EMAIL_BACKEND.endswith("console.EmailBackend"):  # noqa: F405
+    raise ImproperlyConfigured("Set DJANGO_EMAIL_BACKEND and the EMAIL_* settings before going live.")

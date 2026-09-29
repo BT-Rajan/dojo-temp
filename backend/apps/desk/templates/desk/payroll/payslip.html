@@ -1,0 +1,10 @@
+{% extends "desk/base.html" %}{% load elite %}
+{% block title %}{% t "Payslip" "قسيمة الراتب" %}{% endblock %}
+{% block content %}<div class="dk-head"><div><h1>{% t "Payslip" "قسيمة الراتب" %} <span dir="ltr">{{ slip.run.month|date:"m/Y" }}</span></h1><p>{% if lang == "ar" and slip.full_name_ar %}{{ slip.full_name_ar }}{% else %}{{ slip.full_name }}{% endif %} · {% if lang == "ar" and slip.job_title_ar %}{{ slip.job_title_ar }}{% else %}{{ slip.job_title }}{% endif %} · <span dir="ltr">{{ slip.run.reference }}</span></p></div><div class="dk-row"><a class="ea-btn ea-btn--ghost ea-btn--sm" href="?format=pdf">PDF</a><a class="ea-btn ea-btn--ghost ea-btn--sm" data-print href="#">{% t "Print" "طباعة" %}</a></div></div>
+<div class="dk-grid dk-grid--3"><div class="dk-card dk-stat"><b>{% kd slip.gross %}</b><span>{% t "gross" "الإجمالي" %}</span></div><div class="dk-card dk-stat"><b>{% kd slip.deductions %}</b><span>{% t "deductions" "الاستقطاعات" %}</span></div><div class="dk-card dk-stat"><b>{% kd slip.net %}</b><span>{% t "net pay" "صافي الراتب" %}</span></div></div>
+
+<section class="dk-card"><h2>{% t "Earnings" "الاستحقاقات" %}</h2>{% include "desk/payroll/_lines.html" with lines=earnings %}</section>
+<section class="dk-card"><h2>{% t "Deductions" "الاستقطاعات" %}</h2>{% include "desk/payroll/_lines.html" with lines=deductions %}</section>
+{% if employer %}<section class="dk-card"><h2>{% t "Paid by Elite (not deducted)" "تدفعه إيليت (غير مستقطع)" %}</h2>{% include "desk/payroll/_lines.html" with lines=employer %}</section>{% endif %}
+<p class="dk-muted">{% t "Paid on" "يُصرف في" %} <span dir="ltr">{{ slip.run.pay_date|date:"d/m/Y" }}</span>{% if slip.iban_last4 %} · IBAN <span dir="ltr">****{{ slip.iban_last4 }}</span>{% endif %} · {% t "Classes and sales counted" "الحصص والمبيعات المحتسبة" %} <span dir="ltr">{{ slip.run.period_start|date:"d/m" }}–{{ slip.run.period_end|date:"d/m" }}</span></p>
+{% endblock %}

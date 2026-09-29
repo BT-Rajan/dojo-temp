@@ -1,0 +1,13 @@
+{% extends "desk/base.html" %}{% load elite %}
+{% block title %}{% t "Name cover" "تعيين بديل" %}{% endblock %}
+{% block content %}<div class="dk-head"><div><h1>{% t "Name cover" "تعيين بديل" %}</h1><p>EA-OPS-FRM-11</p></div></div>
+<form method="post" class="dk-card dk-form" style="max-width:760px">{% csrf_token %}<div class="dk-fields">
+<div class="ea-field"><label for="og">{% t "Outgoing (on leave or leaving)" "المغادر (إجازة أو مغادرة)" %}</label><select id="og" name="outgoing" required><option value="">—</option>{% for u in people %}<option value="{{ u.pk }}">{{ u.full_name }}</option>{% endfor %}</select></div>
+<div class="ea-field"><label for="ic">{% t "Incoming / cover" "البديل" %}</label><select id="ic" name="incoming" required><option value="">—</option>{% for u in people %}<option value="{{ u.pk }}">{{ u.full_name }}</option>{% endfor %}</select></div>
+<div class="ea-field"><label for="cf">{% t "Cover from" "من" %}</label><input id="cf" type="date" name="cover_from" value="{{ today|date:"Y-m-d" }}" required></div>
+<div class="ea-field"><label for="ct">{% t "Cover until (blank if open-ended)" "حتى (اتركه فارغاً إن كان مفتوحاً)" %}</label><input id="ct" type="date" name="cover_to"></div>
+<label class="dk-wide" style="display:flex;gap:10px;align-items:center"><input type="checkbox" name="leaving" value="1"> {% t "The outgoing person is leaving Elite — their access ends after their last day" "المغادر يترك إيليت — تنتهي صلاحياته بعد آخر يوم عمل" %}</label>
+<div class="ea-field"><label for="ld">{% t "Last day (leavers only)" "آخر يوم (للمغادرين)" %}</label><input id="ld" type="date" name="last_day"></div>
+<div class="ea-field dk-wide"><label for="nt">{% t "Note" "ملاحظة" %}</label><textarea id="nt" name="note" rows="2"></textarea></div></div>
+<button class="ea-btn ea-btn--primary">{% t "Name cover and build the handover list" "تعيين البديل وإعداد قائمة التسليم" %}</button></form>
+{% endblock %}

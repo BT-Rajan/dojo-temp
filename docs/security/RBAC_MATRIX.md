@@ -17,7 +17,7 @@ Document: EA-SYS-SEC-02 · Generated from `backend/apps/rbac/catalog.py` (the si
 | `branch_admin` (BrAdm) | Branch Admin / إداري الفرع |  | Front desk and daily branch operations. |
 | `operations_support` (OpsSp) | Operations Support / دعم العمليات |  | Front desk support at either branch. |
 | `purchasing_coordinator` (Purch) | Purchasing / Receiving Coordinator / منسق المشتريات |  | Orders and deliveries. |
-| `accountant` (Acct) | Accountant / المحاسب | ★ | Finance and payroll preparation. |
+| `accountant` (Acct) | Accountant / المحاسب | ★ | Finance, reconciliation and payroll approval. |
 | `guardian` (Parent) | Parent / Member / ولي الأمر / العضو |  | Portal access to own family only. |
 
 | Permission | Meaning | CEO | OM | Train | Track | Coach | Mkt | MktI | IT | BrAdm | OpsSp | Purch | Acct | Parent |
@@ -54,7 +54,7 @@ Document: EA-SYS-SEC-02 · Generated from `backend/apps/rbac/catalog.py` (the si
 | `renewals.follow_up` | Work the renewals follow-up list | ✓ | ✓ |  |  |  |  |  |  | ✓ | ✓ |  |  |  |
 | `sales.sell` | Sell at the front desk | ✓ | ✓ |  |  |  |  |  |  | ✓ | ✓ |  |  |  |
 | `sales.approve_refund` | Approve freezes, refunds and cancellations | ✓ | ✓ |  |  |  |  |  |  |  |  |  |  |  |
-| `reports.branch` | Branch reports | ✓ | ✓ | ✓ |  |  | ✓ |  |  | ✓ |  |  |  |  |
+| `reports.branch` | Branch reports | ✓ | ✓ | ✓ |  |  | ✓ |  |  | ✓ | ✓ |  |  |  |
 | `reports.all` | All-branch and quarterly reports | ✓ | ✓ |  |  |  |  |  |  |  |  |  | ✓ |  |
 | `reports.verify` | Verify weekly reports | ✓ | ✓ |  |  |  |  |  |  |  |  |  |  |  |
 | `inventory.manage` | Stock counts, transfers and receiving | ✓ | ✓ |  |  |  |  |  |  | ✓ |  | ✓ |  |  |
@@ -65,11 +65,19 @@ Document: EA-SYS-SEC-02 · Generated from `backend/apps/rbac/catalog.py` (the si
 | `cms.edit` | Draft website content | ✓ |  |  |  |  | ✓ | ✓ |  |  |  |  |  |  |
 | `cms.publish` | Publish website content | ✓ |  |  |  |  | ✓ |  |  |  |  |  |  |  |
 | `leads.manage` | Follow up website trial requests and contact messages | ✓ | ✓ |  |  |  | ✓ | ✓ |  | ✓ | ✓ |  |  |  |
-| `finance.manage` | Cash-up, expenses and statements | ✓ | ✓ |  |  |  |  |  |  |  |  |  | ✓ |  |
-| `payroll.prepare` | Prepare payroll |  |  |  |  |  |  |  |  |  |  |  | ✓ |  |
-| `payroll.review` | Review payroll | ✓ | ✓ |  |  |  |  |  |  |  |  |  |  |  |
-| `payroll.approve` | Approve payroll | ✓ |  |  |  |  |  |  |  |  |  |  |  |  |
+| `finance.manage` | Reconciliation, income statements, vendor invoices and exports | ✓ | ✓ |  |  |  |  |  |  |  |  |  | ✓ |  |
+| `finance.expense` | Record branch expenses with a receipt photo | ✓ | ✓ |  |  |  |  |  |  | ✓ | ✓ |  |  |  |
+| `finance.expense_approve` | Approve branch expenses | ✓ | ✓ |  |  |  |  |  |  |  |  |  | ✓ |  |
+| `payroll.prepare` | Set up staff pay and prepare the monthly payroll run |  | ✓ |  |  |  |  |  |  |  |  |  |  |  |
+| `payroll.view` | See payroll runs, payslips and summaries | ✓ | ✓ |  |  |  |  |  |  |  |  |  | ✓ |  |
+| `payroll.approve` | Approve the monthly payroll run |  |  |  |  |  |  |  |  |  |  |  | ✓ |  |
+| `payroll.self` | See own payslips; request leave and salary advances | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ |  |
+| `leave.approve` | Approve staff leave | ✓ | ✓ | ✓ |  |  |  |  |  |  |  |  |  |  |
 | `incidents.escalate` | Receive safety escalations | ✓ | ✓ | ✓ |  |  |  |  |  |  |  |  |  |  |
+| `ops.shift` | Complete the shift opening checklist | ✓ | ✓ |  |  |  |  |  |  | ✓ | ✓ |  |  |  |
+| `ops.incident` | Report incidents | ✓ | ✓ | ✓ | ✓ | ✓ |  |  |  | ✓ | ✓ |  |  |  |
+| `ops.complaint` | Log and handle complaints | ✓ | ✓ |  |  |  | ✓ |  |  | ✓ | ✓ |  |  |  |
+| `ops.manage` | Follow up incidents and complaints, name cover and handovers | ✓ | ✓ |  |  |  |  |  |  |  |  |  |  |  |
 | `portal.own_family` | See and manage own family in the portal |  |  |  |  |  |  |  |  |  |  |  |  | ✓ |
 
 ## Rules that apply on top of the matrix

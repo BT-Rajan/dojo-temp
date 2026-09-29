@@ -169,6 +169,9 @@ class Command(BaseCommand):
             from apps.testdata.phase1 import Phase1Data
 
             Phase1Data(self).load()
+            from apps.testdata.phase2 import Phase2Data
+
+            Phase2Data(self).load()
 
         self.stdout.write(
             self.style.SUCCESS(
@@ -184,7 +187,9 @@ class Command(BaseCommand):
     # ------------------------------------------------------------------
     def _reset(self):
         from apps.testdata.phase1 import reset_phase1
+        from apps.testdata.phase2 import reset_phase2
 
+        reset_phase2()
         reset_phase1()
         MediaConsent.objects.all().delete()
         EmergencyContact.objects.all().delete()

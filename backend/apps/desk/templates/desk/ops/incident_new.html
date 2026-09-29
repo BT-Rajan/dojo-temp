@@ -1,0 +1,7 @@
+{% extends "desk/base.html" %}{% load elite %}
+{% block title %}{% t "Report an incident" "الإبلاغ عن حادثة" %}{% endblock %}
+{% block content %}<div class="dk-head"><div><h1>{% t "Report an incident" "الإبلاغ عن حادثة" %}</h1><p>EA-OPS-FRM-09 · {% t "If a child was involved, tell the guardian now and record it here." "إذا كان طفل معنياً، أبلغ ولي أمره الآن وسجّل ذلك هنا." %}</p></div></div>
+{% include "desk/_member_search.html" %}
+<form method="post" class="dk-card dk-form" style="max-width:820px">{% csrf_token %}<div class="dk-fields">{% include "desk/_member_pick.html" %}{% include "desk/_fields.html" with form=form wide="what_happened action_taken people witnesses needs_ceo" %}</div>
+<button class="ea-btn ea-btn--primary">{% t "Report and tell the OM" "إبلاغ مدير العمليات" %}</button></form>
+{% endblock %}

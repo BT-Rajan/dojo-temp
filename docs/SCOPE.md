@@ -4,8 +4,8 @@
 |---|---|
 | Document Number | EA-SYS-SCOPE-01 |
 | Title | Elite Academy System — Scope of Work |
-| Version | 0.3 (Draft for review) |
-| Date | 28-Sep-2026 |
+| Version | 0.4 (Draft for review) |
+| Date | 29-Sep-2026 |
 | Document Owner | Systems & IT Lead |
 | Reviewed By | Operations Lead (COO); Training Lead; Marketing Lead |
 | Approved By | Chief Executive Officer |
@@ -16,6 +16,7 @@
 | Version | Date | Change |
 |---|---|---|
 | 0.1 | 28-Sep-2026 | First draft from Elite procedures, reports and meeting notes. |
+| 0.4 | 29-Sep-2026 | Phase 1 signed off. Phase 2 decisions P2-1 to P2-17 recorded: pay options for any staff member or coach, OM prepares and Accountant approves payroll, freelance coaches paid through payroll, report layouts from the current forms. |
 | 0.3 | 28-Sep-2026 | Added Section 11 Technology and Non-Functional Requirements: Python (Django) back end, MySQL 8 database, front end from the Claude Design template; many simultaneous users; ISO/IEC 27001:2022 alignment; role-based access control. Phase 0 built on the new stack; the clinic codebase becomes a reference only (Section 10). |
 | 0.2 | 28-Sep-2026 | Added: website content management (CMS) with events photo gallery (M14); online shop for equipment (M19); payroll for directly hired coaches and staff (M20); Kuwait test data package (M21); first run, test and change requests (Section 7.1). Payroll and online shop moved out of "Out of Scope". |
 
@@ -324,13 +325,13 @@ Reports can be scheduled to be emailed automatically. Form reference numbers fol
 *New — replaces paying salaries outside the system.*
 
 - **Staff records:** employment type (full-time, part-time, hourly), job title, branch, start date, contract terms, Civil ID, nationality, bank account (IBAN), and **document expiry reminders** (civil ID, residency, work permit, passport, coaching certificates).
-- **Pay structures:** monthly salary; allowances (e.g. transport, housing); **hourly rate per class for directly hired coaches, with hours taken automatically from the classes they actually taught** (M4 attendance and instructor check-in); rates per program if needed.
-- **Monthly payroll run:** the Accountant prepares → the Operations Manager reviews → the CEO approves. No salary is paid without an approved run.
+- **Pay structures (any combination for any staff member or coach, decision P2-1):** monthly salary; allowances (e.g. transport, housing); **hourly rate or rate per class, with classes taken automatically from the ones actually taught** (M4); rates per program if needed; commission on the person's own sales by category.
+- **Monthly payroll run:** the system builds the draft from classes taught, sales, leave and absences → the Operations Manager checks it, adds bonuses and deductions and submits it → the Accountant approves it (never the person who submitted it) → payslips and the bank file are released; the CEO sees the summary. No salary is paid without an approved run.
 - Additions and deductions: overtime, extra classes, seminars and camps taught, bonuses (e.g. Instructor of the Month), absence deductions, salary advances and their repayment.
 - **Leave:** annual and sick leave balances and requests (linked to class cover in M4); unpaid leave.
 - **Kuwait rules, configurable and confirmed by the Accountant:** end-of-service indemnity accrual under the Kuwait Private Sector Labour Law, PIFSS social security contributions for Kuwaiti employees, and public holidays.
 - **Outputs:** bilingual payslips (sent to staff in the app / by WhatsApp), bank salary transfer file, payroll summary per branch and per function, and payroll cost feeding the income statement (M11) and the Quarterly Business Report.
-- Freelance or contracted coaches who invoice Elite are **not** on payroll; they are paid as vendors (M11), still using hours from taught classes.
+- Freelance or contracted coaches are paid in the same monthly run with the same pay options, without PIFSS, end-of-service or leave (decision P2-7).
 - Payroll data is visible only to the Accountant, the Operations Manager and the CEO; each employee sees only their own payslips.
 
 ### M21. Test Data Package (Kuwait)
@@ -372,7 +373,7 @@ Reports can be scheduled to be emailed automatically. Form reference numbers fol
 | 17 | A photo or video goes public only if every tagged member's consent covers that use; consent withdrawal hides it automatically. | Playbook §7 |
 | 18 | Website pages publish only after Marketing Lead approval; programs, schedule and prices on the website always come from the system. | New (CMS) |
 | 19 | Online orders reserve stock at order and reduce it at fulfilment, from the fulfilling branch; refunds need OM approval. | New (Shop), OPS-PROC §3.5 |
-| 20 | Payroll: Accountant prepares, OM reviews, CEO approves; no salary paid without an approved run. Hourly pay uses classes actually taught. | New (Payroll) |
+| 20 | Payroll: the OM prepares and submits, the Accountant approves (never their own submission); no salary paid without an approved run. Hourly and per-class pay use classes actually taught. | New (Payroll) |
 | 21 | Test data is fictional and can never be loaded into the live system. | New (Test data) |
 
 ---
@@ -395,8 +396,8 @@ Each phase ends with a demo to the leads and sign-off before the next begins. Th
 | Phase | Name | Contents | Outcome |
 |---|---|---|---|
 | **0** | Foundation | New Python/Django back end on MySQL (Section 11); data model for branches, programs, pricing, members and families, staff; login with two-factor authentication; role-based access control; tamper-evident audit log; encryption of sensitive data; **M21 test data package (first version — grows with every phase)** | A secure base to build on, with realistic Kuwait test data — **built** (see backend/README.md) |
-| **1** | Members, Classes and Sales | M1 Programs & pricing, M2 Members & families, M4 Schedule, bookings & check-in, M5 POS, payments, receipts & cash-up, M6 Renewals list | Front desk can run a full day without Mindbody (in test) — **built** (staff desk at /desk/; see backend/README.md), awaiting demo and sign-off |
-| **2** | Operations, Reporting and Payroll | M9 Daily operations forms, M10 Weekly Sales, Weekly Branch, Active Members & dashboards, M11 Finance & Accountant, **M20 Payroll** | Weekly reports build themselves; OM verification online; first payroll run in test |
+| **1** | Members, Classes and Sales | M1 Programs & pricing, M2 Members & families, M4 Schedule, bookings & check-in, M5 POS, payments, receipts & cash-up, M6 Renewals list | Front desk can run a full day without Mindbody (in test) — **built and signed off 29-Sep-2026** |
+| **2** | Operations, Reporting and Payroll | M9 Daily operations forms, M10 Weekly Sales, Weekly Branch, Active Members & dashboards, M11 Finance & Accountant, **M20 Payroll** | Weekly reports build themselves; OM verification online; first payroll run in test — **built** (see backend/README.md), awaiting demo and sign-off |
 | **3** | Inventory and Migration | M8 Inventory, purchasing, vendors, counts; **online-shop provision (M19 catalogue and stock reservation)**; M18 Mindbody import; parallel run; cut-over | **Mindbody replaced** — then the first run and test (7.1) |
 | **4** | Training and Progression | M7 Curriculum, evaluations, test days, promotions, progress cards | Belt path tracked for every member |
 | **5** | Growth: Leads, Website, CMS, AI | M3 Leads & group sales, M13 Marketing, **M14 Website with CMS and events gallery** (built on the approved design template), M16 Knowledge base, SAQR chat & Staff Assistant | One funnel from ad to membership; staff edit the website themselves; AI on the homepage and inside the app |
@@ -440,8 +441,21 @@ This scope is the starting point, not the final list. More needs will appear onc
 |---|---|---|
 | P2-1 | Pay types | Every pay option is available for any staff member or coach, alone or combined: monthly salary, hourly rate, rate per class taught (per program if needed), commission on sales, and allowances. |
 | P2-2 | Additions and deductions | Overtime, allowances, deductions (absence, advances and repayment) and end-of-service indemnity are all included. |
-| P2-3 | Payroll approval | The Accountant approves the payroll run. (Who prepares it, so that the approver is never the preparer, is to be confirmed.) |
+| P2-3 | Payroll approval | The Accountant approves the payroll run; see P2-5 for who prepares it. |
 | P2-4 | Report layouts | The Weekly Sales Report (FRM-06), Weekly Branch Report (FRM-07) and Active Members Report (EA-DOC-003) follow the copies in docs/elite-academy/. |
+| P2-5 | Who prepares payroll | The system builds the draft from classes taught, sales, leave and absences; the OM checks it, adds bonuses and deductions and submits it; the Accountant approves; the CEO sees the summary. |
+| P2-6 | Commission | A percentage per person and per sale category (new, renew, equipment…) on sales that person made at the desk; refunds of those sales in the same period are taken off. |
+| P2-7 | Freelance coaches | Same pay options, no PIFSS, end-of-service or leave; paid in the same monthly run (not as vendors). |
+| P2-8 | Pay period and pay day | Calendar month, paid on the last working day. Classes taught and sales count from the 26th of the previous month to the 25th. |
+| P2-9 | Kuwait rules | Overtime +25% normal day, +50% rest day, +100% public holiday; end-of-service 15 days' pay per year for the first 5 years then a month per year, capped at 18 months, reduced on resignation; PIFSS for Kuwaiti staff; annual and sick leave. All values are settings the Accountant confirms before the first real run; a run cannot be approved until they are confirmed. |
+| P2-10 | Salary advances | Approved by the OM; repaid in monthly instalments taken off the payslip automatically. |
+| P2-11 | Bank file | Standard Excel/CSV transfer file until the bank is named. |
+| P2-12 | Weekly Sales Report | Built from sales; "Matches Mindbody?" becomes "Matches cash-up and terminal settlement"; branch expenses entered during the week with a receipt photo; cash paid out of the drawer is taken off the cash expected at cash-up. |
+| P2-13 | Weekly Branch Report | Figures fill themselves in; the Branch Admin adds the text sections; the OM verifies; references like FRM-06-BED-2026-012. |
+| P2-14 | Active Members | Business rule 1, verified by attendance (last visit, visit count), snapshot every Friday for the week-over-week change. |
+| P2-15 | Daily operations | Shift opening, incidents with the 24-hour CEO countdown, complaint log with the 24-hour reply, cover and handover. |
+| P2-16 | Exports | Every report downloads as PDF (English or Arabic) and Excel and can be emailed on a schedule. |
+| P2-17 | Scope of the income statement | Built in Phase 2 from sales, refunds, expenses and payroll; equipment cost of sales and landed costs come with inventory in Phase 3; the Quarterly Business Report stays in Phase 7. |
 
 **Carried from Elite documents**
 1. Receiving owner for group-sales handoffs (Playbook item 1).
@@ -472,7 +486,6 @@ This scope is the starting point, not the final list. More needs will appear onc
 
 - A full double-entry accounting ledger (the system exports to the accountant's tool).
 - Native iPhone/Android apps (the portal and shop are a mobile-friendly web app that can be added to the home screen).
-- Payroll for freelance or contracted coaches (they are paid as vendors against their invoices; see M20).
 - Items added after the first run are handled through change requests (Section 7.1).
 
 ---

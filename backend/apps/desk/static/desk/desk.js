@@ -7,7 +7,28 @@
 
   $$("[data-autosubmit]").forEach(function (el) { el.addEventListener("change", function () { el.form.submit(); }); });
 
-  document.querySelectorAll("[data-print]").forEach(function (b) { b.addEventListener("click", function () { window.print(); }); });
+  document.querySelectorAll("[data-print]").forEach(function (b) { b.addEventListener("click", function (e) { e.preventDefault(); window.print(); }); });
+
+  // Wide tables scroll sideways on phones: make the scroll area reachable and named for keyboard users.
+  function labelScrollers() {
+    $$(".dk-table-wrap").forEach(function (wrap) {
+      if (wrap.scrollWidth > wrap.clientWidth + 1) {
+        if (!wrap.hasAttribute("tabindex")) {
+          var card = wrap.closest("section, .dk-card, main");
+          var heading = card && card.querySelector("h1, h2, h3");
+          wrap.setAttribute("tabindex", "0");
+          wrap.setAttribute("role", "region");
+          wrap.setAttribute("aria-label", heading ? heading.textContent.trim() : doc.title);
+        }
+      } else if (wrap.getAttribute("role") === "region") {
+        wrap.removeAttribute("tabindex");
+        wrap.removeAttribute("role");
+        wrap.removeAttribute("aria-label");
+      }
+    });
+  }
+  labelScrollers();
+  window.addEventListener("resize", labelScrollers);
 
   // Confirm before irreversible actions.
   doc.addEventListener("submit", function (e) {

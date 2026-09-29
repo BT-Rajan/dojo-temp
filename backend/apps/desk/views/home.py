@@ -67,4 +67,8 @@ def home(request):
         ctx["sales_today"] = sales.count()
         ctx["sales_total"] = sum((s.total for s in sales), 0)
         ctx["cash_up"] = CashUp.objects.filter(branch=branch, date=today).first()
+    from ..tasks import my_tasks
+
+    ctx["tasks"] = my_tasks(request)[:6]
+    ctx["shift_needed"] = any(t["url"].endswith("/shift/") for t in ctx["tasks"])
     return render(request, "desk/home.html", ctx)

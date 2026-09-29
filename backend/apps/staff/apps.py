@@ -8,6 +8,7 @@ class StaffConfig(AppConfig):
     def ready(self):
         from apps.audit.services import track_changes
 
-        from .models import StaffProfile
+        from .models import StaffDocument, StaffProfile
 
         track_changes(StaffProfile)
+        track_changes(StaffDocument)

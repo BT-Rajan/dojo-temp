@@ -1,6 +1,6 @@
 from django.urls import path
 
-from .views import auth, checkin, classes, home, manage, members, sales
+from .views import auth, checkin, classes, finance, home, manage, members, ops, payroll, reports, sales
 
 app_name = "desk"
 
@@ -62,4 +62,48 @@ urlpatterns = [
     path("reports/", manage.reports, name="reports"),
     path("trials/", manage.trial_requests, name="trials"),
     path("trials/<int:pk>/", manage.trial_update, name="trial_update"),
+    # Daily operations (M9)
+    path("tasks/", ops.tasks, name="tasks"),
+    path("shift/", ops.shift_opening, name="shift"),
+    path("incidents/", ops.incidents, name="incidents"),
+    path("incidents/new/", ops.incident_new, name="incident_new"),
+    path("incidents/<int:pk>/", ops.incident_detail, name="incident"),
+    path("incidents/<int:pk>/action/", ops.incident_action, name="incident_action"),
+    path("complaints/", ops.complaints, name="complaints"),
+    path("complaints/new/", ops.complaint_new, name="complaint_new"),
+    path("complaints/<int:pk>/", ops.complaint_detail, name="complaint"),
+    path("handovers/", ops.handovers, name="handovers"),
+    path("handovers/new/", ops.handover_new, name="handover_new"),
+    path("handovers/<int:pk>/", ops.handover_detail, name="handover"),
+    # Finance (M11)
+    path("expenses/", finance.expenses, name="expenses"),
+    path("expenses/new/", finance.expense_new, name="expense_new"),
+    path("expenses/<int:pk>/decide/", finance.expense_decide, name="expense_decide"),
+    path("expenses/<int:pk>/receipt/", finance.expense_receipt, name="expense_receipt"),
+    path("finance/reconciliation/", finance.reconciliation, name="reconciliation"),
+    path("finance/revenue/", finance.revenue, name="revenue"),
+    path("finance/income-statement/", finance.income_statement, name="income_statement"),
+    path("finance/invoices/", finance.invoices, name="invoices"),
+    path("finance/invoices/<int:pk>/", finance.invoice_action, name="invoice_action"),
+    path("finance/invoices/<int:pk>/document/", finance.invoice_document, name="invoice_document"),
+    path("finance/export/", finance.export_sales, name="finance_export"),
+    # Reports (M10)
+    path("weekly-reports/", reports.weekly_reports, name="weekly_reports"),
+    path("weekly-reports/<str:kind>/<str:code>/<str:start>/", reports.weekly_report, name="weekly_report"),
+    path("active-members/", reports.active_members, name="active_members"),
+    path("dashboards/", reports.dashboards, name="dashboards"),
+    path("report-emails/", reports.subscriptions, name="subscriptions"),
+    path("report-emails/<int:pk>/stop/", reports.subscription_stop, name="subscription_stop"),
+    # Payroll (M20)
+    path("payroll/", payroll.payroll_home, name="payroll"),
+    path("payroll/runs/<int:pk>/", payroll.payroll_run, name="payroll_run"),
+    path("payroll/payslips/<int:pk>/", payroll.payslip, name="payslip"),
+    path("payroll/staff/", payroll.staff_list, name="staff_list"),
+    path("payroll/staff/<int:pk>/", payroll.staff_pay, name="staff_pay"),
+    path("payroll/documents/<int:pk>/", payroll.staff_document_file, name="staff_document"),
+    path("payroll/leave/", payroll.leave, name="leave"),
+    path("payroll/advances/", payroll.advances, name="advances"),
+    path("payroll/holidays/", payroll.holidays, name="holidays"),
+    path("payroll/rules/", payroll.payroll_settings, name="payroll_settings"),
+    path("my-pay/", payroll.my_pay, name="my_pay"),
 ]

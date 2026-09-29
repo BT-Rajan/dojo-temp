@@ -58,11 +58,20 @@ PERMISSIONS: dict[str, str] = {
     "cms.edit": "Draft website content",
     "cms.publish": "Publish website content",
     "leads.manage": "Follow up website trial requests and contact messages",
-    "finance.manage": "Cash-up, expenses and statements",
-    "payroll.prepare": "Prepare payroll",
-    "payroll.review": "Review payroll",
-    "payroll.approve": "Approve payroll",
+    "finance.manage": "Reconciliation, income statements, vendor invoices and exports",
+    "finance.expense": "Record branch expenses with a receipt photo",
+    "finance.expense_approve": "Approve branch expenses",
+    "payroll.prepare": "Set up staff pay and prepare the monthly payroll run",
+    "payroll.view": "See payroll runs, payslips and summaries",
+    "payroll.approve": "Approve the monthly payroll run",
+    "payroll.self": "See own payslips; request leave and salary advances",
+    "leave.approve": "Approve staff leave",
     "incidents.escalate": "Receive safety escalations",
+    # Daily operations (M9)
+    "ops.shift": "Complete the shift opening checklist",
+    "ops.incident": "Report incidents",
+    "ops.complaint": "Log and handle complaints",
+    "ops.manage": "Follow up incidents and complaints, name cover and handovers",
     # Member / parent portal
     "portal.own_family": "See and manage own family in the portal",
 }
@@ -77,7 +86,8 @@ ROLES: dict[str, tuple[str, str, str, bool, set[str]]] = {
         "الرئيس التنفيذي",
         "Direction and alignment; sees everything.",
         True,
-        ALL - {"system.admin", "portal.own_family", "payroll.prepare"},
+        # Payroll: the OM prepares, the Accountant approves, the CEO sees the summary (decision P2-5).
+        ALL - {"system.admin", "portal.own_family", "payroll.prepare", "payroll.approve"},
     ),
     "operations_manager": (
         "Operations Manager (COO)",
@@ -109,7 +119,6 @@ ROLES: dict[str, tuple[str, str, str, bool, set[str]]] = {
             "inventory.manage",
             "inventory.approve",
             "finance.manage",
-            "payroll.review",
             "incidents.escalate",
         },
     ),
@@ -218,9 +227,9 @@ ROLES: dict[str, tuple[str, str, str, bool, set[str]]] = {
     "accountant": (
         "Accountant",
         "المحاسب",
-        "Finance and payroll preparation.",
+        "Finance, reconciliation and payroll approval.",
         True,
-        VIEW_ORG | {"finance.manage", "payroll.prepare", "reports.all", "staff.view"},
+        VIEW_ORG | {"finance.manage", "payroll.view", "payroll.approve", "reports.all", "staff.view"},
     ),
     "guardian": (
         "Parent / Member",
@@ -287,3 +296,33 @@ PHASE1 = {
 }
 for _code, _perms in PHASE1.items():
     ROLES[_code][4].update(_perms)
+
+
+# Phase 2 (M9, M10, M11, M20) permissions per role.
+PHASE2 = {
+    "operations_manager": {
+        "ops.shift",
+        "ops.incident",
+        "ops.complaint",
+        "ops.manage",
+        "finance.expense",
+        "finance.expense_approve",
+        "payroll.prepare",
+        "payroll.view",
+        "leave.approve",
+    },
+    "training_lead": {"ops.incident", "leave.approve"},
+    "track_lead": {"ops.incident"},
+    "instructor": {"ops.incident"},
+    "branch_admin": {"ops.shift", "ops.incident", "ops.complaint", "finance.expense"},
+    "operations_support": {"ops.shift", "ops.incident", "ops.complaint", "finance.expense", "reports.branch"},
+    "marketing_lead": {"ops.complaint"},
+    "accountant": {"finance.expense_approve"},
+}
+for _code, _perms in PHASE2.items():
+    ROLES[_code][4].update(_perms)
+
+# Everyone who works at Elite sees their own payslips and can ask for leave.
+for _code in ROLES:
+    if _code != "guardian":
+        ROLES[_code][4].add("payroll.self")

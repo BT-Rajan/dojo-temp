@@ -102,3 +102,28 @@ def is_mfa_verified(user) -> bool:
     if callable(check):
         return bool(check())
     return getattr(user, "otp_device", None) is not None
+
+
+def users_with_perm(code: str, branch_id: int | None = None):
+    """Active users who currently hold `code` (for `branch_id` when given) — used to route alerts."""
+    from django.contrib.auth import get_user_model
+    from django.db.models import Q
+
+    assignments = RoleAssignment.objects.current().filter(role__permissions__code=code)
+    if branch_id is not None:
+        assignments = assignments.filter(Q(branch__isnull=True) | Q(branch_id=branch_id))
+    return get_user_model().objects.filter(pk__in=assignments.values("user_id"), is_active=True).distinct()
+
+
+def notify_perm(code: str, text: str, branch_id: int | None = None, exclude=None) -> int:
+    """Sends `text` by WhatsApp to everyone holding `code`. Returns how many were messaged."""
+    from apps.core.messaging import send_message
+
+    sent = 0
+    for user in users_with_perm(code, branch_id):
+        if exclude is not None and user.pk == getattr(exclude, "pk", exclude):
+            continue
+        if user.mobile:
+            send_message(user.mobile, text)
+            sent += 1
+    return sent

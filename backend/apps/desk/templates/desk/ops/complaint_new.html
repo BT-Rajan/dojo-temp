@@ -1,0 +1,13 @@
+{% extends "desk/base.html" %}{% load elite %}
+{% block title %}{% t "Log a complaint" "تسجيل شكوى" %}{% endblock %}
+{% block content %}<div class="dk-head"><div><h1>{% t "Log a complaint" "تسجيل شكوى" %}</h1><p>EA-OPS-FRM-10</p></div></div>
+{% include "desk/ops/_opener.html" %}
+{% include "desk/_member_search.html" %}
+<form method="post" class="dk-card dk-form" style="max-width:820px">{% csrf_token %}<div class="dk-fields">{% include "desk/_member_pick.html" %}
+{% if not member %}<div class="ea-field"><label for="cn">{% t "Name" "الاسم" %}</label><input id="cn" name="contact_name" maxlength="150"></div><div class="ea-field"><label for="cm">{% t "Mobile" "الجوال" %}</label><input id="cm" name="contact_mobile" inputmode="tel" dir="ltr" maxlength="16"></div>{% endif %}
+<div class="ea-field"><label for="ch">{% t "Channel" "القناة" %}</label><select id="ch" name="channel">{% for v, l in channels %}<option value="{{ v }}">{{ l }}</option>{% endfor %}</select></div>
+<div class="ea-field"><label for="ca">{% t "About" "الموضوع" %}</label><select id="ca" name="category">{% for v, l in categories %}<option value="{{ v }}">{{ l }}{% if v in escalate %} — {% t "goes to the OM" "يُحال لمدير العمليات" %}{% endif %}</option>{% endfor %}</select></div>
+<div class="ea-field"><label for="ra">{% t "Received at" "وقت الاستلام" %}</label><input id="ra" type="datetime-local" name="received_at" value="{{ now }}"></div>
+<div class="ea-field dk-wide"><label for="de">{% t "The complaint, in the member's words" "الشكوى بكلمات العضو" %}</label><textarea id="de" name="details" rows="4" required></textarea></div></div>
+<button class="ea-btn ea-btn--primary">{% t "Log complaint" "تسجيل الشكوى" %}</button></form>
+{% endblock %}

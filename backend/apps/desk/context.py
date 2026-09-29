@@ -7,6 +7,7 @@ from .access import allowed_branches, can, current_branch
 # (url name, English, Arabic, icon, permission codes — any of them)
 MENU = [
     ("desk:home", "Today", "اليوم", "cal", []),
+    ("desk:tasks", "My tasks", "مهامي", "check", []),
     ("desk:checkin", "Check-in", "تسجيل الحضور", "check", ["classes.checkin"]),
     ("desk:members", "Members", "الأعضاء", "user", ["members.view"]),
     ("desk:sell", "Sell", "بيع", "bag", ["sales.sell"]),
@@ -26,7 +27,26 @@ MENU = [
     ),
     ("desk:changes", "Class changes", "تغييرات الحصص", "alert", ["classes.change_request", "classes.change_approve"]),
     ("desk:pricing", "Prices", "الأسعار", "bag", ["programs.view"]),
-    ("desk:reports", "Reports", "التقارير", "photo", ["reports.branch", "reports.all"]),
+    ("desk:shift", "Shift opening", "فتح النوبة", "check", ["ops.shift"]),
+    ("desk:incidents", "Incidents", "الحوادث", "alert", ["ops.incident", "ops.manage"]),
+    ("desk:complaints", "Complaints", "الشكاوى", "phone", ["ops.complaint", "ops.manage"]),
+    ("desk:handovers", "Cover & handover", "التغطية والتسليم", "user", ["ops.manage"]),
+    ("desk:expenses", "Expenses", "المصروفات", "bag", ["finance.expense", "finance.expense_approve", "finance.manage"]),
+    (
+        "desk:weekly_reports",
+        "Weekly reports",
+        "التقارير الأسبوعية",
+        "cal",
+        ["reports.branch", "reports.verify", "reports.all"],
+    ),
+    ("desk:active_members", "Active members", "الأعضاء النشطون", "user", ["reports.branch", "reports.all"]),
+    ("desk:dashboards", "Dashboards", "لوحات المتابعة", "photo", ["reports.branch", "reports.all"]),
+    ("desk:reports", "Class use", "استخدام الحصص", "clock", ["reports.branch", "reports.all"]),
+    ("desk:income_statement", "Finance", "المالية", "bag", ["finance.manage"]),
+    ("desk:payroll", "Payroll", "الرواتب", "bag", ["payroll.view", "payroll.prepare", "payroll.approve"]),
+    ("desk:staff_list", "Staff", "الموظفون", "user", ["staff.manage", "payroll.view", "payroll.prepare"]),
+    ("desk:leave", "Leave", "الإجازات", "cal", ["leave.approve"]),
+    ("desk:my_pay", "My pay", "راتبي", "user", ["payroll.self"]),
 ]
 
 

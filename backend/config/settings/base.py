@@ -47,6 +47,10 @@ INSTALLED_APPS = [
     "apps.classes",
     "apps.sales",
     "apps.renewals",
+    "apps.operations",
+    "apps.finance",
+    "apps.reports",
+    "apps.payroll",
     "apps.desk",
     # Wagtail CMS (website content, gallery, events) — EA-SYS-SCOPE-01 M14
     "wagtail.contrib.forms",
@@ -280,7 +284,27 @@ CELERY_BEAT_SCHEDULE = {
     # 06:00 Kuwait time: prices, sessions four weeks ahead, renewal reminders (scope M1, M4, M6)
     "daily-jobs": {"task": "apps.classes.tasks.daily_jobs", "schedule": crontab(hour=6, minute=0)},
     "hourly-no-shows": {"task": "apps.classes.tasks.hourly_jobs", "schedule": crontab(minute=5)},
+    # Phase 2 (M9, M10, M20): CEO escalations and complaint replies, emailed reports, leavers, documents
+    "p2-hourly": {"task": "apps.reports.tasks.hourly_jobs", "schedule": crontab(minute=15)},
+    "p2-daily": {"task": "apps.reports.tasks.daily_jobs", "schedule": crontab(hour=6, minute=30)},
+    "p2-active-members-snapshot": {
+        "task": "apps.reports.tasks.friday_snapshot",
+        "schedule": crontab(hour=23, minute=30, day_of_week="fri"),
+    },
+    "p2-weekly-reports-due": {
+        "task": "apps.reports.tasks.weekly_reports_due",
+        "schedule": crontab(hour=9, minute=0, day_of_week="sat"),
+    },
 }
+
+# Email (receipts, scheduled reports). Development prints emails to the console.
+EMAIL_BACKEND = env("DJANGO_EMAIL_BACKEND", default="django.core.mail.backends.console.EmailBackend")
+EMAIL_HOST = env("EMAIL_HOST", default="localhost")
+EMAIL_PORT = env.int("EMAIL_PORT", default=587)
+EMAIL_HOST_USER = env("EMAIL_HOST_USER", default="")
+EMAIL_HOST_PASSWORD = env("EMAIL_HOST_PASSWORD", default="")
+EMAIL_USE_TLS = env.bool("EMAIL_USE_TLS", default=True)
+DEFAULT_FROM_EMAIL = env("DEFAULT_FROM_EMAIL", default="Elite Academy <no-reply@elitemaacademy.com>")
 
 # ---------------------------------------------------------------------------
 # Logging — security events go to their own logger (A.8.15)

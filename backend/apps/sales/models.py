@@ -332,6 +332,9 @@ class CashUp(BaseModel):
     branch = models.ForeignKey("organization.Branch", on_delete=models.PROTECT, related_name="cash_ups")
     date = models.DateField()
     expected_cash = models.DecimalField(max_digits=10, decimal_places=3, default=ZERO)
+    cash_paid_out = models.DecimalField(
+        max_digits=10, decimal_places=3, default=ZERO, help_text="Expenses paid from the drawer (already taken off)."
+    )
     counted_cash = models.DecimalField(max_digits=10, decimal_places=3, null=True, blank=True)
     expected_knet = models.DecimalField(max_digits=10, decimal_places=3, default=ZERO)
     terminal_knet = models.DecimalField(max_digits=10, decimal_places=3, null=True, blank=True)

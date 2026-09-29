@@ -70,6 +70,30 @@ roles need an authenticator code in production). Code: `apps/classes` (M4), `app
 The website schedule, SAQR and the portal's "next class" and membership dates now read this timetable and these
 memberships (scope rule 18); the website's separate sample timetable has been removed.
 
+## Phase 2: operations, reports, finance and payroll
+
+Code: `apps/operations` (M9), `apps/reports` (M10), `apps/finance` (M11), `apps/payroll` (M20), staff documents in
+`apps/staff`, screens in `apps/desk/views/{ops,reports,finance,payroll}.py`. Scheduled jobs are in
+`apps/reports/tasks.py` (Celery beat) and can be run by hand with `python manage.py run_phase2_jobs`.
+
+| Area | What the desk does |
+| --- | --- |
+| My tasks | Everything waiting for the signed-in person with due dates: shift opening, cash-up, renewals, approvals, expenses, incidents, complaints, handovers, weekly reports, payroll, leave, expiring documents. Shown on the home page too. |
+| Shift opening (FRM-01) | The 9 checks, each ticked or explained, signed before the first class; hazards go to the OM at once. |
+| Incidents (FRM-09) | Children need the guardian's name and time; the OM is told the same day; safety or removal matters show a 24-hour countdown and go to the CEO automatically if nobody escalates them; follow-up owner and closure. |
+| Complaints (FRM-10) | One Voice opener on screen; money, refunds, staff conduct, safety and "threat to leave" go to the OM; reply due in 24 hours (reminder if missed); closed only with the time the member was told the outcome. |
+| Cover & handover (FRM-11) | The OM names cover; the open-items list is built from live data; the incoming person accepts each item. A leaver's roles end after their last day and the daily job closes the account. |
+| Weekly reports (FRM-06, FRM-07) | Built from live data, week Saturday–Friday, due Saturday 12:00. The Branch Admin prepares (figures are frozen then), the OM verifies — never the same person. "Matches cash-up and terminal settlement?" per method; expenses with receipts; members lost, trials booked/attended/converted, incidents, complaints, class changes, this week vs last week. |
+| Active members (EA-DOC-003) | Business rule 1, per branch and program, roster with last visit and visit count ("verified by attendance"), week-over-week change from the Friday snapshot. |
+| Dashboards | Daily (visits, no-shows, class fill, sales by method, cash-up status), weekly (new vs returning, cancellations, revenue mix, leads), monthly (sales growth, membership growth/churn, branch comparison, instructor hours), training and marketing. Promenade, Bedaya or both. |
+| Exports and emails | Every report as PDF (English or Arabic, right-to-left) and Excel; "Email me this report" daily, weekly, Friday or monthly — stops automatically when the person's access ends. |
+| Finance (M11) | Branch expenses with a receipt photo (or a reason), approved by the OM or Accountant; cash paid from the drawer comes off that day's expected cash. Reconciliation of every cash-up; revenue by category, program, branch and month; monthly/quarterly income statement with the headline-sales check (difference must be explained before it is finalised); vendor invoices (Accountant records, OM approves, Accountant pays); sales and expense exports (Excel/CSV). |
+| Payroll (M20) | Any mix of salary, allowances, hourly rate, rate per class (per program / session type) and commission on own sales. The run is built from classes actually taught, sales, leave, advances and the OM's adjustments (overtime, bonus, absence…); the OM submits, the Accountant approves (never their own submission, and only after confirming the Kuwait rules: overtime, end-of-service, PIFSS, leave). Bilingual payslips released to each person, bank transfer file, summary by branch and function, cost into the income statement. Leave (annual/sick/unpaid, Fridays and public holidays not counted, classes needing cover listed), salary advances repaid automatically, staff documents with 60/30/7-day expiry reminders, end-of-service preview and final settlement. Nobody sets their own pay. |
+
+Emails print to the console in development; set `DJANGO_EMAIL_BACKEND` and the `EMAIL_*` settings before going live
+(production refuses to start without them). PDF fonts are IBM Plex Sans Arabic (SIL Open Font License,
+`apps/reports/fonts/OFL.txt`).
+
 ## The website (elitemaacademy.com)
 
 Built with Wagtail from the Elite Academy design system (direction B · The Path). Code lives in

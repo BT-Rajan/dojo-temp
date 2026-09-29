@@ -18,3 +18,7 @@ gunicorn>=22,<24
 wagtail>=7.4.3,<7.5
 # Image processing for the CMS; kept at a release without known vulnerabilities (pip-audit in CI)
 Pillow>=12.3.0,<13
+# PDF exports with Arabic (M10); fonts are IBM Plex Sans Arabic (SIL Open Font License), in apps/reports/fonts
+reportlab>=4.4,<6
+arabic-reshaper>=3.0,<4
+python-bidi>=0.6,<0.7
