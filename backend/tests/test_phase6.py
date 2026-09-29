@@ -74,7 +74,10 @@ def session(s, days=1, capacity=20, start=datetime.time(17, 0)):
         title_en="Kids",
         date=TODAY + datetime.timedelta(days=days),
         start=start,
-        end=(datetime.datetime.combine(TODAY, start) + datetime.timedelta(hours=1)).time(),
+        end=min(
+            datetime.datetime.combine(TODAY, start) + datetime.timedelta(hours=1),
+            datetime.datetime.combine(TODAY, datetime.time(23, 59)),
+        ).time(),  # never past midnight, so a late-evening test run still has a class in the future
         capacity=capacity,
     )
 

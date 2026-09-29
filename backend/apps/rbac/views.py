@@ -1,14 +1,14 @@
-from django.utils import timezone
+from django.core.exceptions import ValidationError as DjangoValidationError
 from rest_framework import mixins, status, viewsets
 from rest_framework.decorators import action
-from rest_framework.exceptions import PermissionDenied, ValidationError
+from rest_framework.exceptions import ValidationError
 from rest_framework.response import Response
 
 from apps.audit.services import record_event
 
 from .models import Permission, Role, RoleAssignment
 from .serializers import PermissionSerializer, RoleAssignmentSerializer, RoleSerializer
-from .services import effective_access, has_perm
+from .services import check_can_grant, end_role
 
 
 class PermissionViewSet(viewsets.ReadOnlyModelViewSet):
@@ -47,15 +47,7 @@ class RoleAssignmentViewSet(
         role = serializer.validated_data["role"]
         branch = serializer.validated_data.get("branch")
         granter = self.request.user
-        # No privilege escalation: you can only hand out powers you hold yourself, in your own branches.
-        mine = effective_access(granter).permissions
-        missing = {p.code for p in role.permissions.all()} - mine
-        if missing and not has_perm(granter, "rbac.manage_roles"):
-            raise PermissionDenied("You cannot grant a role with permissions you don't have yourself.")
-        if not has_perm(granter, "rbac.assign", branch.id if branch else None) or (
-            branch is None and not self._has_all_branch_assign(granter)
-        ):
-            raise PermissionDenied("You cannot grant access for this branch.")
+        check_can_grant(granter, role, branch)  # no privilege escalation, own branches only
         assignment = serializer.save(granted_by=granter)
         record_event(
             action="role_granted",
@@ -68,25 +60,13 @@ class RoleAssignmentViewSet(
             },
         )
 
-    @staticmethod
-    def _has_all_branch_assign(user):
-        from .services import branch_scope
-
-        return branch_scope(user, "rbac.assign") is None
-
     @action(detail=True, methods=["post"])
     def end(self, request, pk=None):
         assignment = self.get_object()
-        if assignment.user_id == request.user.id:
-            raise PermissionDenied("You cannot change your own access.")
-        if assignment.ends_on is not None and assignment.ends_on <= timezone.localdate():
-            raise ValidationError("This access has already ended.")
-        assignment.ends_on = timezone.localdate()
-        assignment.save(update_fields=["ends_on"])
-        assignment.user.revoke_all_sessions()  # the change takes effect immediately
-        record_event(
-            action="role_ended", instance=assignment, changes={"user": assignment.user_id, "role": assignment.role.code}
-        )
+        try:
+            end_role(request.user, assignment)
+        except DjangoValidationError as exc:
+            raise ValidationError(exc.messages) from exc
         return Response(
             RoleAssignmentSerializer(assignment, context={"request": request}).data, status=status.HTTP_200_OK
         )

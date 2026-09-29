@@ -1,0 +1,23 @@
+{% extends "desk/base.html" %}{% load elite %}
+{% block title %}{% t "Add a staff member" "إضافة موظف" %}{% endblock %}
+{% block content %}<div class="dk-head"><div><h1>{% t "Add a staff member" "إضافة موظف" %}</h1><p>{% t "Creates their record and sign-in. A one-time password is shown on the next page; they change it at their first sign-in." "ينشئ السجل وحساب الدخول. تظهر كلمة مرور مؤقتة في الصفحة التالية ويغيّرها عند أول دخول." %}</p></div><a class="ea-btn ea-btn--ghost ea-btn--sm" href="{% url "desk:staff_list" %}">{% t "All staff" "كل الموظفين" %}</a></div>
+<form method="post" class="dk-card dk-form" style="max-width:860px">{% csrf_token %}
+<h2>{% t "The person" "الموظف" %}</h2><div class="dk-fields">
+<div class="ea-field"><label for="fn">{% t "Full name (English)" "الاسم الكامل (بالإنجليزية)" %}</label><input id="fn" name="full_name" maxlength="150" required autocomplete="off"></div>
+<div class="ea-field"><label for="fa">{% t "Full name (Arabic)" "الاسم الكامل (بالعربية)" %}</label><input id="fa" name="full_name_ar" maxlength="150" dir="rtl" autocomplete="off"></div>
+<div class="ea-field"><label for="em">{% t "Work email (the sign-in)" "البريد الإلكتروني للعمل (للدخول)" %}</label><input id="em" type="email" name="email" required dir="ltr" autocomplete="off"></div>
+<div class="ea-field"><label for="mo">{% t "Mobile (for WhatsApp alerts)" "الجوال (لتنبيهات واتساب)" %}</label><input id="mo" name="mobile" inputmode="tel" dir="ltr" maxlength="16" autocomplete="off"></div>
+<div class="ea-field"><label for="jt">{% t "Job title" "المسمى الوظيفي" %}</label><input id="jt" name="job_title" maxlength="100" required></div>
+<div class="ea-field"><label for="ja">{% t "Job title (Arabic)" "المسمى الوظيفي (بالعربية)" %}</label><input id="ja" name="job_title_ar" maxlength="100" dir="rtl"></div>
+<div class="ea-field"><label for="et">{% t "Employment type" "نوع التوظيف" %}</label><select id="et" name="employment_type">{% for v, l in types %}<option value="{{ v }}">{{ l }}</option>{% endfor %}</select></div>
+<div class="ea-field"><label for="sd">{% t "Start date" "تاريخ البدء" %}</label><input id="sd" type="date" name="start_date" value="{{ today|date:"Y-m-d" }}"></div>
+<div class="ea-field"><label for="br">{% t "Main branch" "الفرع الرئيسي" %}</label><select id="br" name="branch"><option value="">{% t "Both / none" "كلاهما / لا يوجد" %}</option>{% for b in branches %}<option value="{{ b.pk }}">{% if lang == "ar" %}{{ b.name_ar }}{% else %}{{ b.name }}{% endif %}</option>{% endfor %}</select></div>
+<div class="ea-field"><label for="rt">{% t "Reports to" "يتبع لـ" %}</label><select id="rt" name="reports_to"><option value="">—</option>{% for l in leads %}<option value="{{ l.pk }}">{{ l.user.full_name }} — {{ l.job_title }}</option>{% endfor %}</select></div>
+<div class="ea-field"><label for="sl">{% t "Second lead (dotted line, optional)" "قائد ثانٍ (اختياري)" %}</label><select id="sl" name="second_lead"><option value="">—</option>{% for l in leads %}<option value="{{ l.pk }}">{{ l.user.full_name }} — {{ l.job_title }}</option>{% endfor %}</select></div>
+</div>
+<h2>{% t "Access (optional — can be given later)" "الصلاحية (اختياري — يمكن منحها لاحقاً)" %}</h2><div class="dk-fields">
+<div class="ea-field"><label for="ro">{% t "Role" "الدور" %}</label><select id="ro" name="role"><option value="">{% t "No access yet" "بدون صلاحية بعد" %}</option>{% for r in roles %}<option value="{{ r.code }}">{% if lang == "ar" and r.name_ar %}{{ r.name_ar }}{% else %}{{ r.name }}{% endif %} — {{ r.description }}</option>{% endfor %}</select></div>
+<div class="ea-field"><label for="rb">{% t "For" "لـ" %}</label><select id="rb" name="role_branch"><option value="">{% t "All branches" "كل الفروع" %}</option>{% for b in branches %}<option value="{{ b.pk }}">{% if lang == "ar" %}{{ b.name_ar }}{% else %}{{ b.name }}{% endif %} {% t "only" "فقط" %}</option>{% endfor %}</select></div>
+<div class="ea-field dk-wide"><label for="rs">{% t "Reason (kept in the audit log)" "السبب (يُحفظ في سجل التدقيق)" %}</label><input id="rs" name="reason" maxlength="255" value="New staff member"></div>
+</div><button class="ea-btn ea-btn--primary">{% t "Add staff member" "إضافة الموظف" %}</button></form>
+{% endblock %}

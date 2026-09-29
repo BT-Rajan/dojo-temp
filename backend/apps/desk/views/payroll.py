@@ -184,7 +184,7 @@ def payslip(request, pk):
 # ---------------------------------------------------------------------------
 # Staff pay set-up
 # ---------------------------------------------------------------------------
-@desk(any_of=PAYROLL + ["staff.manage"])
+@desk(any_of=PAYROLL + ["staff.manage", "rbac.view"])
 def staff_list(request):
     qs = StaffProfile.objects.select_related("user", "primary_branch", "pay").prefetch_related("documents")
     if request.GET.get("expiring"):
@@ -192,10 +192,42 @@ def staff_list(request):
         qs = qs.filter(documents__expires_on__lte=horizon).distinct()
     if not request.GET.get("all"):
         qs = qs.filter(user__is_active=True)
-    return render(request, "desk/payroll/staff_list.html", {"staff": qs, "today": timezone.localdate()})
+    from apps.organization.models import Branch
+    from apps.rbac.models import Role, RoleAssignment
+
+    current = RoleAssignment.objects.current().select_related("role", "branch")
+    role, branch = request.GET.get("role", ""), request.GET.get("branch", "")
+    if role:
+        qs = qs.filter(user__in=current.filter(role__code=role).values("user_id"))
+    if branch:
+        qs = qs.filter(user__in=current.filter(branch__code=branch).values("user_id")) | qs.filter(
+            primary_branch__code=branch
+        )
+    if request.GET.get("no_access"):
+        qs = qs.exclude(user__in=current.values("user_id"))
+    roles_by_user = {}
+    for a in current:
+        roles_by_user.setdefault(a.user_id, []).append(a.role.name + (f" ({a.branch.code})" if a.branch_id else ""))
+    staff = list(qs.distinct())
+    for s in staff:
+        s.access = roles_by_user.get(s.user_id, [])
+    return render(
+        request,
+        "desk/payroll/staff_list.html",
+        {
+            "staff": staff,
+            "today": timezone.localdate(),
+            "roles": Role.objects.exclude(code="guardian").order_by("name"),
+            "branches": Branch.objects.filter(is_active=True).order_by("-code"),
+            "role": role,
+            "branch": branch,
+            "can_add": has_perm(request.user, "staff.manage"),
+            "payroll_nav": any(has_perm(request.user, c) for c in PAYROLL),
+        },
+    )
 
 
-@desk(any_of=PAYROLL + ["staff.manage"])
+@desk(any_of=PAYROLL + ["staff.manage", "rbac.view"])
 def staff_pay(request, pk):
     staff = get_object_or_404(StaffProfile.objects.select_related("user", "primary_branch"), pk=pk)
     sees_pay = has_perm(request.user, "payroll.view") or has_perm(request.user, "payroll.prepare")
@@ -263,6 +295,10 @@ def staff_pay(request, pk):
             doc.full_clean()
             doc.save()
             messages.success(request, L("Document saved.", "تم حفظ المستند."))
+        elif action in ("grant", "end_role", "reset_password"):
+            from .people import access_action
+
+            access_action(request, staff)
         elif action == "line":
             from apps.management.services import set_reporting_line
 
@@ -316,6 +352,9 @@ def staff_pay(request, pk):
             payslips=staff.payslips.select_related("run")[:12],
             can_adjust=can(request, "payroll.prepare") and staff.user_id != request.user.pk,
         )
+    from .people import access_context
+
+    ctx.update(access_context(request, staff), payroll_nav=any(has_perm(request.user, c) for c in PAYROLL))
     return render(request, "desk/payroll/staff.html", ctx)
 
 

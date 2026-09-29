@@ -192,6 +192,7 @@ before the sender lets go of it.
 | Procedure library | Document number, owner, version, effective date, what changed, file; approved by the CEO (never the preparer); the people it applies to confirm they have read it. |
 | Directory and org chart | Built from the staff records and roles, including dotted lines. |
 | Quarterly Business Report | RPT-01, all 11 sections for Promenade, Bedaya and Combined; live while in draft, frozen when the OM submits it; the headline-sales check must be explained; the CEO approves or returns it; PDF and Excel; a "quarter so far" view; reminders up to the due date (15 days after quarter end). |
+| Staff & access | Desk → Staff & access: the CEO or OM adds a staff member (the login gets a one-time password shown once, changed at first sign-in) and gives roles per branch with a reason; Systems & IT manages access too. No one changes their own access or hands out powers they don't hold; ending a role signs the person out at once. |
 
 ## The website (elitemaacademy.com)
 

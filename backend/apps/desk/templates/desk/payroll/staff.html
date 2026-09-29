@@ -1,7 +1,8 @@
 {% extends "desk/base.html" %}{% load elite desk_tags %}
 {% block title %}{{ staff.user.full_name }}{% endblock %}
 {% block content %}<div class="dk-head"><div><h1>{% if lang == "ar" and staff.user.full_name_ar %}{{ staff.user.full_name_ar }}{% else %}{{ staff.user.full_name }}{% endif %}</h1><p>{% if lang == "ar" and staff.job_title_ar %}{{ staff.job_title_ar }}{% else %}{{ staff.job_title }}{% endif %} · {{ staff.get_employment_type_display }} · {{ staff.primary_branch.name|default:"" }}{% if staff.start_date %} · {% t "since" "منذ" %} <span dir="ltr">{{ staff.start_date|date:"d/m/Y" }}</span>{% endif %}{% if staff.end_date %} · {% t "last day" "آخر يوم" %} <span dir="ltr">{{ staff.end_date|date:"d/m/Y" }}</span>{% endif %}</p></div></div>
-{% include "desk/payroll/_nav.html" %}
+{% if payroll_nav %}{% include "desk/payroll/_nav.html" %}{% endif %}
+{% include "desk/payroll/_access.html" %}
 {% if sees_pay %}
 {% if not editable %}<div class="ea-note ea-note--info">{% icon "shield" %}<span>{% t "You can see this pay set-up but not change it (nobody sets their own pay; the OM sets staff pay and the CEO sets the OM's)." "يمكنك الاطلاع دون التعديل (لا أحد يحدد أجره بنفسه؛ مدير العمليات يحدد أجور الموظفين والرئيس التنفيذي يحدد أجر مدير العمليات)." %}</span></div>{% endif %}
 <div class="dk-grid dk-grid--3"><div class="dk-card dk-stat"><b dir="ltr">{{ balance }}</b><span>{% t "annual leave days available" "أيام إجازة سنوية متاحة" %}</span></div>{% if eos %}<div class="dk-card dk-stat"><b>{% kd eos.amount %}</b><span>{% t "end-of-service if ended by Elite today" "مكافأة نهاية الخدمة إن أنهت إيليت الخدمة اليوم" %} ({{ eos.years }} {% t "years" "سنة" %})</span></div><div class="dk-card dk-stat"><b>{% kd eos_resign.amount %}</b><span>{% t "end-of-service on resignation today" "مكافأة نهاية الخدمة عند الاستقالة اليوم" %}</span></div>{% endif %}</div>

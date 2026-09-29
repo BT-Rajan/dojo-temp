@@ -44,7 +44,13 @@ MENU = [
     ("desk:reports", "Class use", "استخدام الحصص", "clock", ["reports.branch", "reports.all"]),
     ("desk:income_statement", "Finance", "المالية", "bag", ["finance.manage"]),
     ("desk:payroll", "Payroll", "الرواتب", "bag", ["payroll.view", "payroll.prepare", "payroll.approve"]),
-    ("desk:staff_list", "Staff", "الموظفون", "user", ["staff.manage", "payroll.view", "payroll.prepare"]),
+    (
+        "desk:staff_list",
+        "Staff & access",
+        "الموظفون والصلاحيات",
+        "user",
+        ["staff.manage", "rbac.view", "payroll.view", "payroll.prepare"],
+    ),
     ("desk:leave", "Leave", "الإجازات", "cal", ["leave.approve"]),
     ("desk:stock", "Stock", "المخزون", "bag", ["inventory.view"]),
     (
