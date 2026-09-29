@@ -14,6 +14,7 @@ MENU = [
     ("desk:sessions", "Classes", "الحصص", "clock", ["classes.view"]),
     ("desk:my_classes", "My classes", "حصصي", "shield", ["training.teach"]),
     ("desk:timetable", "Timetable", "الجدول الأسبوعي", "cal", ["classes.view"]),
+    ("desk:coaches", "Coaches", "المدربون", "shield", ["staff.manage"]),
     ("desk:renewals", "Renewals", "التجديدات", "phone", ["renewals.follow_up"]),
     ("desk:leads", "Leads", "العملاء المحتملون", "plus", ["leads.manage", "marketing.manage"]),
     ("desk:sales", "Sales", "المبيعات", "bag", ["sales.view"]),
