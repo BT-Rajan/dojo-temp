@@ -434,6 +434,15 @@ This scope is the starting point, not the final list. More needs will appear onc
 | P1-12 | Receipts | Printed, WhatsApp or email, chosen at each sale; WhatsApp by default (sent once a provider is chosen, decision 6). |
 | P1-13 | Renewal reminders / at-risk / class-change notice / cash-up difference | 5 and 1 days before expiry; at risk after 14 days without a visit; changes with under 2 hours' notice allowed but flagged urgent; every cash-up difference recorded, above 1.000 KD needs a written reason. |
 
+**Decided for Phase 2 (29 Sep 2026, so far)**
+
+| # | Question | Decision |
+|---|---|---|
+| P2-1 | Pay types | Every pay option is available for any staff member or coach, alone or combined: monthly salary, hourly rate, rate per class taught (per program if needed), commission on sales, and allowances. |
+| P2-2 | Additions and deductions | Overtime, allowances, deductions (absence, advances and repayment) and end-of-service indemnity are all included. |
+| P2-3 | Payroll approval | The Accountant approves the payroll run. (Who prepares it, so that the approver is never the preparer, is to be confirmed.) |
+| P2-4 | Report layouts | The Weekly Sales Report (FRM-06), Weekly Branch Report (FRM-07) and Active Members Report (EA-DOC-003) follow the copies in docs/elite-academy/. |
+
 **Carried from Elite documents**
 1. Receiving owner for group-sales handoffs (Playbook item 1).
 2. Elite Member tier: eligibility rules and rate (Playbook item 3).
