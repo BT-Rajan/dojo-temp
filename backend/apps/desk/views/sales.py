@@ -5,7 +5,7 @@ from decimal import Decimal, InvalidOperation
 
 from django.contrib import messages
 from django.core.exceptions import ValidationError
-from django.db.models import Sum
+from django.db.models import F, Sum
 from django.shortcuts import get_object_or_404, redirect, render
 from django.utils import timezone
 from django.views.decorators.http import require_POST
@@ -40,7 +40,7 @@ def catalogue(branch):
         if o.is_sellable(today)
     ]
     stock = (
-        BranchStock.objects.filter(branch=branch, quantity__gt=0, variant__product__is_active=True)
+        BranchStock.objects.filter(branch=branch, quantity__gt=F("reserved"), variant__product__is_active=True)
         .select_related("variant", "variant__product")
         .order_by("variant__product__name_en", "variant__sort_order")
     )

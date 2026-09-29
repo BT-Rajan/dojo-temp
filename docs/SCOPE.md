@@ -4,7 +4,7 @@
 |---|---|
 | Document Number | EA-SYS-SCOPE-01 |
 | Title | Elite Academy System — Scope of Work |
-| Version | 0.4 (Draft for review) |
+| Version | 0.5 (Draft for review) |
 | Date | 29-Sep-2026 |
 | Document Owner | Systems & IT Lead |
 | Reviewed By | Operations Lead (COO); Training Lead; Marketing Lead |
@@ -16,6 +16,7 @@
 | Version | Date | Change |
 |---|---|---|
 | 0.1 | 28-Sep-2026 | First draft from Elite procedures, reports and meeting notes. |
+| 0.5 | 29-Sep-2026 | Phase 3 started at the CEO's request; Phase 2 demo and every open decision gathered in Section 8.1, to be closed one by one at the end of the project. Phase 3 working decisions P3-1 to P3-10. |
 | 0.4 | 29-Sep-2026 | Phase 1 signed off. Phase 2 decisions P2-1 to P2-17 recorded: pay options for any staff member or coach, OM prepares and Accountant approves payroll, freelance coaches paid through payroll, report layouts from the current forms. |
 | 0.3 | 28-Sep-2026 | Added Section 11 Technology and Non-Functional Requirements: Python (Django) back end, MySQL 8 database, front end from the Claude Design template; many simultaneous users; ISO/IEC 27001:2022 alignment; role-based access control. Phase 0 built on the new stack; the clinic codebase becomes a reference only (Section 10). |
 | 0.2 | 28-Sep-2026 | Added: website content management (CMS) with events photo gallery (M14); online shop for equipment (M19); payroll for directly hired coaches and staff (M20); Kuwait test data package (M21); first run, test and change requests (Section 7.1). Payroll and online shop moved out of "Out of Scope". |
@@ -397,8 +398,8 @@ Each phase ends with a demo to the leads and sign-off before the next begins. Th
 |---|---|---|---|
 | **0** | Foundation | New Python/Django back end on MySQL (Section 11); data model for branches, programs, pricing, members and families, staff; login with two-factor authentication; role-based access control; tamper-evident audit log; encryption of sensitive data; **M21 test data package (first version — grows with every phase)** | A secure base to build on, with realistic Kuwait test data — **built** (see backend/README.md) |
 | **1** | Members, Classes and Sales | M1 Programs & pricing, M2 Members & families, M4 Schedule, bookings & check-in, M5 POS, payments, receipts & cash-up, M6 Renewals list | Front desk can run a full day without Mindbody (in test) — **built and signed off 29-Sep-2026** |
-| **2** | Operations, Reporting and Payroll | M9 Daily operations forms, M10 Weekly Sales, Weekly Branch, Active Members & dashboards, M11 Finance & Accountant, **M20 Payroll** | Weekly reports build themselves; OM verification online; first payroll run in test — **built** (see backend/README.md), awaiting demo and sign-off |
-| **3** | Inventory and Migration | M8 Inventory, purchasing, vendors, counts; **online-shop provision (M19 catalogue and stock reservation)**; M18 Mindbody import; parallel run; cut-over | **Mindbody replaced** — then the first run and test (7.1) |
+| **2** | Operations, Reporting and Payroll | M9 Daily operations forms, M10 Weekly Sales, Weekly Branch, Active Members & dashboards, M11 Finance & Accountant, **M20 Payroll** | Weekly reports build themselves; OM verification online; first payroll run in test — **built**; demo and sign-off moved to the end of the project (Section 8.1) |
+| **3** | Inventory and Migration | M8 Inventory, purchasing, vendors, counts; **online-shop provision (M19 catalogue and stock reservation)**; M18 Mindbody import; parallel run; cut-over | **Mindbody replaced** — then the first run and test (7.1). **Built in test**; demo and sign-off moved to the end of the project (O-16); going live waits on the Mindbody exports and cut-over date (O-11, O-12) |
 | **4** | Training and Progression | M7 Curriculum, evaluations, test days, promotions, progress cards | Belt path tracked for every member |
 | **5** | Growth: Leads, Website, CMS, AI | M3 Leads & group sales, M13 Marketing, **M14 Website with CMS and events gallery** (built on the approved design template), M16 Knowledge base, SAQR chat & Staff Assistant | One funnel from ad to membership; staff edit the website themselves; AI on the homepage and inside the app |
 | **6** | Members, Shop and Messaging | M15 Member & parent portal, online payments, **M19 Online shop storefront**, M17 WhatsApp/SMS notifications | Members self-serve; equipment sold online; automatic reminders |
@@ -457,6 +458,21 @@ This scope is the starting point, not the final list. More needs will appear onc
 | P2-16 | Exports | Every report downloads as PDF (English or Arabic) and Excel and can be emailed on a schedule. |
 | P2-17 | Scope of the income statement | Built in Phase 2 from sales, refunds, expenses and payroll; equipment cost of sales and landed costs come with inventory in Phase 3; the Quarterly Business Report stays in Phase 7. |
 
+**Phase 3 working decisions (29 Sep 2026)** — sensible defaults so building can continue; each can be changed at the end-of-project review.
+
+| # | Question | Working decision |
+|---|---|---|
+| P3-1 | Online shop | Phase 3 builds the provision only: one stock record per branch shared by the front desk and online orders, reserved when an order is placed and taken off when it is fulfilled. The storefront opens in Phase 6. |
+| P3-2 | Transfers | Stock leaves the sender and reaches the receiver only when the receiver accepts (rule 9). While in transit it is held at the sender and can't be sold. A count that differs can be accepted only after confirming the sender and the OM were called; the shortfall is flagged to the OM. |
+| P3-3 | Business days | Sunday–Thursday, excluding public holidays, for the 2-business-day purchase decision and the count deadline (3rd working day). |
+| P3-4 | Catalogue changes | The OM (or CEO) adds products and sets costs and retail prices; branches and the coordinator request items, including items not yet in the catalogue (free text). |
+| P3-5 | Landed cost | Unit price × exchange rate × (1 + customs/clearance %), plus freight shared by value. Default customs/clearance 20% and target margin 50% (from the Dhalay analysis); both editable per order. |
+| P3-6 | Product cost | The latest landed cost of what was received becomes the product's cost (used for margins and, later, cost of sales). |
+| P3-7 | Monthly count | Created automatically on the last working day for each branch; two people (counter and recorder); every difference recounted and given a reason code (US, UT, D, FI, EE, U); stock corrected only after the OM approves; items short two months running are flagged. |
+| P3-8 | Mindbody import | From Mindbody's standard exports (clients, relationships, pricing option expirations, visits, sales, inventory on hand). Every import is first run as a dry run with a report; nothing changes until it is applied. Re-running is safe (records are matched by their Mindbody ID), so the final delta at cut-over uses the same tool. |
+| P3-9 | Cleaning | Test products are skipped; possible duplicate clients are listed for a person to merge; each Mindbody pricing option is mapped to a system pricing option (or skipped) before memberships are imported; the stock baseline is confirmed with the first monthly count. |
+| P3-10 | Staff | Staff accounts are set up in the system by Systems & IT (not imported), since roles and access must be assigned by a person. |
+
 **Carried from Elite documents**
 1. Receiving owner for group-sales handoffs (Playbook item 1).
 2. Elite Member tier: eligibility rules and rate (Playbook item 3).
@@ -481,6 +497,28 @@ This scope is the starting point, not the final list. More needs will appear onc
 17. **Website template:** choose one of the Claude Design options built from the design brief (EA-SYS-DESIGN-01) and supply the logo files.
 
 ---
+
+### 8.1 Open items — closed one by one at the end of the project
+
+| # | Item | From |
+|---|---|---|
+| O-1 | Phase 2 demo and sign-off (payroll, reports, finance, operations) | Phase 2 |
+| O-2 | Accountant confirms the payroll rules: PIFSS rates and cap, overtime, end-of-service, leave | P2-9 |
+| O-3 | Salary-transfer bank and its file format | P2-11, decision 15 |
+| O-4 | Remove real member and staff data from the code repository (Active Members report, staff contact list) | Security |
+| O-5 | Hosting and domain | Decision 10 |
+| O-6 | Payment gateway (KNET / cards, online) and whether card terminals connect | Decision 5 |
+| O-7 | WhatsApp Business and SMS provider (receipts, reminders, payslips, codes) | Decision 6 |
+| O-8 | Email sending service (receipts, emailed reports) | New |
+| O-9 | Accounting software and export format | Decision 8 |
+| O-10 | How much sales history to import from Mindbody | Decision 9 |
+| O-11 | The Mindbody exports themselves (both branches) and the pricing-option mapping | P3-8, P3-9 |
+| O-12 | Parallel-run length and cut-over date | Section 6 |
+| O-13 | Elite Member tier rule and rate; freeze fee | Decisions 2, 3 |
+| O-14 | Payroll set-up per person: directly hired vs freelance, rates, PIFSS registration | Decision 15 |
+| O-15 | Remaining earlier decisions: 1, 4, 7, 11–14, 16–17 | Section 8 |
+| O-16 | Phase 3 demo and sign-off (inventory, purchasing, counts, online stock, Mindbody import, parallel run, cut-over) | Phase 3 |
+| O-17 | Stock settings to confirm: customs/clearance % and target margin (P3-5), reorder and maximum levels per item, which items are sold online | P3-5, P3-1 |
 
 ## 9. Out of Scope (for now)
 

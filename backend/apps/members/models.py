@@ -84,6 +84,7 @@ class Member(BaseModel):
         WEBSITE = "website", "Website"
         GROUP = "group", "School / group"
         OTHER = "other", "Other"
+        MINDBODY = "mindbody", "Imported from Mindbody"
 
     branch = models.ForeignKey(
         "organization.Branch", on_delete=models.PROTECT, related_name="members", help_text="Home branch."

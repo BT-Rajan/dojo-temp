@@ -46,6 +46,18 @@ MENU = [
     ("desk:payroll", "Payroll", "الرواتب", "bag", ["payroll.view", "payroll.prepare", "payroll.approve"]),
     ("desk:staff_list", "Staff", "الموظفون", "user", ["staff.manage", "payroll.view", "payroll.prepare"]),
     ("desk:leave", "Leave", "الإجازات", "cal", ["leave.approve"]),
+    ("desk:stock", "Stock", "المخزون", "bag", ["inventory.view"]),
+    (
+        "desk:purchase_requests",
+        "Purchasing",
+        "المشتريات",
+        "bag",
+        ["inventory.manage", "inventory.purchase", "inventory.approve"],
+    ),
+    ("desk:transfers", "Transfers", "التحويلات", "arrow", ["inventory.manage", "inventory.purchase"]),
+    ("desk:stock_counts", "Stock count", "الجرد", "check", ["inventory.manage", "inventory.approve"]),
+    ("desk:online_orders", "Online orders", "الطلبات الإلكترونية", "bag", ["inventory.manage"]),
+    ("desk:imports", "Mindbody", "مايندبودي", "arrow", ["data.import"]),
     ("desk:my_pay", "My pay", "راتبي", "user", ["payroll.self"]),
 ]
 

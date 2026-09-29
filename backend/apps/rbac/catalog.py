@@ -50,8 +50,11 @@ PERMISSIONS: dict[str, str] = {
     "reports.branch": "Branch reports",
     "reports.all": "All-branch and quarterly reports",
     "reports.verify": "Verify weekly reports",
-    "inventory.manage": "Stock counts, transfers and receiving",
-    "inventory.approve": "Approve purchase requests and stock corrections",
+    "inventory.view": "See products, stock at each branch and stock history",
+    "inventory.manage": "Request purchases, send and accept transfers, take part in stock counts",
+    "inventory.purchase": "Place purchase orders with vendors and receive deliveries at Promenade",
+    "inventory.approve": "Approve purchase requests and stock corrections; edit the catalogue, costs and prices",
+    "data.import": "Import data from Mindbody and run the parallel-run comparison",
     "training.manage": "Curriculum, evaluations and promotions",
     "training.teach": "Take attendance and evaluate own classes",
     "marketing.manage": "Campaigns, leads and media library",
@@ -326,3 +329,16 @@ for _code, _perms in PHASE2.items():
 for _code in ROLES:
     if _code != "guardian":
         ROLES[_code][4].add("payroll.self")
+
+
+# Phase 3 (M8, M18, M19) permissions per role.
+PHASE3 = {
+    "operations_manager": {"inventory.view", "inventory.purchase", "data.import"},
+    "branch_admin": {"inventory.view"},
+    "operations_support": {"inventory.view", "inventory.manage"},
+    "purchasing_coordinator": {"inventory.view", "inventory.purchase"},
+    "accountant": {"inventory.view"},
+    "it_admin": {"data.import"},
+}
+for _code, _perms in PHASE3.items():
+    ROLES[_code][4].update(_perms)

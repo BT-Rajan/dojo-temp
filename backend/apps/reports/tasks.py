@@ -9,21 +9,28 @@ from django.utils import timezone
 
 @shared_task
 def hourly_jobs():
+    from apps.inventory.services import remind_overdue_requests
     from apps.operations.services import auto_escalate_overdue, remind_overdue_complaints
 
     return {
         "incidents_escalated": auto_escalate_overdue(),
         "complaint_reminders": remind_overdue_complaints(),
+        "purchase_requests_overdue": remind_overdue_requests(),
         "reports_emailed": send_subscriptions(),
     }
 
 
 @shared_task
 def daily_jobs():
+    from apps.inventory.services import auto_create_counts
     from apps.operations.services import close_leaver_accounts
     from apps.payroll.services import remind_expiring_documents
 
-    return {"leavers_closed": close_leaver_accounts(), "document_reminders": remind_expiring_documents()}
+    return {
+        "leavers_closed": close_leaver_accounts(),
+        "document_reminders": remind_expiring_documents(),
+        "stock_counts_created": auto_create_counts(),
+    }
 
 
 @shared_task

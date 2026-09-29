@@ -23,7 +23,7 @@ def _need(user, perm, branch_id, message):
 # ---------------------------------------------------------------------------
 # Reference numbers: FRM-09-BED-2026-004
 # ---------------------------------------------------------------------------
-def next_reference(form: str, branch, year: int | None = None) -> str:
+def next_number(form: str, branch, year: int | None = None) -> int:
     """Next number for a form at a branch, handed out under a row lock (two desks never share one)."""
     year = year or timezone.localdate().year
     for _ in range(3):
@@ -34,10 +34,16 @@ def next_reference(form: str, branch, year: int | None = None) -> str:
                 )
                 counter.last_number += 1
                 counter.save(update_fields=["last_number"])
-                return f"{form}-{branch.code}-{year}-{counter.last_number:03d}"
+                return counter.last_number
         except IntegrityError:
             continue  # another desk created the counter at the same moment; try again
     raise ValidationError("Could not assign a reference number. Try again.")
+
+
+def next_reference(form: str, branch, year: int | None = None) -> str:
+    """e.g. FRM-09-BED-2026-004."""
+    year = year or timezone.localdate().year
+    return f"{form}-{branch.code}-{year}-{next_number(form, branch, year):03d}"
 
 
 # ---------------------------------------------------------------------------

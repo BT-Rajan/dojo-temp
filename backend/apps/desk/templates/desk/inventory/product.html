@@ -1,0 +1,18 @@
+{% extends "desk/base.html" %}{% load elite %}
+{% block title %}{% t "Product" "المنتج" %}{% endblock %}
+{% block content %}<div class="dk-head"><div><h1>{% if product %}{{ product.name_en }}{% else %}{% t "New product" "منتج جديد" %}{% endif %}</h1><p>{% t "Belts are never sold online — they are issued at promotion." "لا تُباع الأحزمة إلكترونياً — تُصرف عند الترقية." %}</p></div></div>
+{% include "desk/inventory/_nav.html" %}
+<form method="post" class="dk-card dk-form">{% csrf_token %}<input type="hidden" name="action" value="product"><div class="dk-fields">
+<div class="ea-field"><label for="pn">{% t "Name (English)" "الاسم بالإنجليزية" %}</label><input id="pn" name="name_en" value="{{ product.name_en }}" required maxlength="100"></div>
+<div class="ea-field"><label for="pa">{% t "Name (Arabic)" "الاسم بالعربية" %}</label><input id="pa" name="name_ar" value="{{ product.name_ar }}" maxlength="100" dir="rtl"></div>
+<div class="ea-field"><label for="pc">{% t "Category" "الفئة" %}</label><select id="pc" name="category">{% for v, l in categories %}<option value="{{ v }}"{% if product.category == v %} selected{% endif %}>{{ l }}</option>{% endfor %}</select></div>
+<div class="ea-field"><label for="pp">{% t "Price (KD)" "السعر (د.ك)" %}</label><input id="pp" name="price" value="{{ product.price|default:"" }}" inputmode="decimal" dir="ltr" required></div>
+<div class="ea-field"><label for="ps">{% t "Supplier" "المورد" %}</label><select id="ps" name="supplier"><option value="">—</option>{% for v in vendors %}<option value="{{ v.pk }}"{% if product.supplier_id == v.pk %} selected{% endif %}>{{ v.name }}</option>{% endfor %}</select></div>
+<div class="ea-field"><label for="pg">{% t "Program" "البرنامج" %}</label><select id="pg" name="program"><option value="">{% t "No program" "بدون برنامج" %}</option>{% for g in programs %}<option value="{{ g.pk }}"{% if product.program_id == g.pk %} selected{% endif %}>{{ g.branch.code }} · {{ g.name }}</option>{% endfor %}</select></div>
+<label style="display:flex;gap:8px;align-items:center"><input type="checkbox" name="old_stock" value="1"{% if product.old_stock %} checked{% endif %}> {% t "Old stock / no logo" "مخزون قديم / بدون شعار" %}</label>
+<label style="display:flex;gap:8px;align-items:center"><input type="checkbox" name="sell_online" value="1"{% if not product or product.sell_online %} checked{% endif %}> {% t "Sell online" "يُباع إلكترونياً" %}</label>
+<label style="display:flex;gap:8px;align-items:center"><input type="checkbox" name="is_active" value="1"{% if not product or product.is_active %} checked{% endif %}> {% t "Active" "فعال" %}</label></div>
+<button class="ea-btn ea-btn--primary">{% t "Save product" "حفظ المنتج" %}</button></form>
+{% if product %}<section class="dk-card"><h2>{% t "Sizes" "المقاسات" %}</h2>{% for v in variants %}<form method="post" class="dk-form" style="border-block-end:1px solid var(--line);padding-block-end:10px">{% csrf_token %}<input type="hidden" name="action" value="variant"><input type="hidden" name="variant" value="{{ v.pk }}">{% include "desk/inventory/_variant_fields.html" with v=v i=v.pk %}<button class="ea-btn ea-btn--ghost ea-btn--sm">{% t "Save size" "حفظ المقاس" %}</button> <a href="{% url "desk:stock_item" v.pk %}">{% t "Stock and ledger" "المخزون والسجل" %}</a></form>{% endfor %}
+<form method="post" class="dk-form">{% csrf_token %}<input type="hidden" name="action" value="variant"><h3 class="ea-h4">{% t "Add a size" "إضافة مقاس" %}</h3>{% include "desk/inventory/_variant_fields.html" with v=None i="new" %}<button class="ea-btn ea-btn--primary ea-btn--sm">{% t "Add size" "إضافة المقاس" %}</button></form></section>{% endif %}
+{% endblock %}

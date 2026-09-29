@@ -29,6 +29,12 @@ class Category(models.TextChoices):
     HEAD_GUARDS = "head_guards", "Head guards"
     RASH_GUARDS = "rash_guards", "Rash guards"
     TSHIRTS = "tshirts", "T-shirts"
+    PROTECTIVE = "protective", "Protective gear"
+    PATCHES = "patches", "Patches and badges"
+    BAGS = "bags", "Bags and accessories"
+    BELTS = "belts", "Belts"
+    DRINKS = "drinks", "Drinks"
+    OTHER = "other", "Other"
 
 
 CATEGORY_AR = {
@@ -38,6 +44,12 @@ CATEGORY_AR = {
     "head_guards": "واقي الرأس",
     "rash_guards": "راش جارد",
     "tshirts": "تيشيرتات",
+    "protective": "معدات الحماية",
+    "patches": "شعارات وشارات",
+    "bags": "حقائب وإكسسوارات",
+    "belts": "أحزمة",
+    "drinks": "مشروبات",
+    "other": "أخرى",
 }
 
 
@@ -53,6 +65,20 @@ class Product(ClusterableModel):
     description_ar = models.TextField(blank=True)
     image = models.ForeignKey("wagtailimages.Image", null=True, blank=True, on_delete=models.SET_NULL, related_name="+")
     is_active = models.BooleanField(default=True)
+    # Inventory (M8)
+    supplier = models.ForeignKey(
+        "finance.Vendor", null=True, blank=True, on_delete=models.SET_NULL, related_name="products"
+    )
+    program = models.ForeignKey(
+        "organization.Program",
+        null=True,
+        blank=True,
+        on_delete=models.SET_NULL,
+        related_name="products",
+        help_text="Empty = no program (e.g. Judo stock after Judo coaching stopped).",
+    )
+    old_stock = models.BooleanField(default=False, help_text="Old stock / no logo.")
+    sell_online = models.BooleanField(default=True, help_text="Belts are never sold online (issued at promotion).")
 
     panels = [
         FieldPanel("name_en"),
@@ -65,7 +91,8 @@ class Product(ClusterableModel):
         FieldPanel("description_ar"),
         FieldPanel("image"),
         FieldPanel("is_active"),
-        InlinePanel("variants", label="Sizes and stock"),
+        FieldPanel("sell_online"),
+        InlinePanel("variants", label="Sizes (stock is managed in the desk: Inventory)"),
     ]
 
     class Meta:
@@ -95,15 +122,37 @@ class Product(ClusterableModel):
 class ProductVariant(Orderable):
     product = ParentalKey(Product, on_delete=models.CASCADE, related_name="variants")
     size = models.CharField(max_length=20, help_text="Gloves in oz (10 oz), uniforms in cm (140 cm), guards XS–XL.")
-    stock = models.PositiveIntegerField(default=0)
+    colour = models.CharField(max_length=30, blank=True)
+    stock = models.PositiveIntegerField(
+        default=0, help_text="Available to order online (kept up to date from branch stock; not edited by hand)."
+    )
+    barcode = models.CharField(max_length=40, blank=True, db_index=True)
+    cost = models.DecimalField(
+        max_digits=10, decimal_places=3, default=Decimal("0"), help_text="Latest landed cost per unit (KD)."
+    )
+    retail_price = models.DecimalField(
+        max_digits=8, decimal_places=3, null=True, blank=True, help_text="Empty = the product's price."
+    )
+    reorder_level = models.PositiveIntegerField(default=0)
+    max_level = models.PositiveIntegerField(default=0)
+    is_active = models.BooleanField(default=True)
 
-    panels = [FieldPanel("size"), FieldPanel("stock")]
+    panels = [FieldPanel("size"), FieldPanel("colour")]
 
     class Meta(Orderable.Meta):
-        unique_together = [("product", "size")]
+        unique_together = [("product", "size", "colour")]
 
     def __str__(self):
-        return f"{self.product.name_en} · {self.size}"
+        colour = f" {self.colour}" if self.colour else ""
+        return f"{self.product.name_en} · {self.size}{colour}"
+
+    @property
+    def price(self):
+        return self.retail_price if self.retail_price is not None else self.product.price
+
+    @property
+    def label(self):
+        return f"{self.size} {self.colour}".strip()
 
 
 @register_snippet
@@ -176,6 +225,10 @@ class Order(models.Model):
     )
     created_at = models.DateTimeField(auto_now_add=True)
     paid_at = models.DateTimeField(null=True, blank=True)
+    fulfilled_at = models.DateTimeField(null=True, blank=True)
+    fulfilled_by = models.ForeignKey(
+        settings.AUTH_USER_MODEL, null=True, blank=True, on_delete=models.SET_NULL, related_name="+"
+    )
 
     class Meta:
         ordering = ["-created_at"]
@@ -205,9 +258,11 @@ class Order(models.Model):
         order = Order.objects.select_for_update().get(pk=self.pk)
         if order.status != Order.Status.PENDING:
             return order
-        for item in order.items.select_related("variant"):
-            if item.variant_id:
-                ProductVariant.objects.filter(pk=item.variant_id).update(stock=models.F("stock") + item.quantity)
+        from apps.inventory.services import release
+
+        for item in order.items.select_related("variant", "branch"):
+            if item.variant_id and item.branch_id:
+                release(item.variant, item.branch, item.quantity)
         order.status = Order.Status.FAILED
         order.save(update_fields=["status"])
         return order
@@ -216,6 +271,14 @@ class Order(models.Model):
 class OrderItem(models.Model):
     order = models.ForeignKey(Order, on_delete=models.CASCADE, related_name="items")
     variant = models.ForeignKey(ProductVariant, null=True, on_delete=models.SET_NULL, related_name="+")
+    branch = models.ForeignKey(
+        "organization.Branch",
+        null=True,
+        blank=True,
+        on_delete=models.PROTECT,
+        related_name="+",
+        help_text="Branch whose stock is reserved for this line (and that fulfils it).",
+    )
     product_name = models.CharField(max_length=100)
     product_name_ar = models.CharField(max_length=100, blank=True)
     size = models.CharField(max_length=20)
@@ -242,30 +305,48 @@ class OutOfStock(Exception):
         self.variant = variant
 
 
+def _branches_for(fulfilment, pickup_branch):
+    """
+    Where to reserve: the pick-up branch's shelf first, then the other branch (the line records which
+    branch holds it, so the desk knows to bring it over). Delivery: Promenade first, then Bedaya.
+    """
+    from apps.organization.models import Branch
+
+    branches = sorted(Branch.objects.filter(is_active=True), key=lambda b: b.code != "PRM")
+    if fulfilment == Order.Fulfilment.PICKUP and pickup_branch is not None:
+        return [pickup_branch] + [b for b in branches if b.pk != pickup_branch.pk]
+    return branches
+
+
 @transaction.atomic
 def place_order(*, cart_lines, customer, fulfilment, payment_method, delivery_fee, language, user=None):
     """
-    Creates the order and reserves stock atomically. `cart_lines` = [(variant_id, qty), …].
-    Variants are locked in a fixed order so simultaneous checkouts can't deadlock or oversell.
+    Creates the order and reserves stock at a branch (scope M19, decision P3-1). `cart_lines` = [(variant_id, qty), …].
+    Stock rows are locked in a fixed order so simultaneous checkouts can't deadlock or oversell; the stock
+    stays on the branch's shelf (reserved) until the order is fulfilled.
     """
-    variant_ids = sorted({vid for vid, _ in cart_lines})
+    from apps.inventory.services import reserve
+
     variants = {
-        v.pk: v
-        for v in ProductVariant.objects.select_for_update()
-        .filter(pk__in=variant_ids)
-        .select_related("product")
-        .order_by("pk")
+        v.pk: v for v in ProductVariant.objects.filter(pk__in={vid for vid, _ in cart_lines}).select_related("product")
     }
+    branches = _branches_for(fulfilment, customer.get("pickup_branch"))
     subtotal = Decimal("0")
     lines = []
-    for vid, qty in cart_lines:
+    for vid, qty in sorted(cart_lines):
         variant = variants.get(vid)
-        if variant is None or not variant.product.is_active or variant.stock < qty:
+        if variant is None or not variant.product.is_active or not variant.product.sell_online:
             raise OutOfStock(variant or vid)
-        variant.stock -= qty
-        variant.save(update_fields=["stock"])
-        subtotal += variant.product.price * qty
-        lines.append((variant, qty))
+        stocks = {
+            s.branch_id: s
+            for s in BranchStock.objects.select_for_update().filter(variant=variant, branch__in=branches).order_by("pk")
+        }
+        branch = next((b for b in branches if b.pk in stocks and stocks[b.pk].available >= qty), None)
+        if branch is None:
+            raise OutOfStock(variant)
+        reserve(variant, branch, qty)
+        subtotal += variant.price * qty
+        lines.append((variant, qty, branch))
     fee = delivery_fee if fulfilment == Order.Fulfilment.DELIVERY else Decimal("0")
     order = Order.objects.create(
         subtotal=subtotal,
@@ -282,30 +363,64 @@ def place_order(*, cart_lines, customer, fulfilment, payment_method, delivery_fe
             OrderItem(
                 order=order,
                 variant=v,
+                branch=b,
                 product_name=v.product.name_en,
                 product_name_ar=v.product.name_ar,
-                size=v.size,
+                size=v.label,
                 quantity=q,
-                unit_price=v.product.price,
+                unit_price=v.price,
             )
-            for v, q in lines
+            for v, q, b in lines
         ]
     )
+    return order
+
+
+@transaction.atomic
+def fulfil_order(order, user):
+    """Handed over or sent out: the reserved stock leaves the branch shelf (ledger kind 'online')."""
+    from apps.inventory.services import move, release
+
+    order = Order.objects.select_for_update().get(pk=order.pk)
+    if order.status not in (Order.Status.PAID, Order.Status.READY):
+        raise ValueError("Only a paid order can be fulfilled.")
+    for item in order.items.select_related("variant", "branch"):
+        if item.variant_id and item.branch_id:
+            release(item.variant, item.branch, item.quantity)
+            move(
+                item.variant,
+                item.branch,
+                -item.quantity,
+                "online",
+                user,
+                reference=order.reference,
+                unit_cost=item.variant.cost,
+                check=False,
+            )
+    order.status, order.fulfilled_at, order.fulfilled_by = Order.Status.COMPLETED, timezone.now(), user
+    order.save(update_fields=["status", "fulfilled_at", "fulfilled_by"])
     return order
 
 
 class BranchStock(models.Model):
     """
     Stock on the shelf at each branch, sold at the front desk. A branch may sell only its own stock
-    (scope M5). Phase 3 (M8) adds counts, transfers and receiving on top of this.
+    (scope M5). Every change goes through apps.inventory.services, which writes the stock ledger.
     """
 
     variant = models.ForeignKey(ProductVariant, on_delete=models.CASCADE, related_name="branch_stock")
     branch = models.ForeignKey("organization.Branch", on_delete=models.PROTECT, related_name="stock")
-    quantity = models.IntegerField(default=0)
+    quantity = models.IntegerField(default=0, help_text="On the shelf (every change is in the stock ledger).")
+    reserved = models.IntegerField(
+        default=0, help_text="Held for online orders and transfers in transit; can't be sold at the desk."
+    )
 
     class Meta:
         constraints = [models.UniqueConstraint(fields=["variant", "branch"], name="one_stock_row_per_branch")]
 
     def __str__(self):
         return f"{self.variant} @ {self.branch.code}: {self.quantity}"
+
+    @property
+    def available(self):
+        return self.quantity - self.reserved

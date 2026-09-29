@@ -252,6 +252,80 @@ def my_tasks(request) -> list[dict]:
                 )
             )
 
+    # Inventory (M8), online orders (M19), Mindbody (M18)
+    from apps.inventory.models import Discrepancy, PurchaseRequest, StockCount, Transfer
+    from apps.shop.models import Order
+
+    if can(request, "inventory.approve"):
+        for req in PurchaseRequest.objects.filter(status="submitted").exclude(created_by=user):
+            out.append(
+                _task(
+                    f"Decide purchase request {req.reference}",
+                    f"قرّر طلب الشراء {req.reference}",
+                    reverse("desk:purchase_request", args=[req.pk]),
+                    req.due_at,
+                )
+            )
+        for c in StockCount.objects.filter(status="submitted").exclude(recorded_by=user).exclude(counted_by=user):
+            out.append(
+                _task(
+                    f"Approve stock count {c.reference}",
+                    f"اعتمد الجرد {c.reference}",
+                    reverse("desk:stock_count", args=[c.pk]),
+                    c.due_date,
+                )
+            )
+        n = Discrepancy.objects.filter(status="open").count()
+        if n:
+            out.append(_task("Open delivery discrepancies", "فروقات استلام مفتوحة", reverse("desk:receipts"), None, n))
+    if can(request, "inventory.purchase"):
+        n = PurchaseRequest.objects.filter(status__in=PurchaseRequest.OPEN_FOR_ORDER).count()
+        if n:
+            out.append(
+                _task(
+                    "Approved purchase requests to order",
+                    "طلبات شراء معتمدة للطلب",
+                    reverse("desk:purchase_orders"),
+                    None,
+                    n,
+                )
+            )
+    if branch is not None and can(request, "inventory.manage"):
+        for t in Transfer.objects.filter(to_branch=branch, status="sent").exclude(sent_by=user):
+            out.append(
+                _task(
+                    f"Count and accept transfer {t.reference}",
+                    f"عدّ واستلم التحويل {t.reference}",
+                    reverse("desk:transfer", args=[t.pk]),
+                    t.sent_at,
+                    urgent=True,
+                )
+            )
+        for c in StockCount.objects.filter(branch=branch, status__in=["counting", "returned"]):
+            out.append(
+                _task(
+                    f"Monthly stock count {c.reference}",
+                    f"الجرد الشهري {c.reference}",
+                    reverse("desk:stock_count", args=[c.pk]),
+                    c.due_date,
+                )
+            )
+        n = Order.objects.filter(status__in=["paid", "ready"], items__branch=branch).distinct().count()
+        if n:
+            out.append(
+                _task("Online orders to hand over", "طلبات إلكترونية للتسليم", reverse("desk:online_orders"), None, n)
+            )
+    if can(request, "data.import"):
+        from apps.mindbody.services import unmapped_options
+
+        n = unmapped_options().count()
+        if n:
+            out.append(
+                _task(
+                    "Map Mindbody pricing options", "اربط خيارات أسعار مايندبودي", reverse("desk:option_map"), None, n
+                )
+            )
+
     if branch is not None and can(request, "leads.manage"):
         n = TrialRequest.objects.filter(branch=branch, status="new").count()
         if n:

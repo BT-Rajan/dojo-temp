@@ -94,6 +94,26 @@ Emails print to the console in development; set `DJANGO_EMAIL_BACKEND` and the `
 (production refuses to start without them). PDF fonts are IBM Plex Sans Arabic (SIL Open Font License,
 `apps/reports/fonts/OFL.txt`).
 
+## Phase 3: inventory, purchasing and replacing Mindbody
+
+Code: `apps/inventory` (M8), stock reservation for online orders in `apps/shop` (M19 provision), `apps/mindbody`
+(M18), screens in `apps/desk/views/{inventory,mindbody}.py`. Daily jobs (overdue purchase requests, monthly counts)
+run with the Phase 2 jobs.
+
+| Area | What the desk does |
+| --- | --- |
+| Stock ledger | Every change to a branch's shelf (opening, import, sale, free issue, refund, receipt, transfer, count, online order, correction) is one ledger line with who, when, reference and running balance; nothing else writes stock. Stock value at cost per branch. Corrections outside the count: OM only, with a reason code. |
+| Catalogue | Products with sizes and colours, barcode, supplier, program, cost, retail price, reorder and maximum levels, sold online or not (belts never). The OM edits costs and prices. |
+| Purchase requests (FRM-05) | Branches request (from the reorder list or free text); one local request per branch per month; the OM approves, amends or rejects within 2 business days (Sun–Thu, not holidays; reminder if late) — never their own. |
+| Purchase orders (EA-PO-YYYY-NNN) | Only from approved requests; vendor prices in any currency; landed cost per unit = price × rate × (1 + customs %) + freight shared by value; margin at retail and the counter-price that reaches the target margin; order document for the vendor in Arabic or English (PDF/Excel). |
+| Receiving (FRM-01) and discrepancies (FRM-04) | All deliveries at Promenade against the vendor's invoice; landed cost becomes the item's cost; any difference opens a discrepancy that is resolved only after the vendor is told. |
+| Transfers (FRM-03) | Stock is held at the sender while travelling and moves only when the receiving branch counts and accepts it; a short count needs a call to the sender and OM and an explanation, and the OM is told. |
+| Monthly count (FRM-08) | Sheet made automatically on the last working day, due by the 3rd working day; two people; every difference recounted with a reason code (US, UT, D, FI, EE, U); the OM approves (not a counter) and only then is stock corrected; items short two months running are flagged. PDF/Excel. |
+| Vendors | Local and international vendors, contacts, currency, quotations with documents and validity. |
+| Online orders (M19 provision) | Front desk and website share one stock record per branch: an online order reserves stock (pick-up branch first), a failed payment releases it, and the desk hands it over to take it off the shelf. The storefront opens in Phase 6. |
+| Mindbody import (M18) | Clients, families, inventory on hand, pricing option expirations, visits and sales from Mindbody's CSV, Excel or ".xls" (HTML) exports. Each file is a dry run first with a report (what would change, rows skipped, warnings); nothing changes until Apply. Re-running is safe (matched by Mindbody ID), so the final delta uses the same screen. Pricing options are mapped (or skipped) before memberships come across; test products are skipped. |
+| Parallel run and cut-over | Mindbody's weekly KNET, card, cash and active members typed next to the system's figures, with differences explained; the cut-over checklist with who ticked each step. |
+
 ## The website (elitemaacademy.com)
 
 Built with Wagtail from the Elite Academy design system (direction B · The Path). Code lives in

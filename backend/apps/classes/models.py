@@ -281,6 +281,7 @@ class Attendance(BaseModel):
         DESK = "desk", "Front desk search"
         QR = "qr", "Member card (QR)"
         COACH = "coach", "Coach's class list"
+        IMPORT = "import", "Imported from Mindbody"
 
     class Warning(models.TextChoices):
         NONE = "", "—"

@@ -1,0 +1,1 @@
+{% load elite %}<select id="{{ idp }}{{ i }}" name="{{ namep }}{{ i }}" style="max-width:320px"><option value="">—</option>{% for v in variants %}<option value="{{ v.pk }}"{% if v.pk == selected %} selected{% endif %}>{% if lang == "ar" and v.product.name_ar %}{{ v.product.name_ar }}{% else %}{{ v.product.name_en }}{% endif %} · {{ v.label }}</option>{% endfor %}</select>

@@ -85,10 +85,18 @@ class Expense(BaseModel):
 
 
 class Vendor(BaseModel):
+    class Type(models.TextChoices):
+        LOCAL = "local", "Local"
+        INTERNATIONAL = "international", "International"
+
     name = models.CharField(max_length=150, unique=True)
     name_ar = models.CharField(max_length=150, blank=True)
+    vendor_type = models.CharField(max_length=13, choices=Type.choices, default=Type.LOCAL)
     country = models.CharField(max_length=60, default="Kuwait")
-    contact = models.CharField(max_length=200, blank=True)
+    contact = models.CharField(max_length=200, blank=True, help_text="Contact person.")
+    phone = models.CharField(max_length=30, blank=True)
+    email = models.EmailField(blank=True)
+    currency = models.CharField(max_length=3, default="KWD")
     is_active = models.BooleanField(default=True)
 
     class Meta:
@@ -131,6 +139,9 @@ class VendorInvoice(BaseModel):
     )
     amount_kwd = models.DecimalField(max_digits=12, decimal_places=3)
     document = models.FileField(upload_to=invoice_document_path, storage=get_private_storage, blank=True)
+    purchase_order = models.ForeignKey(
+        "inventory.PurchaseOrder", null=True, blank=True, on_delete=models.SET_NULL, related_name="invoices"
+    )
     status = models.CharField(max_length=8, choices=Status.choices, default=Status.RECORDED)
     approved_by = models.ForeignKey(
         settings.AUTH_USER_MODEL, null=True, blank=True, on_delete=models.PROTECT, related_name="+"

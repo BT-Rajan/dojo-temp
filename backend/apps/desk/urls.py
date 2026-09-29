@@ -1,6 +1,20 @@
 from django.urls import path
 
-from .views import auth, checkin, classes, finance, home, manage, members, ops, payroll, reports, sales
+from .views import (
+    auth,
+    checkin,
+    classes,
+    finance,
+    home,
+    inventory,
+    manage,
+    members,
+    mindbody,
+    ops,
+    payroll,
+    reports,
+    sales,
+)
 
 app_name = "desk"
 
@@ -106,4 +120,35 @@ urlpatterns = [
     path("payroll/holidays/", payroll.holidays, name="holidays"),
     path("payroll/rules/", payroll.payroll_settings, name="payroll_settings"),
     path("my-pay/", payroll.my_pay, name="my_pay"),
+    # Inventory and purchasing (M8), online orders (M19)
+    path("stock/", inventory.stock, name="stock"),
+    path("stock/<int:pk>/", inventory.item, name="stock_item"),
+    path("catalogue/", inventory.catalogue, name="catalogue"),
+    path("catalogue/new/", inventory.product_edit, name="product_new"),
+    path("catalogue/<int:pk>/", inventory.product_edit, name="product_edit"),
+    path("purchase-requests/", inventory.requests, name="purchase_requests"),
+    path("purchase-requests/new/", inventory.request_new, name="purchase_request_new"),
+    path("purchase-requests/<int:pk>/", inventory.request_detail, name="purchase_request"),
+    path("reorder/", inventory.reorder, name="reorder"),
+    path("purchase-orders/", inventory.orders, name="purchase_orders"),
+    path("purchase-orders/<int:pk>/", inventory.order_detail, name="purchase_order"),
+    path("receiving/", inventory.receive, name="receive"),
+    path("receipts/", inventory.receipts, name="receipts"),
+    path("receipts/<int:pk>/", inventory.receipt_detail, name="receipt"),
+    path("receipts/<int:pk>/invoice/", inventory.receipt_invoice, name="receipt_invoice"),
+    path("transfers/", inventory.transfers, name="transfers"),
+    path("transfers/new/", inventory.transfer_new, name="transfer_new"),
+    path("transfers/<int:pk>/", inventory.transfer_detail, name="transfer"),
+    path("stock-counts/", inventory.counts, name="stock_counts"),
+    path("stock-counts/<int:pk>/", inventory.count_detail, name="stock_count"),
+    path("vendors/", inventory.vendors, name="vendors"),
+    path("vendors/quotes/<int:pk>/", inventory.quote_document, name="quote_document"),
+    path("online-orders/", inventory.online_orders, name="online_orders"),
+    path("online-orders/<int:pk>/fulfil/", inventory.online_fulfil, name="online_fulfil"),
+    # Replacing Mindbody (M18)
+    path("mindbody/", mindbody.imports, name="imports"),
+    path("mindbody/<int:pk>/", mindbody.import_batch, name="import_batch"),
+    path("mindbody/pricing-options/", mindbody.option_map, name="option_map"),
+    path("mindbody/parallel-run/", mindbody.parallel_run, name="parallel_run"),
+    path("mindbody/cut-over/", mindbody.cutover, name="cutover"),
 ]

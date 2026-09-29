@@ -578,10 +578,9 @@ class Phase1Data:
                 session=session, kind="cancel", reason="Test: mat maintenance", created_by=coach, updated_by=coach
             )
         # Front-desk stock for the shop's products (if the website seed has created them).
+        from apps.inventory.services import set_opening
         from apps.shop.models import ProductVariant
 
         for variant in ProductVariant.objects.all():
             for branch in self.branches.values():
-                BranchStock.objects.update_or_create(
-                    variant=variant, branch=branch, defaults={"quantity": self.rng.randint(0, 6)}
-                )
+                set_opening(variant, branch, self.rng.randint(0, 6), note="Opening balance (test data)")

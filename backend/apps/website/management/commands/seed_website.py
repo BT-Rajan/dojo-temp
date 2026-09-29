@@ -22,9 +22,10 @@ from django.db import transaction
 from django.utils import timezone
 from wagtail.models import Collection, Locale, Page, Site
 
+from apps.inventory.services import set_opening
 from apps.members.models import Member
 from apps.organization.models import Branch
-from apps.shop.models import BranchStock, Product, ProductVariant, ShopSettings, SizeGuide, SizeGuideRow
+from apps.shop.models import Product, ProductVariant, ShopSettings, SizeGuide, SizeGuideRow
 from apps.website.cms_groups import ensure_cms_groups
 from apps.website.models import (
     AlbumPage,
@@ -1385,11 +1386,9 @@ class Command(BaseCommand):
                 slug=slug, name_en=en, name_ar=ar, category=category, price=Decimal(price), is_sample_price=True
             )
             for i, (size, stock) in enumerate(sizes):
-                variant = ProductVariant.objects.create(product=product, size=size, stock=stock, sort_order=i)
-                for branch in self.branches.values():  # front-desk shelves (scope M5)
-                    BranchStock.objects.update_or_create(
-                        variant=variant, branch=branch, defaults={"quantity": max(stock // 2, 0)}
-                    )
+                variant = ProductVariant.objects.create(product=product, size=size, stock=0, sort_order=i)
+                for branch in self.branches.values():  # shelves at each branch; online stock is derived (M19)
+                    set_opening(variant, branch, max(stock // 2, 0))
         guide = SizeGuide.objects.create(category="gloves")
         for i, (size, measure, en, ar) in enumerate(
             [

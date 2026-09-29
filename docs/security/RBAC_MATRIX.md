@@ -57,8 +57,11 @@ Document: EA-SYS-SEC-02 · Generated from `backend/apps/rbac/catalog.py` (the si
 | `reports.branch` | Branch reports | ✓ | ✓ | ✓ |  |  | ✓ |  |  | ✓ | ✓ |  |  |  |
 | `reports.all` | All-branch and quarterly reports | ✓ | ✓ |  |  |  |  |  |  |  |  |  | ✓ |  |
 | `reports.verify` | Verify weekly reports | ✓ | ✓ |  |  |  |  |  |  |  |  |  |  |  |
-| `inventory.manage` | Stock counts, transfers and receiving | ✓ | ✓ |  |  |  |  |  |  | ✓ |  | ✓ |  |  |
-| `inventory.approve` | Approve purchase requests and stock corrections | ✓ | ✓ |  |  |  |  |  |  |  |  |  |  |  |
+| `inventory.view` | See products, stock at each branch and stock history | ✓ | ✓ |  |  |  |  |  |  | ✓ | ✓ | ✓ | ✓ |  |
+| `inventory.manage` | Request purchases, send and accept transfers, take part in stock counts | ✓ | ✓ |  |  |  |  |  |  | ✓ | ✓ | ✓ |  |  |
+| `inventory.purchase` | Place purchase orders with vendors and receive deliveries at Promenade | ✓ | ✓ |  |  |  |  |  |  |  |  | ✓ |  |  |
+| `inventory.approve` | Approve purchase requests and stock corrections; edit the catalogue, costs and prices | ✓ | ✓ |  |  |  |  |  |  |  |  |  |  |  |
+| `data.import` | Import data from Mindbody and run the parallel-run comparison | ✓ | ✓ |  |  |  |  |  | ✓ |  |  |  |  |  |
 | `training.manage` | Curriculum, evaluations and promotions | ✓ |  | ✓ | ✓ |  |  |  |  |  |  |  |  |  |
 | `training.teach` | Take attendance and evaluate own classes | ✓ |  | ✓ | ✓ | ✓ |  |  |  |  |  |  |  |  |
 | `marketing.manage` | Campaigns, leads and media library | ✓ |  |  |  |  | ✓ | ✓ |  |  |  |  |  |  |

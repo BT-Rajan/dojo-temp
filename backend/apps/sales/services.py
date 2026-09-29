@@ -323,18 +323,25 @@ def sell(
                 if line.category == SaleLine.Category.NEW:
                     new_membership_line = line
         else:
+            from apps.inventory.services import move
+
             variant = ProductVariant.objects.select_related("product").get(pk=item.variant.pk)
-            try:
-                stock = BranchStock.objects.select_for_update().get(variant=variant, branch=branch)
-            except BranchStock.DoesNotExist as exc:
-                raise ValidationError(f"{variant} is not stocked at this branch.") from exc
-            if stock.quantity < item.quantity:
-                raise ValidationError(f"Only {stock.quantity} of {variant} left at this branch.")
-            stock.quantity -= item.quantity
-            stock.save(update_fields=["quantity"])
+            if not BranchStock.objects.filter(variant=variant, branch=branch).exists():
+                raise ValidationError(f"{variant} is not stocked at this branch.")
             if item.free_issue and not item.free_issue_reason.strip():
                 raise ValidationError("A free issue needs a reason (e.g. grading belt).")
-            unit = ZERO if item.free_issue else variant.product.price
+            # Only this branch's own free stock can be sold (reserved online / in-transit stock can't).
+            move(
+                variant,
+                branch,
+                -item.quantity,
+                "free_issue" if item.free_issue else "sale",
+                user,
+                reference=sale.reference,
+                unit_cost=variant.cost,
+                note=item.free_issue_reason.strip() if item.free_issue else "",
+            )
+            unit = ZERO if item.free_issue else variant.price
             gross = unit * item.quantity
             if item.discount is not None:
                 _check_discount(item, member, branch, today, "equipment")
@@ -549,12 +556,18 @@ def _apply_request(req: AccountRequest, user):
             Membership.objects.filter(pk=req.membership_id).update(status=Membership.Status.REFUNDED, end_date=today)
         # Returned equipment goes back on the shelf at the branch that sold it.
         if req.refund_amount >= original.total:
+            from apps.inventory.services import move
+
             for line in original.lines.filter(variant__isnull=False):
-                stock, _ = BranchStock.objects.select_for_update().get_or_create(
-                    variant_id=line.variant_id, branch=original.branch
+                move(
+                    line.variant_id,
+                    original.branch,
+                    line.quantity,
+                    "refund",
+                    user,
+                    reference=refund.reference,
+                    check=False,
                 )
-                stock.quantity += line.quantity
-                stock.save(update_fields=["quantity"])
 
 
 # ---------------------------------------------------------------------------
