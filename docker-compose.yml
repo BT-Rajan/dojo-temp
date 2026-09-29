@@ -1,0 +1,46 @@
+# Local trial of the Elite Academy system with fictional test data.
+#   docker compose up --build        start (first start loads the test data)
+#   docker compose down               stop
+#   docker compose down -v            stop and delete the trial database
+# Development-only passwords and keys: never use these values on a real server.
+services:
+  db:
+    image: mysql:8.0
+    command: --character-set-server=utf8mb4 --collation-server=utf8mb4_0900_ai_ci
+    environment:
+      MYSQL_ROOT_PASSWORD: root-dev-only
+      MYSQL_DATABASE: elite
+      MYSQL_USER: elite
+      MYSQL_PASSWORD: elite-dev-only
+    volumes:
+      - db:/var/lib/mysql
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "127.0.0.1", "-uroot", "-proot-dev-only"]
+      interval: 5s
+      retries: 30
+
+  redis:
+    image: redis:7-alpine
+
+  web:
+    build: ./backend
+    environment:
+      DJANGO_SETTINGS_MODULE: config.settings.dev
+      DJANGO_SECRET_KEY: local-trial-only-not-a-real-secret-key-0123456789
+      DJANGO_ALLOWED_HOSTS: localhost,127.0.0.1
+      DATABASE_URL: mysql://elite:elite-dev-only@db:3306/elite
+      REDIS_URL: redis://redis:6379/0
+      AI_ENABLED: "false"
+    ports:
+      - "8000:8000"
+    volumes:
+      - media:/app/media
+    depends_on:
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_started
+
+volumes:
+  db:
+  media:

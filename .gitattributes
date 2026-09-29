@@ -10,3 +10,4 @@
 *.png binary
 *.heic binary
 *.HEIC binary
+*.sh text eol=lf

@@ -12,3 +12,6 @@ if not FIELD_ENCRYPTION_KEYS:  # noqa: F405
     FIELD_ENCRYPTION_KEYS = ["bG9jYWwtZGV2LW9ubHkta2V5LTMyLWJ5dGVzLWxvbmc="]
 if not BLIND_INDEX_KEY:  # noqa: F405
     BLIND_INDEX_KEY = "local-dev-only-blind-index-key"
+
+# Show the messages the console backend "sends" (e.g. portal sign-in codes) in the terminal.
+LOGGING["loggers"]["elite.messaging"] = {"handlers": ["console"], "level": "INFO", "propagate": False}  # noqa: F405

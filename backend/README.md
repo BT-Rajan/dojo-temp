@@ -20,6 +20,15 @@ Claude Design template and talks to this back end through the REST API at `/api/
 | Test data | Fictional Kuwait test data package (`seed_kuwait`). |
 | Simultaneous users | Per-request transactions, optimistic locking (HTTP 409 on edit collisions), row locks for counters, Redis sessions, rate limits, load test script. |
 
+## Try it on a PC (Windows, Mac or Linux) with Docker
+
+Install Docker Desktop, then from the repository folder run `docker compose up --build`. The first start builds the
+app, creates the database and loads the fictional test data (a few minutes); later starts take seconds. Open
+http://localhost:8000/en/ (website) and http://localhost:8000/en/desk/ (staff desk). The test logins and the test
+parent's mobile are printed in the window; portal sign-in codes appear there too (no real messages are sent).
+`docker compose down` stops it; `docker compose down -v` also deletes the trial database. The passwords and keys in
+`docker-compose.yml` are for this local trial only.
+
 ## Run it locally
 
 Requirements: Python 3.11+, MySQL 8, Redis, and the MySQL client headers (`libmysqlclient-dev pkg-config` on Ubuntu).
