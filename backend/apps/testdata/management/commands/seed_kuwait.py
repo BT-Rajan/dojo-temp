@@ -166,6 +166,9 @@ class Command(BaseCommand):
             for _ in range(opts["adults"]):
                 self._adult()
             self._edge_cases()
+            from apps.testdata.phase1 import Phase1Data
+
+            Phase1Data(self).load()
 
         self.stdout.write(
             self.style.SUCCESS(
@@ -180,6 +183,9 @@ class Command(BaseCommand):
 
     # ------------------------------------------------------------------
     def _reset(self):
+        from apps.testdata.phase1 import reset_phase1
+
+        reset_phase1()
         MediaConsent.objects.all().delete()
         EmergencyContact.objects.all().delete()
         GuardianLink.objects.all().delete()
@@ -191,7 +197,7 @@ class Command(BaseCommand):
         PricingOption.objects.all().delete()
         Program.objects.all().delete()
         Discipline.objects.all().delete()
-        Branch.objects.all().delete()
+        # Branches are kept (website pages and enquiries point at them); _branches() refreshes them.
 
     def _branches(self):
         prm, _ = Branch.objects.update_or_create(

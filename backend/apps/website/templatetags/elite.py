@@ -202,7 +202,8 @@ def trial_url(context, obj=None, source="", branch=""):
     """Link to Book a trial, pre-filling branch and program from a page, program or timetable entry."""
     from urllib.parse import urlencode
 
-    from apps.website.models import ProgramPage, TimetableEntry
+    from apps.classes.models import ClassSlot
+    from apps.website.models import ProgramPage
 
     try:
         trial = context["key"].get("trial_page")
@@ -216,8 +217,13 @@ def trial_url(context, obj=None, source="", branch=""):
         params["branch"] = branch or branch_obj.code
     if isinstance(obj, ProgramPage):
         params["program"] = obj.pk
-    elif isinstance(obj, TimetableEntry) and obj.program_id:
-        params["program"] = obj.program_id
+    elif isinstance(obj, ClassSlot):
+        cache = context.render_context.setdefault("slot_program_pages", {})  # one lookup per program per page
+        if obj.program_id not in cache:
+            page = ProgramPage.objects.live().filter(system_programs=obj.program_id).order_by("path").first()
+            cache[obj.program_id] = page.pk if page else None
+        if cache[obj.program_id]:
+            params["program"] = cache[obj.program_id]
     if source:
         params["source"] = source
     url = trial.get_url(context.get("request"))

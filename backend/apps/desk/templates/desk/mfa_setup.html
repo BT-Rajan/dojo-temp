@@ -1,0 +1,7 @@
+{% extends "desk/base.html" %}{% load elite %}
+{% block title %}{% t "Two-factor sign-in" "التحقق بخطوتين" %}{% endblock %}
+{% block content %}<div class="dk-head"><div><h1>{% t "Two-factor sign-in" "التحقق بخطوتين" %}</h1><p>{% t "Your role can see sensitive data, so sign-in needs a code from an authenticator app (Google or Microsoft Authenticator)." "دورك يتيح رؤية بيانات حساسة، لذا يحتاج الدخول إلى رمز من تطبيق مصادقة (Google أو Microsoft Authenticator)." %}</p></div></div>
+<div class="dk-card" style="max-width:460px"><ol><li>{% t "Open the app and scan this code." "افتح التطبيق وامسح هذا الرمز." %}</li><li>{% t "Type the 6-digit code it shows." "اكتب الرمز المكوّن من 6 أرقام." %}</li></ol>
+<div style="width:220px;background:var(--logo-plate);padding:8px;border-radius:var(--radius-md)">{{ qr }}</div>
+<form method="post" class="dk-form">{% csrf_token %}<div class="ea-field"><label for="otp">{% t "Code" "الرمز" %}</label><input class="ea-input" id="otp" name="otp_token" inputmode="numeric" autocomplete="one-time-code" dir="ltr" maxlength="8" required autofocus></div><button class="ea-btn ea-btn--primary">{% t "Turn on" "تفعيل" %}</button></form></div>
+{% endblock %}

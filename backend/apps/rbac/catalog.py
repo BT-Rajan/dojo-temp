@@ -33,7 +33,18 @@ PERMISSIONS: dict[str, str] = {
     "rbac.manage_roles": "Change what roles can do",
     "audit.view": "Read the audit log",
     "system.admin": "Technical administration",
-    # Reserved for later phases, listed now so roles are complete from day one
+    # Classes (M4)
+    "classes.view": "See the timetable, sessions and class lists",
+    "classes.manage": "Edit the weekly timetable, rooms and one-off sessions",
+    "classes.book": "Book members and trials into classes",
+    "classes.checkin": "Check members in and take attendance",
+    "classes.change_request": "Request a class cancellation, time change or substitute coach",
+    "classes.change_approve": "Approve class changes (members are notified)",
+    # Sales, requests, cash-up and renewals (M5, M6)
+    "sales.view": "See sales, receipts and memberships",
+    "sales.request": "Log freeze, refund and cancellation requests",
+    "sales.cashup": "Prepare and submit the end-of-day cash-up",
+    "renewals.follow_up": "Work the renewals follow-up list",
     "sales.sell": "Sell at the front desk",
     "sales.approve_refund": "Approve freezes, refunds and cancellations",
     "reports.branch": "Branch reports",
@@ -227,3 +238,52 @@ if _unknown:
 # Website trial requests and messages go to whoever sells or markets (Customer Management Procedure).
 for _code in ("operations_manager", "branch_admin", "operations_support", "marketing_lead", "marketing_staff"):
     ROLES[_code][4].add("leads.manage")
+
+# Phase 1 (M4–M6) permissions per role, following the scope's role descriptions.
+PHASE1 = {
+    "operations_manager": {
+        "classes.view",
+        "classes.manage",
+        "classes.book",
+        "classes.checkin",
+        "classes.change_request",
+        "classes.change_approve",
+        "sales.view",
+        "sales.request",
+        "sales.cashup",
+        "renewals.follow_up",
+    },
+    "training_lead": {
+        "classes.view",
+        "classes.manage",
+        "classes.checkin",
+        "classes.change_request",
+        "classes.change_approve",
+    },
+    "track_lead": {"classes.view", "classes.checkin", "classes.change_request"},
+    "instructor": {"classes.view", "classes.checkin", "classes.change_request"},
+    "branch_admin": {
+        "classes.view",
+        "classes.book",
+        "classes.checkin",
+        "classes.change_request",
+        "sales.view",
+        "sales.request",
+        "sales.cashup",
+        "renewals.follow_up",
+    },
+    "operations_support": {
+        "classes.view",
+        "classes.book",
+        "classes.checkin",
+        "classes.change_request",
+        "sales.view",
+        "sales.request",
+        "sales.cashup",
+        "renewals.follow_up",
+    },
+    "accountant": {"sales.view"},
+    "marketing_lead": {"classes.view"},
+}
+for _code, _perms in PHASE1.items():
+    ROLES[_code][4].update(_perms)

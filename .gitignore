@@ -30,6 +30,7 @@ __pycache__/
 .ruff_cache/
 backend/staticfiles/
 backend/media/
+backend/private_media/
 # Office lock files
 ~$*
 dump.rdb

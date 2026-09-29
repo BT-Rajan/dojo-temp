@@ -1,0 +1,8 @@
+{% extends "desk/base.html" %}{% load elite desk_tags %}
+{% block title %}{% t "Members" "الأعضاء" %}{% endblock %}
+{% block content %}
+<div class="dk-head"><div><h1>{% t "Members" "الأعضاء" %}</h1></div>{% if desk_menu %}<a class="ea-btn ea-btn--primary" href="{% url "desk:member_new" %}">{% icon "plus" %}{% t "Register a member" "تسجيل عضو" %}</a>{% endif %}</div>
+<form method="get" class="dk-search" role="search"><label class="ea-sr" for="q">{% t "Search" "بحث" %}</label><input class="ea-input" id="q" name="q" value="{{ q }}" placeholder="{% t "Name (English or Arabic) or mobile" "الاسم (عربي أو إنجليزي) أو الجوال" %}"><button class="ea-btn ea-btn--secondary">{% t "Search" "بحث" %}</button></form>
+{% if rows %}<div class="dk-card"><div class="dk-table-wrap"><table class="dk-table"><thead><tr><th></th><th>{% t "Name" "الاسم" %}</th><th>{% t "Status" "الحالة" %}</th><th>{% t "Branch" "الفرع" %}</th><th>{% t "Age" "العمر" %}</th></tr></thead><tbody>{% for m, status in rows %}<tr{% if not m.is_active %} class="is-muted"{% endif %}><td>{% include "desk/_avatar.html" %}</td><td><a href="{% url "desk:member" m.pk %}">{% name m %}</a>{% if m.first_name_ar %}<br><span class="dk-muted">{{ m.first_name_ar }} {{ m.last_name_ar }}</span>{% endif %}</td><td>{% include "desk/_status.html" %}</td><td>{{ m.branch.code }}</td><td dir="ltr">{{ m.age }}</td></tr>{% endfor %}</tbody></table></div></div>
+{% else %}<div class="ea-empty"><p class="ea-h4">{% t "No members to show" "لا يوجد أعضاء للعرض" %}</p></div>{% endif %}
+{% endblock %}

@@ -395,7 +395,7 @@ Each phase ends with a demo to the leads and sign-off before the next begins. Th
 | Phase | Name | Contents | Outcome |
 |---|---|---|---|
 | **0** | Foundation | New Python/Django back end on MySQL (Section 11); data model for branches, programs, pricing, members and families, staff; login with two-factor authentication; role-based access control; tamper-evident audit log; encryption of sensitive data; **M21 test data package (first version — grows with every phase)** | A secure base to build on, with realistic Kuwait test data — **built** (see backend/README.md) |
-| **1** | Members, Classes and Sales | M1 Programs & pricing, M2 Members & families, M4 Schedule, bookings & check-in, M5 POS, payments, receipts & cash-up, M6 Renewals list | Front desk can run a full day without Mindbody (in test) |
+| **1** | Members, Classes and Sales | M1 Programs & pricing, M2 Members & families, M4 Schedule, bookings & check-in, M5 POS, payments, receipts & cash-up, M6 Renewals list | Front desk can run a full day without Mindbody (in test) — **built** (staff desk at /desk/; see backend/README.md), awaiting demo and sign-off |
 | **2** | Operations, Reporting and Payroll | M9 Daily operations forms, M10 Weekly Sales, Weekly Branch, Active Members & dashboards, M11 Finance & Accountant, **M20 Payroll** | Weekly reports build themselves; OM verification online; first payroll run in test |
 | **3** | Inventory and Migration | M8 Inventory, purchasing, vendors, counts; **online-shop provision (M19 catalogue and stock reservation)**; M18 Mindbody import; parallel run; cut-over | **Mindbody replaced** — then the first run and test (7.1) |
 | **4** | Training and Progression | M7 Curriculum, evaluations, test days, promotions, progress cards | Belt path tracked for every member |
@@ -415,6 +415,24 @@ This scope is the starting point, not the final list. More needs will appear onc
 ---
 
 ## 8. Decisions Needed
+
+**Decided for Phase 1 (29 Sep 2026)**
+
+| # | Question | Decision |
+|---|---|---|
+| P1-1 | Must members book to attend? | No. Members are enrolled in their regular classes and simply checked in; booking is for trials, full classes and events. Walk-ins allowed. |
+| P1-2 | Check-in with an expired membership? | Allowed with a warning; the member goes onto the renewals list. |
+| P1-3 | No-shows and late cancellations | Recorded for the dashboard only; no penalty. A late cancellation is under 2 hours before the class. |
+| P1-4 | Freeze (Playbook item 3) | No fee to start; 1–4 weeks; once per membership; OM approves. |
+| P1-5 | Elite Member tier (Playbook item 3) | Built and switched off until the eligibility rule and rate are decided. |
+| P1-6 | Family / sibling discount | Set per discount in the system (test data: 10% on memberships); no fixed default. |
+| P1-7 | Referral reward | A set KD credit (test data: 5.000 KD) off the referring member's next renewal. |
+| P1-8 | Session packages "10×4, 12×5, 12×6" | Sessions × weeks (e.g. 10 sessions within 4 weeks). |
+| P1-9 | Rooms | One per branch unless the academy adds more. |
+| P1-10 | Card terminals | Amounts typed in by hand with the terminal reference; a connected terminal can come with the payment provider (decision 5). |
+| P1-11 | Check-in hardware (decision 11) | Both name search and QR card are built; a scanner can be added any time. |
+| P1-12 | Receipts | Printed, WhatsApp or email, chosen at each sale; WhatsApp by default (sent once a provider is chosen, decision 6). |
+| P1-13 | Renewal reminders / at-risk / class-change notice / cash-up difference | 5 and 1 days before expiry; at risk after 14 days without a visit; changes with under 2 hours' notice allowed but flagged urgent; every cash-up difference recorded, above 1.000 KD needs a written reason. |
 
 **Carried from Elite documents**
 1. Receiving owner for group-sales handoffs (Playbook item 1).

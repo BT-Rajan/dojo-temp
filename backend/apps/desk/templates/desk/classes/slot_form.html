@@ -1,0 +1,5 @@
+{% extends "desk/base.html" %}{% load elite %}
+{% block title %}{% t "Class" "حصة" %}{% endblock %}
+{% block content %}<div class="dk-head"><div><h1>{% if slot %}{{ slot.title_en }}{% else %}{% t "Add a class" "إضافة حصة" %}{% endif %}</h1><p>{% t "Changes apply to future sessions that haven't been changed by hand. Booked sessions stay until they are cancelled through a class change." "التغييرات تسري على الحصص القادمة التي لم تُعدّل يدوياً." %}</p></div></div>
+<form method="post" class="dk-card dk-form">{% csrf_token %}<div class="dk-fields">{% include "desk/_fields.html" with wide="instructors" %}</div><div><button class="ea-btn ea-btn--primary">{% t "Save" "حفظ" %}</button> <a href="{% url "desk:timetable" %}">{% t "Cancel" "إلغاء" %}</a></div></form>
+{% endblock %}

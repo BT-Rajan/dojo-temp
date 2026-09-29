@@ -1,0 +1,5 @@
+{% extends "desk/base.html" %}{% load elite %}
+{% block title %}{{ member }}{% endblock %}
+{% block content %}<div class="dk-head"><h1>{{ member }}</h1></div>
+<form method="post" class="dk-card dk-form">{% csrf_token %}<div class="dk-fields">{% include "desk/_fields.html" with wide="medical_notes allergies" %}</div><div><button class="ea-btn ea-btn--primary">{% t "Save" "حفظ" %}</button> <a href="{% url "desk:member" member.pk %}">{% t "Cancel" "إلغاء" %}</a></div></form>
+{% endblock %}

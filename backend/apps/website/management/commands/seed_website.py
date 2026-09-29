@@ -24,7 +24,7 @@ from wagtail.models import Collection, Locale, Page, Site
 
 from apps.members.models import Member
 from apps.organization.models import Branch
-from apps.shop.models import Product, ProductVariant, ShopSettings, SizeGuide, SizeGuideRow
+from apps.shop.models import BranchStock, Product, ProductVariant, ShopSettings, SizeGuide, SizeGuideRow
 from apps.website.cms_groups import ensure_cms_groups
 from apps.website.models import (
     AlbumPage,
@@ -40,7 +40,6 @@ from apps.website.models import (
     ProgramPage,
     ShopPage,
     SiteSettings,
-    TimetableEntry,
 )
 
 KAJUKENBO = "white,yellow,purple,blue,green,brown,brownblack,black"
@@ -245,68 +244,16 @@ PROGRAMS = [
     ),
 ]
 
-# weekday (0=Sat), "H:MM" (PM), branch, program slug, title_en, title_ar, ages_en, ages_ar, age group
-TIMETABLE = [
-    (0, "4:30", "PRM", "kajukenbo", "Kajukenbo", "كاجوكينبو", "Kids 5–8", "أطفال 5–8", "kids"),
-    (0, "5:30", "BED", "taekwondo", "Taekwondo", "تايكوندو", "Boys 6–13", "أولاد 6–13", "kids"),
-    (0, "6:30", "PRM", "jiu-jitsu", "Jiu-Jitsu", "جوجيتسو", "Teens 13+", "ناشئين 13+", "teens"),
-    (
-        0,
-        "7:30",
-        "BED",
-        "kyokushin-karate",
-        "Kyokushin · Ladies",
-        "كيوكوشن · سيدات",
-        "Girls 6+, women",
-        "بنات وسيدات",
-        "ladies",
-    ),
-    (1, "4:30", "PRM", "kickboxing", "Kickboxing", "كيك بوكسينغ", "Kids 5–8", "أطفال 5–8", "kids"),
-    (1, "4:30", "BED", "kajukenbo-bedaya", "Kajukenbo", "كاجوكينبو", "Boys 6–13", "أولاد 6–13", "kids"),
-    (1, "5:30", "BED", "kickboxing", "Kickboxing", "كيك بوكسينغ", "Adults", "كبار", "adults"),
-    (
-        1,
-        "7:30",
-        "BED",
-        "ladies-class",
-        "Kickboxing · Ladies",
-        "كيك بوكسينغ · سيدات",
-        "Girls 6+, women",
-        "بنات وسيدات",
-        "ladies",
-    ),
-    (2, "4:30", "PRM", "kajukenbo", "Kajukenbo", "كاجوكينبو", "Kids 5–8", "أطفال 5–8", "kids"),
-    (2, "5:30", "PRM", "jiu-jitsu", "Jiu-Jitsu", "جوجيتسو", "Kids 9–12", "أطفال 9–12", "kids"),
-    (2, "6:30", "BED", "kyokushin-karate", "Kyokushin", "كيوكوشن", "Adults", "كبار", "adults"),
-    (3, "4:30", "BED", "kajukenbo-bedaya", "Kajukenbo", "كاجوكينبو", "Boys 6–13", "أولاد 6–13", "kids"),
-    (3, "6:30", "PRM", "kickboxing", "Kickboxing", "كيك بوكسينغ", "Kids 9–12", "أطفال 9–12", "kids"),
-    (
-        3,
-        "7:30",
-        "BED",
-        "ladies-class",
-        "Kajukenbo · Ladies",
-        "كاجوكينبو · سيدات",
-        "Girls 6+, women",
-        "بنات وسيدات",
-        "ladies",
-    ),
-    (4, "5:30", "PRM", "kajukenbo", "Kajukenbo", "كاجوكينبو", "Kids 9–12", "أطفال 9–12", "kids"),
-    (4, "6:30", "BED", "taekwondo", "Taekwondo", "تايكوندو", "Adults", "كبار", "adults"),
-    (
-        4,
-        "7:30",
-        "BED",
-        "ladies-class",
-        "Taekwondo · Ladies",
-        "تايكوندو · سيدات",
-        "Girls 6+, women",
-        "بنات وسيدات",
-        "ladies",
-    ),
-    (5, "5:30", "BED", "ladies-class", "Kickboxing · Ladies", "كيك بوكسينغ · سيدات", "Women", "سيدات", "ladies"),
-    (5, "6:30", "BED", "kajukenbo-bedaya", "Kajukenbo", "كاجوكينبو", "Adults", "كبار", "adults"),
-]
+# Program page -> timetable programs (from seed_kuwait) and the class titles it covers.
+PAGE_PROGRAMS = {
+    "kajukenbo": (["Elite Program 5-7", "Elite Program 8-12"], "Kajukenbo"),
+    "kickboxing": (["Elite Program 5-7", "Elite Program 8-12"], "Kickboxing"),
+    "jiu-jitsu": (["Elite Program 5-7", "Elite Program 8-12", "Jiu-Jitsu 13+"], "Jiu-Jitsu"),
+    "taekwondo": (["Taekwondo Boys"], ""),
+    "kyokushin-karate": (["Kyokushin Karate", "Shin-Kyokushin Junior"], ""),
+    "kajukenbo-bedaya": (["Kajukenbo"], ""),
+    "ladies-class": (["Ladies' Class"], ""),
+}
 
 # slug, en, ar, sizes [(size, stock)], price, category
 PRODUCTS = [
@@ -459,7 +406,6 @@ class Command(BaseCommand):
     def _reset(self):
         for home in HomePage.objects.all():
             home.delete()  # removes every page under it too
-        TimetableEntry.objects.all().delete()
         ProductVariant.objects.all().delete()
         Product.objects.all().delete()
         SizeGuide.objects.all().delete()
@@ -670,6 +616,13 @@ class Command(BaseCommand):
                 ),
             )
             program_pages[slug] = page
+        from apps.organization.models import Program
+
+        for slug, (names, match) in PAGE_PROGRAMS.items():
+            page = program_pages[slug]
+            page.system_programs.set(Program.objects.filter(branch=page.branch, name__in=names))
+            page.schedule_match = match
+            page.save()
         for page in program_pages.values():  # the schedule on each program page lists only that program
             page.body[0 if page.belt_path != KAJUKENBO else 1].value["program"] = page
             page.save()
@@ -848,24 +801,6 @@ class Command(BaseCommand):
                 ],
             ),
         )
-        # Friday is closed at both branches; Thursday at Promenade (branch pages hold the closed days).
-        for day, start, code, prog, en, ar, ages_en, ages_ar, group in TIMETABLE:
-            h, m = (int(x) for x in start.split(":"))
-            begin = datetime.time(h + 12, m)
-            TimetableEntry.objects.create(
-                branch=self.branches[code],
-                program=program_pages.get(prog),
-                title_en=en,
-                title_ar=ar,
-                ages_en=ages_en,
-                ages_ar=ages_ar,
-                age_group=group,
-                weekday=day,
-                start=begin,
-                end=(datetime.datetime.combine(datetime.date.today(), begin) + datetime.timedelta(hours=1)).time(),
-                is_sample=True,
-            )
-
         # --- Events ---------------------------------------------------------------
         events = self.add(
             home,
@@ -1450,7 +1385,11 @@ class Command(BaseCommand):
                 slug=slug, name_en=en, name_ar=ar, category=category, price=Decimal(price), is_sample_price=True
             )
             for i, (size, stock) in enumerate(sizes):
-                ProductVariant.objects.create(product=product, size=size, stock=stock, sort_order=i)
+                variant = ProductVariant.objects.create(product=product, size=size, stock=stock, sort_order=i)
+                for branch in self.branches.values():  # front-desk shelves (scope M5)
+                    BranchStock.objects.update_or_create(
+                        variant=variant, branch=branch, defaults={"quantity": max(stock // 2, 0)}
+                    )
         guide = SizeGuide.objects.create(category="gloves")
         for i, (size, measure, en, ar) in enumerate(
             [
@@ -1465,7 +1404,6 @@ class Command(BaseCommand):
     def _progress(self):
         """Belt progress for a few fictional test members, so the portal has something to show."""
         belts = ["white", "yellow", "purple", "blue"]
-        today = timezone.localdate()
         for i, member in enumerate(Member.objects.filter(is_active=True).order_by("pk")[:30]):
             MemberProgress.objects.update_or_create(
                 member=member,
@@ -1473,9 +1411,5 @@ class Command(BaseCommand):
                     "belt": belts[i % len(belts)],
                     "stripes": i % 5,
                     "stripes_needed": 4,
-                    "next_class_en": "Sun · 4:30 PM · Kickboxing",
-                    "next_class_ar": "الأحد · 4:30 م · كيك بوكسينغ",
-                    "membership_until": today + datetime.timedelta(days=5 if i % 4 == 0 else 40),
-                    "renew_price": Decimal("85.000") if member.branch.code == "PRM" else Decimal("65.000"),
                 },
             )

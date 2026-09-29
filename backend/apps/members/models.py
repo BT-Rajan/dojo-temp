@@ -1,10 +1,32 @@
+import secrets
+
 from django.conf import settings
+from django.core.files.storage import FileSystemStorage
 from django.db import models
 from django.utils import timezone
+from django.utils.functional import LazyObject
 
 from apps.core.crypto import EncryptedTextField, blind_index
 from apps.core.models import BaseModel
 from apps.core.validators import normalize_kuwait_mobile, validate_civil_id
+
+
+class PrivateStorage(LazyObject):
+    """Member photos and signatures are never served as public media; staff see them through a checked view."""
+
+    def _setup(self):
+        self._wrapped = FileSystemStorage(location=settings.PRIVATE_MEDIA_ROOT, base_url=None)
+
+
+private_storage = PrivateStorage()
+
+
+def new_qr_token() -> str:
+    return secrets.token_urlsafe(12)
+
+
+def member_photo_path(instance, filename):
+    return f"members/{instance.pk or 'new'}/photo-{secrets.token_hex(6)}.jpg"
 
 
 class Guardian(BaseModel):
@@ -78,6 +100,19 @@ class Member(BaseModel):
     allergies = EncryptedTextField(blank=True)
     joined_on = models.DateField(default=timezone.localdate)
     is_active = models.BooleanField(default=True)
+    photo = models.ImageField(
+        upload_to=member_photo_path,
+        storage=private_storage,
+        blank=True,
+        help_text="Shown to the member's instructors on the class list.",
+    )
+    qr_token = models.CharField(
+        max_length=32,
+        unique=True,
+        default=new_qr_token,
+        editable=False,
+        help_text="Printed on the member card; scanned at the front desk.",
+    )
     guardians = models.ManyToManyField(Guardian, through="GuardianLink", related_name="members", blank=True)
     user = models.OneToOneField(
         settings.AUTH_USER_MODEL,
@@ -174,3 +209,24 @@ class MediaConsent(models.Model):
     @property
     def is_withdrawn(self) -> bool:
         return not (self.internal_records or self.social_media or self.website_marketing)
+
+
+class RulesAgreement(models.Model):
+    """Agreement to the academy rules and safety instructions, signed on screen (scope M2)."""
+
+    CURRENT_VERSION = "2026-1"
+
+    member = models.ForeignKey(Member, on_delete=models.CASCADE, related_name="rules_agreements")
+    rules_version = models.CharField(max_length=20, default=CURRENT_VERSION)
+    signed_by_name = models.CharField(max_length=150, help_text="Parent/guardian, or the adult member.")
+    signature = models.TextField(blank=True, help_text="The on-screen signature (image data).")
+    signed_at = models.DateTimeField(default=timezone.now)
+    recorded_by = models.ForeignKey(settings.AUTH_USER_MODEL, null=True, on_delete=models.PROTECT, related_name="+")
+
+    AUDIT_REDACT = ("signature",)
+
+    class Meta:
+        ordering = ["-signed_at", "-id"]
+
+    def __str__(self):
+        return f"Rules {self.rules_version} · {self.member} ({self.signed_at:%Y-%m-%d})"

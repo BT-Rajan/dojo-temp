@@ -292,3 +292,20 @@ def place_order(*, cart_lines, customer, fulfilment, payment_method, delivery_fe
         ]
     )
     return order
+
+
+class BranchStock(models.Model):
+    """
+    Stock on the shelf at each branch, sold at the front desk. A branch may sell only its own stock
+    (scope M5). Phase 3 (M8) adds counts, transfers and receiving on top of this.
+    """
+
+    variant = models.ForeignKey(ProductVariant, on_delete=models.CASCADE, related_name="branch_stock")
+    branch = models.ForeignKey("organization.Branch", on_delete=models.PROTECT, related_name="stock")
+    quantity = models.IntegerField(default=0)
+
+    class Meta:
+        constraints = [models.UniqueConstraint(fields=["variant", "branch"], name="one_stock_row_per_branch")]
+
+    def __str__(self):
+        return f"{self.variant} @ {self.branch.code}: {self.quantity}"

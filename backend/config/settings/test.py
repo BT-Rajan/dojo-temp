@@ -20,3 +20,9 @@ REST_FRAMEWORK = {
     **REST_FRAMEWORK,  # noqa: F405
     "DEFAULT_THROTTLE_RATES": {"anon": "10000/min", "user": "10000/min", "login": "10000/min"},
 }
+
+# Uploaded member photos in tests go to a throw-away folder.
+import tempfile  # noqa: E402
+from pathlib import Path  # noqa: E402
+
+PRIVATE_MEDIA_ROOT = Path(tempfile.gettempdir()) / "elite-test-private-media"

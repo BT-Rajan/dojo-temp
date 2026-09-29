@@ -1,0 +1,1 @@
+<span class="dk-badge dk-badge--{{ status.code }}">{% for code, labels in status.LABELS.items %}{% if code == status.code %}{% if lang == "ar" %}{{ labels.1 }}{% else %}{{ labels.0 }}{% endif %}{% endif %}{% endfor %}</span>

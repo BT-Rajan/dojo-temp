@@ -1,0 +1,6 @@
+{% extends "desk/base.html" %}{% load static elite %}
+{% block title %}{% t "Member card" "بطاقة العضو" %}{% endblock %}
+{% block content %}<div class="dk-head dk-noprint"><h1>{% t "Member card" "بطاقة العضو" %}</h1><button type="button" class="ea-btn ea-btn--secondary" data-print>{% t "Print" "طباعة" %}</button></div>
+<div class="dk-card-member"><div style="display:grid;gap:6px"><img src="{% static "website/img/elite-academy-logo.png" %}" alt="Elite Academy" width="96" height="36" style="height:36px;width:auto"><b style="font:600 18px/24px var(--font-display)">{{ member.first_name }} {{ member.last_name }}</b>{% if member.first_name_ar %}<span>{{ member.first_name_ar }} {{ member.last_name_ar }}</span>{% endif %}<span class="dk-muted">{% if lang == "ar" %}{{ member.branch.name_ar }}{% else %}{{ member.branch.name }}{% endif %}</span></div><div aria-label="{% t "Check-in code" "رمز الحضور" %}">{{ qr }}</div></div>
+<p class="dk-muted dk-noprint">{% t "Scan at the front desk to check in." "امسحها في الاستقبال لتسجيل الحضور." %}</p>
+{% endblock %}

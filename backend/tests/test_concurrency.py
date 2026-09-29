@@ -85,3 +85,65 @@ def test_row_lock_keeps_counters_correct(branches):
     for t in threads:
         t.join()
     assert Member.objects.get(pk=member.pk).version == 21
+
+
+@pytest.mark.django_db(transaction=True, serialized_rollback=True)
+def test_two_desks_booking_the_last_place_and_selling_at_once(branches):
+    """Phase 1: one class place, ten people at once — exactly one gets it; receipt numbers never repeat."""
+    import datetime
+    from decimal import Decimal
+
+    from django.utils import timezone
+
+    from apps.classes.models import Booking, ClassSession
+    from apps.classes.services import book
+    from apps.organization.models import PricingOption, Program
+    from apps.rbac.models import Role, RoleAssignment
+    from apps.rbac.sync import sync_rbac
+    from apps.sales import services as sales
+    from apps.sales.models import Sale
+
+    sync_rbac()
+    from django.contrib.auth import get_user_model
+
+    desk = get_user_model().objects.create_user(email="desk@example.test", password="x" * 12, full_name="Desk")
+    RoleAssignment.objects.create(
+        user=desk, role=Role.objects.get(code="branch_admin"), branch=branches["PRM"], reason="test"
+    )
+    program = Program.objects.create(branch=branches["PRM"], name="P", name_ar="P")
+    tomorrow = timezone.localdate() + datetime.timedelta(days=1)
+    session = ClassSession.objects.create(
+        branch=branches["PRM"],
+        program=program,
+        title_en="Class",
+        date=tomorrow,
+        start=datetime.time(17, 0),
+        end=datetime.time(18, 0),
+        capacity=1,
+    )
+    option = PricingOption.objects.create(
+        branch=branches["PRM"], name="Trial", kind="trial", price=Decimal("10"), duration_days=1, approval="approved"
+    )
+    errors = []
+
+    def one_booking(i):
+        close_old_connections()
+        try:
+            book(session, desk, guest_name=f"Guest {i}", guest_mobile=f"5550{i:04d}")
+            cart = sales.Cart(items=[sales.Item(pricing_option=option)], payments=[sales.Pay("cash", Decimal("10"))])
+            sales.sell(branch=branches["PRM"], user=desk, cart=cart, customer_name=f"Guest {i}")
+        except Exception as exc:  # noqa: BLE001 - collected and asserted below
+            errors.append(exc)
+        finally:
+            connections.close_all()
+
+    threads = [threading.Thread(target=one_booking, args=(i,)) for i in range(10)]
+    for t in threads:
+        t.start()
+    for t in threads:
+        t.join()
+    assert errors == []
+    assert Booking.objects.filter(session=session, status="booked").count() == 1
+    assert Booking.objects.filter(session=session, status="waitlisted").count() == 9
+    numbers = sorted(Sale.objects.values_list("number", flat=True))
+    assert numbers == list(range(1, 11))

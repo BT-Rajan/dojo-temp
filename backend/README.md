@@ -39,12 +39,36 @@ cp .env.example .env        # then fill in DJANGO_SECRET_KEY and DATABASE_URL
 python manage.py migrate    # also creates the default roles and permissions
 python manage.py seed_kuwait   # fictional test data; prints the test logins
 python manage.py seed_website  # the website pages (EN/AR), sample timetable and shop
-python manage.py runserver     # website: http://localhost:8000/en/ and /ar/ · CMS: /cms/
+python manage.py runserver     # website: /en/ and /ar/ · staff desk: /en/desk/ · CMS: /cms/
+python manage.py run_daily_jobs  # (or Celery beat) prices, sessions 4 weeks ahead, reminders, no-shows
 ```
 
 Test logins after `seed_kuwait`: `ops@test.elite.local`, `admin.prm@test.elite.local`,
 `admin.bed@test.elite.local`, `coach.prm@test.elite.local`, `parent@test.elite.local`, … —
 password `Elite-Test-2026!`. These accounts exist only in development and test databases.
+
+## Phase 1: the staff desk (members, classes and sales)
+
+The front desk, coaches and managers work at `/en/desk/` or `/ar/desk/` (sign in with the staff email; privileged
+roles need an authenticator code in production). Code: `apps/classes` (M4), `apps/sales` (M5), `apps/renewals` (M6),
+`apps/desk` (screens), plus additions to `apps/organization` (M1) and `apps/members` (M2). Rules live in each app's
+`services.py`; the desk screens and the API (`/api/v1/class-sessions/`, `bookings/`, `check-ins/`, `sales/`,
+`memberships/`, `price-changes/`, `rooms/`) both call them, so the rules are the same everywhere.
+
+| Area | What the desk does |
+| --- | --- |
+| Prices (M1) | Membership / non-membership types; packages as sessions × weeks (10×4); All-Access; family, Elite Member (off until its rule is set), referral (5.000 KD credit on the referrer's next renewal) and manual discounts. New prices and price changes go live only after the Operations Manager approves — never by the person who asked. |
+| Members (M2) | Register with guardian, emergency contact, medical notes, media consent and the rules signed on screen; photo (stored privately, served only to staff); QR member card; status calculated (Active, Expiring ≤5 days, Expired, Frozen, Trial, Lead, Former); one timeline. |
+| Classes (M4) | Weekly timetable with room, coaches, capacity and striking/grappling focus; sessions made 4 weeks ahead; regular places; bookings with a waiting list (first in line moves up and is told); seminars, camps, events and private sessions. Check-in by name, mobile or QR at the desk, or from the coach's class list with photos and medical flags. Walk-ins allowed; an expired membership warns but still checks in. No-shows and late cancellations (under 2 hours) are recorded, no penalty. |
+| Class changes (M4) | Cancel, move or substitute: requested by coaches or the desk, approved by the Training Lead or OM (not the requester), then everyone expecting the class is messaged; the log keeps time, channel and count (replaces FRM-04). Under 2 hours' notice is allowed but flagged urgent. |
+| Sales (M5) | Sell from the member's profile: memberships (early renewals start after the current period), passes, sessions, equipment by exact size from this branch's shelf, 0 KD free issues. KNET / card (terminal reference typed in) / cash, split payments; receipts numbered per branch (PRM-000123), printed, WhatsApp or email; category set automatically (New, Renew, Trial Pass, Day Pass, Equipment). |
+| Requests (M5) | Freeze (1–4 weeks, once per membership, no fee), refund (negative receipt; equipment back on the shelf) and cancellation: the desk logs, the OM decides. |
+| Cash-up (M5) | Counted cash and terminal totals against the system; any difference is recorded, above 1.000 KD needs a written reason; sent to the OM and the Accountant, verified by someone other than the preparer. |
+| Renewals (M6) | Daily list (expired ≤30 days, expiring ≤5, anyone checked in without a membership), one-tap WhatsApp with the renewal message, outcomes R/W/F/L/N; after 3 unanswered attempts the member's coach is asked to have a word. Reminders 5 days and 1 day before expiry. At-risk list: no visit in 14 days. |
+| Reports | Visits per day, class utilisation, no-shows, late cancellations, sales by category. |
+
+The website schedule, SAQR and the portal's "next class" and membership dates now read this timetable and these
+memberships (scope rule 18); the website's separate sample timetable has been removed.
 
 ## The website (elitemaacademy.com)
 

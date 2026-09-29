@@ -19,7 +19,9 @@ from rest_framework.response import Response
 from rest_framework.throttling import AnonRateThrottle
 from rest_framework.views import APIView
 
-from .models import BranchPage, ProgramPage, SiteSettings, TimetableEntry
+from apps.classes.models import ClassSlot
+
+from .models import BranchPage, ProgramPage, SiteSettings
 
 HANDOFF = re.compile(
     r"refund|cancel|complain|complaint|injur|hurt|person|human|staff|manager|"
@@ -199,7 +201,7 @@ class RuleEngine:
     def _schedule_text(self, lang, branch):
         days_en = ["Sat", "Sun", "Mon", "Tue", "Wed", "Thu", "Fri"]
         days_ar = ["السبت", "الأحد", "الاثنين", "الثلاثاء", "الأربعاء", "الخميس", "الجمعة"]
-        entries = TimetableEntry.objects.filter(is_active=True).select_related("branch")
+        entries = ClassSlot.objects.filter(is_active=True, is_public=True).select_related("branch")
         if branch:
             entries = entries.filter(branch__code=branch)
         lines = []

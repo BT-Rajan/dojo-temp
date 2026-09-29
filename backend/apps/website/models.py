@@ -22,7 +22,6 @@ from wagtail.contrib.settings.models import BaseGenericSetting, register_setting
 from wagtail.fields import RichTextField, StreamField
 from wagtail.models import Orderable, Page
 from wagtail.search import index
-from wagtail.snippets.models import register_snippet
 
 from apps.core.validators import validate_kuwait_mobile
 
@@ -282,6 +281,15 @@ class ProgramPage(BilingualPage):
         "belt order is confirmed (only Kajukenbo is confirmed so far).",
     )
     belt_path_confirmed = models.BooleanField(default=False)
+    system_programs = ParentalManyToManyField(
+        "organization.Program",
+        blank=True,
+        related_name="web_pages",
+        help_text="The timetable programs this page describes; its schedule and trial bookings use them.",
+    )
+    schedule_match = models.CharField(
+        max_length=40, blank=True, help_text="Show only classes whose title contains this, e.g. Kajukenbo."
+    )
     badge_en = models.CharField(max_length=40, blank=True, help_text="e.g. Rare in Kuwait")
     badge_ar = models.CharField(max_length=40, blank=True)
     card_image = models.ForeignKey(
@@ -307,6 +315,8 @@ class ProgramPage(BilingualPage):
                     FieldPanel("price_note_ar"),
                     FieldPanel("belt_path"),
                     FieldPanel("belt_path_confirmed"),
+                    FieldPanel("system_programs"),
+                    FieldPanel("schedule_match"),
                     FieldPanel("badge_en"),
                     FieldPanel("badge_ar"),
                     FieldPanel("card_image"),
@@ -689,74 +699,6 @@ class AlbumPhoto(Orderable):
 
 
 # ---------------------------------------------------------------------------
-# Timetable (read by the Schedule block; the full class module comes in Phase 1)
-# ---------------------------------------------------------------------------
-@register_snippet
-class TimetableEntry(models.Model):
-    WEEKDAYS = [
-        (0, "Saturday"),
-        (1, "Sunday"),
-        (2, "Monday"),
-        (3, "Tuesday"),
-        (4, "Wednesday"),
-        (5, "Thursday"),
-        (6, "Friday"),
-    ]
-    AGE_GROUPS = ProgramPage.AGE_GROUPS
-
-    branch = models.ForeignKey("organization.Branch", on_delete=models.CASCADE, related_name="timetable")
-    program = models.ForeignKey(ProgramPage, null=True, blank=True, on_delete=models.SET_NULL, related_name="timetable")
-    title_en = models.CharField(max_length=80)
-    title_ar = models.CharField(max_length=80, blank=True)
-    ages_en = models.CharField(max_length=60)
-    ages_ar = models.CharField(max_length=60, blank=True)
-    age_group = models.CharField(max_length=8, choices=AGE_GROUPS)
-    weekday = models.PositiveSmallIntegerField(choices=WEEKDAYS)
-    start = models.TimeField()
-    end = models.TimeField()
-    is_sample = models.BooleanField(default=True, help_text="Untick once the time is confirmed.")
-    is_active = models.BooleanField(default=True)
-
-    panels = [
-        FieldPanel("branch"),
-        FieldPanel("program"),
-        FieldPanel("title_en"),
-        FieldPanel("title_ar"),
-        FieldPanel("ages_en"),
-        FieldPanel("ages_ar"),
-        FieldPanel("age_group"),
-        FieldPanel("weekday"),
-        FieldPanel("start"),
-        FieldPanel("end"),
-        FieldPanel("is_sample"),
-        FieldPanel("is_active"),
-    ]
-
-    class Meta:
-        ordering = ["weekday", "start"]
-        verbose_name_plural = "timetable entries"
-
-    def __str__(self):
-        return f"{self.get_weekday_display()} {self.start:%H:%M} · {self.title_en} ({self.branch.code})"
-
-    @property
-    def key(self):
-        return "promenade" if self.branch.code == "PRM" else "bedaya"
-
-    @property
-    def discipline_en(self):
-        return self.title_en.split("·")[0].strip()
-
-    @property
-    def discipline_ar(self):
-        return (self.title_ar or self.title_en).split("·")[0].strip()
-
-    @property
-    def discipline_key(self):
-        return self.discipline_en.lower().replace(" ", "-").replace("'", "")
-
-
-# ---------------------------------------------------------------------------
 # Site-wide settings
 # ---------------------------------------------------------------------------
 @register_setting(icon="cog")
@@ -888,16 +830,13 @@ class PortalCode(models.Model):
 
 
 class MemberProgress(models.Model):
-    """Current belt and stripes shown in the portal. Replaced by the curriculum module (Phase 4, M7)."""
+    """Current belt and stripes shown in the portal (until the curriculum module, Phase 4 M7). Next class and
+    membership dates come live from the timetable and sales."""
 
     member = models.OneToOneField("members.Member", on_delete=models.CASCADE, related_name="progress")
     belt = models.CharField(default="white", **BELT_FIELD)
     stripes = models.PositiveSmallIntegerField(default=0)
     stripes_needed = models.PositiveSmallIntegerField(default=4)
-    next_class_en = models.CharField(max_length=80, blank=True)
-    next_class_ar = models.CharField(max_length=80, blank=True)
-    membership_until = models.DateField(null=True, blank=True)
-    renew_price = models.DecimalField(max_digits=8, decimal_places=3, null=True, blank=True)
     updated_at = models.DateTimeField(auto_now=True)
 
     def __str__(self):
@@ -910,10 +849,6 @@ class MemberProgress(models.Model):
         if self.belt in path and self.belt != "black":
             return path[path.index(self.belt) + 1]
         return keys[-1]
-
-    @property
-    def expiring_soon(self):
-        return bool(self.membership_until and (self.membership_until - timezone.localdate()).days <= 7)
 
 
 # ---------------------------------------------------------------------------

@@ -1,10 +1,23 @@
-from rest_framework import viewsets
+from django.core.exceptions import PermissionDenied as DjangoPermissionDenied
+from django.core.exceptions import ValidationError as DjangoValidationError
+from rest_framework import mixins, serializers, viewsets
+from rest_framework.decorators import action
+from rest_framework.exceptions import PermissionDenied
+from rest_framework.response import Response
 
 from apps.core.concurrency import OptimisticLockMixin
 from apps.rbac.drf import BranchScopedMixin
 
-from .models import Branch, Discipline, PricingOption, Program
-from .serializers import BranchSerializer, DisciplineSerializer, PricingOptionSerializer, ProgramSerializer
+from . import services
+from .models import Branch, Discipline, PriceChange, PricingOption, Program, Room
+from .serializers import (
+    BranchSerializer,
+    DisciplineSerializer,
+    PriceChangeSerializer,
+    PricingOptionSerializer,
+    ProgramSerializer,
+    RoomSerializer,
+)
 
 
 class AuditedWriteMixin(OptimisticLockMixin):
@@ -60,6 +73,16 @@ class ProgramViewSet(BranchScopedMixin, AuditedWriteMixin, viewsets.ModelViewSet
     }
 
 
+def run_service(fn, *args, **kwargs):
+    """Turns service-layer refusals into API errors."""
+    try:
+        return fn(*args, **kwargs)
+    except DjangoPermissionDenied as exc:
+        raise PermissionDenied(str(exc)) from exc
+    except DjangoValidationError as exc:
+        raise serializers.ValidationError({"detail": exc.messages}) from exc
+
+
 class PricingOptionViewSet(BranchScopedMixin, AuditedWriteMixin, viewsets.ModelViewSet):
     queryset = PricingOption.objects.select_related("branch").prefetch_related("programs")
     serializer_class = PricingOptionSerializer
@@ -70,4 +93,77 @@ class PricingOptionViewSet(BranchScopedMixin, AuditedWriteMixin, viewsets.ModelV
         "create": "pricing.manage",
         "update": "pricing.manage",
         "partial_update": "pricing.manage",
+        "approve": "pricing.approve",
+        "reject": "pricing.approve",
+    }
+
+    @action(detail=True, methods=["post"])
+    def approve(self, request, pk=None):
+        option = run_service(services.decide_pricing_option, self.get_object(), True, request.user)
+        return Response(self.get_serializer(option).data)
+
+    @action(detail=True, methods=["post"])
+    def reject(self, request, pk=None):
+        option = run_service(services.decide_pricing_option, self.get_object(), False, request.user)
+        return Response(self.get_serializer(option).data)
+
+
+class PriceChangeViewSet(
+    mixins.ListModelMixin, mixins.RetrieveModelMixin, mixins.CreateModelMixin, viewsets.GenericViewSet
+):
+    queryset = PriceChange.objects.select_related("pricing_option", "created_by")
+    serializer_class = PriceChangeSerializer
+    branch_field = "pricing_option__branch"
+    required_perms = {
+        "list": "programs.view",
+        "retrieve": "programs.view",
+        "create": "pricing.manage",
+        "approve": "pricing.approve",
+        "reject": "pricing.approve",
+    }
+
+    def get_queryset(self):
+        from apps.rbac.services import scope_queryset
+
+        return scope_queryset(super().get_queryset(), self.request.user, "programs.view", "pricing_option__branch")
+
+    def create(self, request, *args, **kwargs):
+        data = self.get_serializer(data=request.data)
+        data.is_valid(raise_exception=True)
+        v = data.validated_data
+        change = run_service(
+            services.request_price_change,
+            v["pricing_option"],
+            v["new_price"],
+            v["effective_from"],
+            v["reason"],
+            request.user,
+        )
+        return Response(self.get_serializer(change).data, status=201)
+
+    @action(detail=True, methods=["post"])
+    def approve(self, request, pk=None):
+        change = run_service(
+            services.decide_price_change, self.get_object(), True, request.user, request.data.get("note", "")
+        )
+        return Response(self.get_serializer(change).data)
+
+    @action(detail=True, methods=["post"])
+    def reject(self, request, pk=None):
+        change = run_service(
+            services.decide_price_change, self.get_object(), False, request.user, request.data.get("note", "")
+        )
+        return Response(self.get_serializer(change).data)
+
+
+class RoomViewSet(BranchScopedMixin, AuditedWriteMixin, viewsets.ModelViewSet):
+    queryset = Room.objects.select_related("branch")
+    serializer_class = RoomSerializer
+    http_method_names = ["get", "post", "put", "patch", "head", "options"]
+    required_perms = {
+        "list": "programs.view",
+        "retrieve": "programs.view",
+        "create": "programs.manage",
+        "update": "programs.manage",
+        "partial_update": "programs.manage",
     }

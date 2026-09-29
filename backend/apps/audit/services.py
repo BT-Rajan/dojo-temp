@@ -20,8 +20,16 @@ IGNORED_FIELDS = {"updated_at", "created_at", "version", "updated_by", "created_
 
 
 def _plain(value):
+    from django.db.models.fields.files import FieldFile
+
     if isinstance(value, (datetime.date, datetime.datetime, datetime.time, decimal.Decimal)):
         return str(value)
+    if isinstance(value, FieldFile):
+        return value.name or ""  # the stored file name, never the contents
+    if isinstance(value, (list, tuple)):
+        return [_plain(v) for v in value]
+    if isinstance(value, dict):
+        return {k: _plain(v) for k, v in value.items()}
     return value
 
 

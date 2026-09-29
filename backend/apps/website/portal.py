@@ -12,7 +12,7 @@ from django.conf import settings
 from django.contrib.auth import get_user_model, login, logout
 from django.core.cache import cache
 from django.core.exceptions import ValidationError
-from django.db import transaction
+from django.db import models, transaction
 from django.http import HttpResponseRedirect
 from django.template.response import TemplateResponse
 from django.utils import timezone
@@ -88,6 +88,10 @@ def _portal_user(profile, kind):
 
 
 def _family(user):
+    """Each child's belt (MemberProgress until the curriculum module), plus live membership and next class."""
+    from apps.classes.models import ClassSession
+    from apps.sales.services import member_status
+
     members = Member.objects.none()
     guardian = getattr(user, "guardian_profile", None)
     if guardian is not None:
@@ -97,10 +101,34 @@ def _family(user):
         members = members | Member.objects.filter(pk=own.pk)
     members = members.filter(is_active=True).select_related("branch").distinct()
     progress = {p.member_id: p for p in MemberProgress.objects.filter(member__in=members)}
-    return [
-        {"member": m, "progress": progress.get(m.pk), "key": "promenade" if m.branch.code == "PRM" else "bedaya"}
-        for m in members
-    ]
+    today = timezone.localdate()
+    rows = []
+    for m in members:
+        status = member_status(m, today)
+        slot_ids = m.enrollments.filter(end_date__isnull=True).values_list("slot_id", flat=True)
+        next_class = (
+            ClassSession.objects.filter(date__gte=today, status="scheduled")
+            .filter(
+                models.Q(slot_id__in=list(slot_ids))
+                | models.Q(bookings__member=m, bookings__status__in=["booked", "waitlisted"])
+            )
+            .exclude(date=today, end__lt=timezone.localtime().time())
+            .order_by("date", "start")
+            .first()
+        )
+        membership = status.membership
+        rows.append(
+            {
+                "member": m,
+                "progress": progress.get(m.pk),
+                "key": "promenade" if m.branch.code == "PRM" else "bedaya",
+                "status": status,
+                "membership": membership,
+                "next_class": next_class,
+                "expiring": status.code in ("expiring", "expired"),
+            }
+        )
+    return rows
 
 
 def serve_portal(page, request):

@@ -1,0 +1,5 @@
+{% extends "desk/base.html" %}{% load elite %}
+{% block title %}{% t "Seminar, camp or event" "ندوة أو معسكر أو فعالية" %}{% endblock %}
+{% block content %}<div class="dk-head"><div><h1>{% t "Seminar, camp, event or private session" "ندوة أو معسكر أو فعالية أو جلسة خاصة" %}</h1><p>{% t "Bookable one-off session. Link a pricing option if it is paid." "جلسة لمرة واحدة قابلة للحجز. اربط خيار سعر إن كانت مدفوعة." %}</p></div></div>
+<form method="post" class="dk-card dk-form">{% csrf_token %}<div class="dk-fields">{% include "desk/_fields.html" with wide="instructors note" %}</div><div><button class="ea-btn ea-btn--primary">{% t "Create" "إنشاء" %}</button></div></form>
+{% endblock %}

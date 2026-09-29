@@ -2,7 +2,7 @@ from rest_framework import serializers
 
 from apps.core.concurrency import VersionedSerializerMixin
 
-from .models import Branch, Discipline, PricingOption, Program
+from .models import Branch, Discipline, PriceChange, PricingOption, Program, Room
 
 
 class BranchSerializer(VersionedSerializerMixin, serializers.ModelSerializer):
@@ -68,8 +68,48 @@ class PricingOptionSerializer(VersionedSerializerMixin, serializers.ModelSeriali
             "duration_days",
             "sessions_per_week",
             "total_sessions",
+            "package_weeks",
+            "all_access",
+            "family_discount_allowed",
             "active_from",
             "active_until",
             "is_active",
+            "approval",
             "version",
         ]
+        read_only_fields = ["approval"]
+
+    def validate(self, attrs):
+        # After creation a price changes only through an approved PriceChange (scope M1).
+        if self.instance is not None and "price" in attrs and attrs["price"] != self.instance.price:
+            raise serializers.ValidationError({"price": "Request a price change; it goes live after approval."})
+        return super().validate(attrs)
+
+
+class PriceChangeSerializer(serializers.ModelSerializer):
+    requested_by = serializers.CharField(source="created_by.full_name", read_only=True, default="")
+    option_name = serializers.CharField(source="pricing_option.name", read_only=True)
+
+    class Meta:
+        model = PriceChange
+        fields = [
+            "id",
+            "pricing_option",
+            "option_name",
+            "old_price",
+            "new_price",
+            "effective_from",
+            "reason",
+            "status",
+            "requested_by",
+            "decided_at",
+            "decision_note",
+            "created_at",
+        ]
+        read_only_fields = ["old_price", "status", "decided_at", "decision_note", "created_at"]
+
+
+class RoomSerializer(VersionedSerializerMixin, serializers.ModelSerializer):
+    class Meta:
+        model = Room
+        fields = ["id", "branch", "name", "name_ar", "capacity", "is_active", "version"]

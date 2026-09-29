@@ -1,0 +1,107 @@
+/* Staff desk layout. Colours, type and spacing come only from the design tokens (tokens.css). */
+.dk { min-height: 100vh; display: grid; grid-template-columns: 1fr; background: var(--surface); }
+@media (min-width: 960px) { .dk { grid-template-columns: 248px 1fr; } }
+.dk-side { background: var(--surface-deep); color: var(--on-deep); padding: 12px; display: flex; flex-direction: column; gap: 12px; }
+@media (min-width: 960px) { .dk-side { position: sticky; top: 0; height: 100vh; overflow-y: auto; } }
+.dk-brand { display: flex; align-items: center; gap: 10px; padding: 4px; }
+.dk-brand img { height: 36px; width: auto; background: var(--logo-plate); border-radius: var(--radius-sm); padding: 4px 6px; }
+.dk-brand b { font: 600 15px/20px var(--font-display); }
+.dk-nav { display: flex; gap: 4px; overflow-x: auto; }
+@media (min-width: 960px) { .dk-nav { flex-direction: column; overflow: visible; } }
+.dk-nav a { display: flex; align-items: center; gap: 10px; min-height: 44px; padding: 0 12px; border-radius: var(--radius-md); color: var(--on-deep); text-decoration: none; font: 500 15px/20px var(--font-sans); white-space: nowrap; }
+.dk-nav a:hover { background: rgba(244,241,236,.1); }
+.dk-nav a[aria-current="page"] { background: rgba(244,241,236,.16); box-shadow: inset 3px 0 0 var(--brand-orange); }
+[dir="rtl"] .dk-nav a[aria-current="page"] { box-shadow: inset -3px 0 0 var(--brand-orange); }
+.dk-nav .dk-count { margin-inline-start: auto; min-width: 22px; height: 22px; border-radius: var(--radius-pill); background: var(--action); color: var(--on-action); font: 700 12px/22px var(--font-sans); text-align: center; padding: 0 6px; }
+.dk-side-foot { margin-top: auto; display: grid; gap: 8px; font-size: 13px; }
+.dk-side-foot form { margin: 0; }
+.dk-side select { width: 100%; min-height: 40px; border-radius: var(--radius-md); border: 1px solid rgba(244,241,236,.4); background: transparent; color: var(--on-deep); padding: 0 8px; font: inherit; }
+.dk-side select option { color: var(--ink); }
+.dk-side .dk-linkbtn { color: var(--on-deep); }
+.dk-main { padding: 16px; min-width: 0; display: grid; gap: 20px; align-content: start; }
+@media (min-width: 960px) { .dk-main { padding: 28px 36px 64px; } }
+.dk-head { display: flex; flex-wrap: wrap; align-items: flex-end; justify-content: space-between; gap: 12px; }
+.dk-head h1 { margin: 0; font: 600 26px/34px var(--font-display); }
+.dk-head p { margin: 4px 0 0; color: var(--ink-muted); }
+.dk-grid { display: grid; gap: 16px; }
+@media (min-width: 720px) { .dk-grid--2 { grid-template-columns: repeat(2, minmax(0, 1fr)); } .dk-grid--3 { grid-template-columns: repeat(3, minmax(0, 1fr)); } .dk-grid--4 { grid-template-columns: repeat(4, minmax(0, 1fr)); } }
+.dk-card { background: var(--surface-raised); border: 1px solid var(--line); border-radius: var(--radius-lg); padding: 16px; display: grid; gap: 12px; align-content: start; min-width: 0; }
+.dk-card h2 { margin: 0; font: 600 18px/26px var(--font-display); }
+.dk-card h3 { margin: 0; font: 600 16px/22px var(--font-display); }
+.dk-stat b { display: block; font: 600 30px/36px var(--font-display); }
+.dk-stat span { color: var(--ink-muted); font-size: 14px; }
+.dk-table-wrap { overflow-x: auto; }
+.dk-table { width: 100%; border-collapse: collapse; font-size: 14px; line-height: 20px; }
+.dk-table th, .dk-table td { text-align: start; padding: 10px 8px; border-block-end: 1px solid var(--line); vertical-align: top; }
+.dk-table th { font-weight: 600; color: var(--ink-muted); background: var(--surface-sunken); position: sticky; top: 0; }
+.dk-table tr.is-muted td { color: var(--ink-muted); }
+.dk-badge { display: inline-flex; align-items: center; gap: 4px; padding: 2px 10px; border-radius: var(--radius-pill); font: 600 12px/20px var(--font-sans); background: var(--surface-sunken); color: var(--ink); white-space: nowrap; }
+.dk-badge--active, .dk-badge--ok { background: var(--success-soft, var(--blue-soft)); color: var(--success); }
+.dk-badge--expiring, .dk-badge--warn, .dk-badge--frozen { background: var(--orange-soft); color: var(--warning); }
+.dk-badge--expired, .dk-badge--danger { background: var(--danger-soft, var(--orange-soft)); color: var(--danger); }
+.dk-badge--trial, .dk-badge--info, .dk-badge--lead { background: var(--blue-soft); color: var(--blue-text); }
+.dk-form { display: grid; gap: 12px; }
+.dk-form .ea-field { display: grid; gap: 6px; }
+.dk-form label { font-weight: 600; font-size: 14px; }
+.dk-form input[type="checkbox"], .dk-form input[type="radio"] { width: 20px; height: 20px; accent-color: var(--brand-blue); }
+.dk-form ul { list-style: none; padding: 0; margin: 0; display: grid; gap: 6px; }
+.dk-form ul label { font-weight: 400; display: flex; gap: 8px; align-items: center; }
+.dk-form .errorlist { color: var(--danger); font-size: 13px; }
+.dk-row { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+.dk-row > * { margin: 0; }
+.dk-inline { display: inline; margin: 0; }
+.dk-muted { color: var(--ink-muted); font-size: 14px; }
+.dk-linkbtn { background: none; border: 0; padding: 0; color: var(--blue-text); font: inherit; text-decoration: underline; cursor: pointer; min-height: 32px; }
+.dk-messages { display: grid; gap: 8px; }
+.dk-avatar { width: 48px; height: 48px; border-radius: 50%; object-fit: cover; background: var(--surface-sunken); display: grid; place-items: center; font: 600 18px/1 var(--font-display); color: var(--ink-muted); flex: none; }
+.dk-avatar--lg { width: 96px; height: 96px; font-size: 32px; }
+.dk-flag { color: var(--danger); font-weight: 600; font-size: 13px; }
+.dk-search { display: flex; gap: 8px; }
+.dk-search .ea-input { flex: 1; }
+.dk-sig { width: 100%; height: 160px; border: 1.5px dashed var(--line-strong); border-radius: var(--radius-md); background: var(--surface-raised); touch-action: none; }
+.dk-bar { height: 8px; border-radius: 4px; background: var(--brand-blue); min-width: 2px; }
+.dk-chart { display: grid; grid-template-columns: repeat(28, 1fr); gap: 3px; align-items: end; height: 120px; }
+.dk-chart i { display: block; background: var(--brand-blue); border-radius: 2px 2px 0 0; min-height: 2px; }
+.dk-steps { display: flex; gap: 6px; flex-wrap: wrap; }
+.dk-card--warn { border-color: var(--warning); }
+.dk-card--danger { border-color: var(--danger); }
+details.dk-more > summary { cursor: pointer; font-weight: 600; min-height: 32px; }
+@media print {
+  .dk-side, .dk-noprint, .ea-skip { display: none !important; }
+  .dk { display: block; background: var(--surface-raised); }
+  .dk-main { padding: 0; }
+  .dk-card { border: 0; }
+}
+.dk-receipt { max-width: 420px; }
+.dk-card-member { width: 340px; border: 1px solid var(--line); border-radius: var(--radius-lg); padding: 16px; display: grid; grid-template-columns: 1fr 120px; gap: 12px; align-items: center; }
+.dk-card-member svg { width: 120px; height: 120px; }
+.dk-login { min-height: 100vh; display: grid; place-items: center; padding: 16px; background: var(--surface-deep); }
+.dk-login .dk-card { width: min(420px, 100%); }
+/* Django-rendered form fields look like the design system's inputs */
+.dk-form :is(input:not([type="checkbox"]):not([type="radio"]):not([type="hidden"]):not([type="file"]), select, textarea) { font: 400 16px/24px var(--font-sans); min-height: 48px; padding: 10px 12px; border-radius: var(--radius-md); border: 1.5px solid var(--line-strong); background: var(--surface-raised); color: var(--ink); width: 100%; }
+.dk-form select[multiple] { min-height: 120px; }
+.dk-form :is(input, select, textarea):focus { outline: 2px solid var(--focus-ring); outline-offset: 1px; border-color: var(--brand-blue); }
+.dk-form .helptext { color: var(--ink-muted); font-size: 13px; }
+.dk-fields { display: grid; gap: 12px; }
+@media (min-width: 720px) { .dk-fields { grid-template-columns: repeat(2, minmax(0, 1fr)); } .dk-fields .dk-wide { grid-column: 1 / -1; } }
+.dk-table .ea-input, .dk-table select, .dk-table input { min-height: 40px; padding: 6px 8px; }
+.ea-skip { position: absolute; inset-inline-start: 8px; top: -80px; z-index: 20; background: var(--surface-raised); color: var(--ink); padding: 12px 16px; border-radius: var(--radius-md); box-shadow: var(--shadow-2); }
+.ea-skip:focus { top: 8px; }
+a.dk-card { text-decoration: none; color: inherit; }
+a.dk-card:hover { border-color: var(--brand-blue); }
+a.dk-card span { color: var(--ink-muted); }
+a.ea-chip { text-decoration: none; }
+.ea-chip[aria-current="true"] { background: var(--blue-soft); border-color: var(--brand-blue); color: var(--blue-text); font-weight: 600; }
+.ea-filters { display: flex; flex-wrap: wrap; gap: 8px; margin: 0; }
+/* Phones: the menu scrolls sideways inside its strip instead of widening the page */
+.dk { grid-template-columns: minmax(0, 1fr); }
+@media (min-width: 960px) { .dk { grid-template-columns: 248px minmax(0, 1fr); } }
+.dk-side { min-width: 0; }
+@media (max-width: 959px) {
+  .dk-side { flex-direction: row; flex-wrap: wrap; align-items: center; padding: 8px; gap: 8px; }
+  .dk-brand { flex: 1; }
+  .dk-nav { order: 3; flex-basis: 100%; scrollbar-width: thin; }
+  .dk-side-foot { margin: 0; display: flex; flex-wrap: wrap; align-items: center; gap: 8px; }
+  .dk-side-foot > span { display: none; }
+  .dk-side select { width: auto; }
+}

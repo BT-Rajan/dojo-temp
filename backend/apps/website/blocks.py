@@ -289,12 +289,24 @@ class ScheduleBlock(blocks.StructBlock):
         label = "Class schedule"
 
     def get_context(self, value, parent_context=None):
-        from .models import BranchPage, TimetableEntry
+        from apps.classes.models import ClassSlot
+
+        from .models import BranchPage
 
         ctx = super().get_context(value, parent_context)
-        entries = TimetableEntry.objects.filter(is_active=True).select_related("branch", "program")
-        if value.get("program"):
-            entries = entries.filter(program_id=value["program"].id)
+        # The one timetable (scope rule 18): the classes the desk manages, shown live.
+        today = timezone.localdate()
+        entries = (
+            ClassSlot.objects.filter(is_active=True, is_public=True, valid_from__lte=today)
+            .exclude(valid_until__lt=today)
+            .select_related("branch", "program")
+        )
+        page = value.get("program")
+        if page:
+            page = page.specific
+            entries = entries.filter(program__in=page.system_programs.all())
+            if page.schedule_match:
+                entries = entries.filter(title_en__icontains=page.schedule_match)
         entries = list(entries.order_by("weekday", "start"))
         today = timezone.localdate()
         today_index = (today.weekday() + 2) % 7  # Python Monday=0 -> Kuwait week Saturday=0

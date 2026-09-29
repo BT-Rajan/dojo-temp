@@ -1,0 +1,1 @@
+{% if m.photo %}<img class="dk-avatar{% if big %} dk-avatar--lg{% endif %}" src="{% url "desk:member_photo_file" m.pk %}" alt="" loading="lazy" width="48" height="48">{% else %}<span class="dk-avatar{% if big %} dk-avatar--lg{% endif %}" aria-hidden="true">{{ m.first_name|slice:":1" }}</span>{% endif %}

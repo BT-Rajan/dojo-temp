@@ -8,7 +8,7 @@ class OrganizationConfig(AppConfig):
     def ready(self):
         from apps.audit.services import track_changes
 
-        from .models import Branch, Discipline, PricingOption, Program
+        from .models import Branch, Discipline, PriceChange, PricingOption, Program, Room
 
-        for model in (Branch, Discipline, Program, PricingOption):
+        for model in (Branch, Discipline, Program, PricingOption, PriceChange, Room):
             track_changes(model)

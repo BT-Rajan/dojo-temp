@@ -21,6 +21,8 @@ api_v1 = [
     path("", include("apps.members.urls")),
     path("portal/", include("apps.portal.urls")),
     path("website/", include("apps.website.urls")),
+    path("", include("apps.classes.urls")),
+    path("", include("apps.sales.urls")),
     path("saqr/", SaqrView.as_view(), name="saqr"),
     path("schema/", SpectacularAPIView.as_view(), name="schema"),
 ]
@@ -42,4 +44,8 @@ if settings.DEBUG:
     urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 
 # The public website: /en/… and /ar/… (the last pattern catches every CMS page).
-urlpatterns += i18n_patterns(path("", include(wagtail_urls)), prefix_default_language=True)
+urlpatterns += i18n_patterns(
+    path("desk/", include("apps.desk.urls")),  # the staff desk (Phase 1), in English and Arabic
+    path("", include(wagtail_urls)),
+    prefix_default_language=True,
+)

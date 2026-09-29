@@ -50,3 +50,13 @@ def normalize_kuwait_mobile(value: str) -> str:
 
 def validate_kuwait_mobile(value: str) -> None:
     normalize_kuwait_mobile(value)
+
+
+def day_range(day):
+    """Start and end of a Kuwait calendar day as aware datetimes (MySQL has no time-zone tables for __date)."""
+    import datetime as _dt
+
+    from django.utils import timezone as _tz
+
+    start = _tz.make_aware(_dt.datetime.combine(day, _dt.time.min))
+    return start, start + _dt.timedelta(days=1)

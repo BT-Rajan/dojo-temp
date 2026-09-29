@@ -1,0 +1,22 @@
+{% extends "desk/base.html" %}{% load elite %}
+{% block title %}{% t "Register a member" "تسجيل عضو" %}{% endblock %}
+{% block content %}
+<div class="dk-head"><div><h1>{% t "Register a member" "تسجيل عضو" %}</h1><p>{% t "Replaces the paper Registration Form (FRM-03) and Media Consent Form (MKT-FRM-01)." "يحل محل نموذج التسجيل الورقي ونموذج موافقة الصور." %}</p></div></div>
+<form method="post" class="dk-form dk-grid">{% csrf_token %}
+<section class="dk-card"><h2>{% t "Member" "العضو" %}</h2><div class="dk-fields">{% include "desk/_fields.html" with form=form wide="medical_notes allergies" %}</div></section>
+<section class="dk-card"><h2>{% t "Parent or guardian (needed under 18)" "وليّ الأمر (مطلوب لمن هم دون 18)" %}</h2>
+<div class="dk-fields"><div class="ea-field"><label for="{{ extra.guardian_name.id_for_label }}">{% t "Full name" "الاسم الكامل" %}</label>{{ extra.guardian_name }}</div><div class="ea-field"><label for="{{ extra.guardian_mobile.id_for_label }}">{% t "Mobile (WhatsApp)" "الجوال (واتساب)" %}</label>{{ extra.guardian_mobile }}</div><div class="ea-field"><label for="{{ extra.guardian_relationship.id_for_label }}">{% t "Relationship" "صلة القرابة" %}</label>{{ extra.guardian_relationship }}</div>
+<div class="ea-field"><label for="{{ extra.existing_guardian.id_for_label }}">{% t "…or a parent already registered (brother or sister)" "…أو وليّ أمر مسجّل مسبقاً (أخ أو أخت)" %}</label>{{ extra.existing_guardian }}</div></div></section>
+<section class="dk-card"><h2>{% t "Emergency contact" "جهة اتصال للطوارئ" %}</h2><div class="dk-fields"><div class="ea-field"><label for="{{ extra.emergency_name.id_for_label }}">{% t "Name" "الاسم" %}</label>{{ extra.emergency_name }}{{ extra.emergency_name.errors }}</div><div class="ea-field"><label for="{{ extra.emergency_relationship.id_for_label }}">{% t "Relationship" "صلة القرابة" %}</label>{{ extra.emergency_relationship }}{{ extra.emergency_relationship.errors }}</div><div class="ea-field"><label for="{{ extra.emergency_mobile.id_for_label }}">{% t "Mobile" "الجوال" %}</label>{{ extra.emergency_mobile }}{{ extra.emergency_mobile.errors }}</div></div></section>
+<section class="dk-card"><h2>{% t "Photos and videos" "الصور ومقاطع الفيديو" %}</h2><p class="dk-muted">{% t "The parent (or adult member) chooses; they can change it any time." "يختار وليّ الأمر (أو العضو البالغ)، ويمكنه التغيير في أي وقت." %}</p>
+<label style="display:flex;gap:8px;align-items:center">{{ extra.consent_internal }} {% t "Internal records (class lists, progress)" "السجلات الداخلية (قوائم الحصص، التقدّم)" %}</label>
+<label style="display:flex;gap:8px;align-items:center">{{ extra.consent_social }} {% t "Social media (Instagram, WhatsApp status)" "وسائل التواصل (إنستغرام، حالة واتساب)" %}</label>
+<label style="display:flex;gap:8px;align-items:center">{{ extra.consent_website }} {% t "Website and marketing" "الموقع والتسويق" %}</label></section>
+<section class="dk-card"><h2>{% t "Rules and safety" "القواعد والسلامة" %}</h2>
+<p class="dk-muted">{% t "Safety First: supervised classes, age-matched partners, protective gear for sparring, respect for coaches and teammates. Medical conditions must be shared with the instructor." "السلامة أولاً: حصص تحت إشراف، شركاء من نفس العمر، معدات حماية للنزال، احترام المدرّبين والزملاء. يجب إبلاغ المدرّب بأي حالة صحية." %}</p>
+<label style="display:flex;gap:8px;align-items:center">{{ extra.rules_accepted }} {% t "I agree to the academy rules and safety instructions." "أوافق على قواعد الأكاديمية وتعليمات السلامة." %}</label>{{ extra.rules_accepted.errors }}
+<div class="ea-field"><label for="{{ extra.signed_by_name.id_for_label }}">{% t "Signed by (full name)" "الموقّع (الاسم الكامل)" %}</label>{{ extra.signed_by_name }}{{ extra.signed_by_name.errors }}</div>
+<label for="sig">{% t "Signature" "التوقيع" %}</label><canvas id="sig" class="dk-sig" data-signature="{{ extra.signature.id_for_label }}" aria-label="{% t "Sign here with a finger or mouse" "وقّع هنا بالإصبع أو الفأرة" %}" role="img"></canvas>{{ extra.signature }}<button type="button" class="dk-linkbtn" data-signature-clear="sig" style="justify-self:start">{% t "Clear signature" "مسح التوقيع" %}</button>{{ extra.signature.errors }}</section>
+<div><button class="ea-btn ea-btn--primary">{% t "Register" "تسجيل" %}</button></div>
+</form>
+{% endblock %}

@@ -1,0 +1,17 @@
+{% load static elite %}<!doctype html>
+<html lang="{{ lang }}" dir="{{ dir }}">
+<head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><meta name="robots" content="noindex">
+<title>{% t "Sign in" "تسجيل الدخول" %} · {% t "Elite Academy desk" "مكتب أكاديمية إيليت" %}</title>
+<link rel="stylesheet" href="{% static "website/css/tokens.css" %}"><link rel="stylesheet" href="{% static "website/css/fonts.css" %}"><link rel="stylesheet" href="{% static "website/css/blocks.css" %}"><link rel="stylesheet" href="{% static "desk/desk.css" %}"></head>
+<body><main class="dk-login"><div class="dk-card">
+<img src="{% static "website/img/elite-academy-logo.png" %}" alt="Elite Academy" width="129" height="48" style="height:48px;width:auto">
+<h1 class="ea-h3">{% t "Staff desk" "مكتب الموظفين" %}</h1>
+{% for m in messages %}<div class="ea-note ea-note--danger" role="alert">{% icon "alert" %}<span>{{ m }}</span></div>{% endfor %}
+<form method="post" class="dk-form" novalidate>{% csrf_token %}<input type="hidden" name="next" value="{{ next }}">
+<div class="ea-field"><label for="id_email">{% t "Email" "البريد الإلكتروني" %}</label><input class="ea-input" type="email" name="email" id="id_email" autocomplete="username" required value="{{ form.email.value|default:"" }}"{% if not need_code %} autofocus{% endif %}></div>
+<div class="ea-field"><label for="id_password">{% t "Password" "كلمة المرور" %}</label><input class="ea-input" type="password" name="password" id="id_password" autocomplete="current-password" required></div>
+{% if need_code %}<div class="ea-field"><label for="id_otp">{% t "6-digit code from your authenticator app" "الرمز المكوّن من 6 أرقام من تطبيق المصادقة" %}</label><input class="ea-input" name="otp_token" id="id_otp" inputmode="numeric" autocomplete="one-time-code" maxlength="8" dir="ltr" autofocus></div>{% endif %}
+<button class="ea-btn ea-btn--primary ea-btn--block">{% t "Sign in" "دخول" %}</button>
+</form>
+<a class="ea-lang" href="{% switch_lang_url other_lang %}" lang="{{ other_lang }}" style="justify-self:start">{% if lang == "ar" %}English{% else %}العربية{% endif %}</a>
+</div></main></body></html>

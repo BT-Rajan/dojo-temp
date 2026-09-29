@@ -1,6 +1,6 @@
 # RBAC Matrix — Default Roles and Permissions
 
-Document: EA-SYS-SEC-02 · Generated from `backend/apps/rbac/catalog.py` (the single source of truth). Regenerate after any change.
+Document: EA-SYS-SEC-02 · Generated from `backend/apps/rbac/catalog.py` (the single source of truth) by `backend/scripts/build_rbac_matrix.py`. Regenerate after any change.
 
 ✓ = granted. Branch-scoped roles (e.g. Branch Admin, Instructor) apply the permission only in their assigned branch. ★ = privileged role (two-factor login required in production).
 
@@ -42,6 +42,16 @@ Document: EA-SYS-SEC-02 · Generated from `backend/apps/rbac/catalog.py` (the si
 | `rbac.manage_roles` | Change what roles can do | ✓ |  |  |  |  |  |  | ✓ |  |  |  |  |  |
 | `audit.view` | Read the audit log | ✓ | ✓ |  |  |  |  |  | ✓ |  |  |  |  |  |
 | `system.admin` | Technical administration |  |  |  |  |  |  |  | ✓ |  |  |  |  |  |
+| `classes.view` | See the timetable, sessions and class lists | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ |  |  | ✓ | ✓ |  |  |  |
+| `classes.manage` | Edit the weekly timetable, rooms and one-off sessions | ✓ | ✓ | ✓ |  |  |  |  |  |  |  |  |  |  |
+| `classes.book` | Book members and trials into classes | ✓ | ✓ |  |  |  |  |  |  | ✓ | ✓ |  |  |  |
+| `classes.checkin` | Check members in and take attendance | ✓ | ✓ | ✓ | ✓ | ✓ |  |  |  | ✓ | ✓ |  |  |  |
+| `classes.change_request` | Request a class cancellation, time change or substitute coach | ✓ | ✓ | ✓ | ✓ | ✓ |  |  |  | ✓ | ✓ |  |  |  |
+| `classes.change_approve` | Approve class changes (members are notified) | ✓ | ✓ | ✓ |  |  |  |  |  |  |  |  |  |  |
+| `sales.view` | See sales, receipts and memberships | ✓ | ✓ |  |  |  |  |  |  | ✓ | ✓ |  | ✓ |  |
+| `sales.request` | Log freeze, refund and cancellation requests | ✓ | ✓ |  |  |  |  |  |  | ✓ | ✓ |  |  |  |
+| `sales.cashup` | Prepare and submit the end-of-day cash-up | ✓ | ✓ |  |  |  |  |  |  | ✓ | ✓ |  |  |  |
+| `renewals.follow_up` | Work the renewals follow-up list | ✓ | ✓ |  |  |  |  |  |  | ✓ | ✓ |  |  |  |
 | `sales.sell` | Sell at the front desk | ✓ | ✓ |  |  |  |  |  |  | ✓ | ✓ |  |  |  |
 | `sales.approve_refund` | Approve freezes, refunds and cancellations | ✓ | ✓ |  |  |  |  |  |  |  |  |  |  |  |
 | `reports.branch` | Branch reports | ✓ | ✓ | ✓ |  |  | ✓ |  |  | ✓ |  |  |  |  |
@@ -54,6 +64,7 @@ Document: EA-SYS-SEC-02 · Generated from `backend/apps/rbac/catalog.py` (the si
 | `marketing.manage` | Campaigns, leads and media library | ✓ |  |  |  |  | ✓ | ✓ |  |  |  |  |  |  |
 | `cms.edit` | Draft website content | ✓ |  |  |  |  | ✓ | ✓ |  |  |  |  |  |  |
 | `cms.publish` | Publish website content | ✓ |  |  |  |  | ✓ |  |  |  |  |  |  |  |
+| `leads.manage` | Follow up website trial requests and contact messages | ✓ | ✓ |  |  |  | ✓ | ✓ |  | ✓ | ✓ |  |  |  |
 | `finance.manage` | Cash-up, expenses and statements | ✓ | ✓ |  |  |  |  |  |  |  |  |  | ✓ |  |
 | `payroll.prepare` | Prepare payroll |  |  |  |  |  |  |  |  |  |  |  | ✓ |  |
 | `payroll.review` | Review payroll | ✓ | ✓ |  |  |  |  |  |  |  |  |  |  |  |

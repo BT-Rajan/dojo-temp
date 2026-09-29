@@ -9,6 +9,7 @@ from datetime import timedelta
 from pathlib import Path
 
 import environ
+from celery.schedules import crontab
 
 BASE_DIR = Path(__file__).resolve().parent.parent.parent
 
@@ -43,6 +44,10 @@ INSTALLED_APPS = [
     "apps.testdata",
     "apps.website",
     "apps.shop",
+    "apps.classes",
+    "apps.sales",
+    "apps.renewals",
+    "apps.desk",
     # Wagtail CMS (website content, gallery, events) — EA-SYS-SCOPE-01 M14
     "wagtail.contrib.forms",
     "wagtail.contrib.redirects",
@@ -96,6 +101,7 @@ TEMPLATES = [
                 "django.contrib.messages.context_processors.messages",
                 "wagtail.contrib.settings.context_processors.settings",
                 "apps.website.context_processors.site",
+                "apps.desk.context.desk",
             ],
         },
     },
@@ -237,6 +243,8 @@ STATIC_URL = "static/"
 STATIC_ROOT = BASE_DIR / "staticfiles"
 MEDIA_URL = "media/"
 MEDIA_ROOT = BASE_DIR / "media"
+# Member photos and signatures: outside MEDIA_ROOT, so the web server never publishes them (ISO 27001 A.8.3).
+PRIVATE_MEDIA_ROOT = Path(env("PRIVATE_MEDIA_ROOT", default=str(BASE_DIR / "private_media")))
 
 ADMIN_URL = env("ADMIN_URL", default="admin/")
 
@@ -268,6 +276,11 @@ PORTAL_OTP_MAX_ATTEMPTS = 5
 CELERY_BROKER_URL = REDIS_URL
 CELERY_RESULT_BACKEND = REDIS_URL
 CELERY_TIMEZONE = TIME_ZONE
+CELERY_BEAT_SCHEDULE = {
+    # 06:00 Kuwait time: prices, sessions four weeks ahead, renewal reminders (scope M1, M4, M6)
+    "daily-jobs": {"task": "apps.classes.tasks.daily_jobs", "schedule": crontab(hour=6, minute=0)},
+    "hourly-no-shows": {"task": "apps.classes.tasks.hourly_jobs", "schedule": crontab(minute=5)},
+}
 
 # ---------------------------------------------------------------------------
 # Logging — security events go to their own logger (A.8.15)
