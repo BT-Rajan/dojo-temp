@@ -62,8 +62,9 @@ Document: EA-SYS-SEC-02 · Generated from `backend/apps/rbac/catalog.py` (the si
 | `inventory.purchase` | Place purchase orders with vendors and receive deliveries at Promenade | ✓ | ✓ |  |  |  |  |  |  |  |  | ✓ |  |  |
 | `inventory.approve` | Approve purchase requests and stock corrections; edit the catalogue, costs and prices | ✓ | ✓ |  |  |  |  |  |  |  |  |  |  |  |
 | `data.import` | Import data from Mindbody and run the parallel-run comparison | ✓ | ✓ |  |  |  |  |  | ✓ |  |  |  |  |  |
-| `training.manage` | Curriculum, evaluations and promotions | ✓ |  | ✓ | ✓ |  |  |  |  |  |  |  |  |  |
-| `training.teach` | Take attendance and evaluate own classes | ✓ |  | ✓ | ✓ | ✓ |  |  |  |  |  |  |  |  |
+| `training.view` | See the curriculum, members' belts and progress cards, and test days | ✓ | ✓ | ✓ | ✓ | ✓ |  |  |  | ✓ | ✓ |  |  |  |
+| `training.manage` | Edit the curriculum, place belts, run test days and confirm promotions | ✓ |  | ✓ | ✓ |  |  |  |  |  |  |  |  |  |
+| `training.teach` | Evaluate own students, tick off skills and write monthly progress notes | ✓ |  | ✓ | ✓ | ✓ |  |  |  |  |  |  |  |  |
 | `marketing.manage` | Campaigns, leads and media library | ✓ |  |  |  |  | ✓ | ✓ |  |  |  |  |  |  |
 | `cms.edit` | Draft website content | ✓ |  |  |  |  | ✓ | ✓ |  |  |  |  |  |  |
 | `cms.publish` | Publish website content | ✓ |  |  |  |  | ✓ |  |  |  |  |  |  |  |

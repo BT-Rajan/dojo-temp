@@ -326,6 +326,39 @@ def my_tasks(request) -> list[dict]:
                 )
             )
 
+    # Training (M7)
+    from apps.training.models import ProgressNote, Promotion, TestCandidate
+
+    if branch is not None and can(request, "sales.sell"):
+        n = Promotion.objects.filter(branch=branch, belt_status="to_issue").count()
+        if n:
+            out.append(_task("Belts to hand over", "أحزمة للتسليم", reverse("desk:belts"), None, n, urgent=True))
+    if can(request, "training.teach") or can(request, "training.manage"):
+        n = ProgressNote.objects.filter(instructor=user, status="draft").count()
+        if n:
+            out.append(
+                _task(
+                    "Monthly progress notes to send",
+                    "تقارير التقدم الشهرية للإرسال",
+                    reverse("desk:progress_notes"),
+                    today.replace(day=1) + datetime.timedelta(days=6),
+                    n,
+                )
+            )
+    if branch is not None and can(request, "training.manage"):
+        pending = TestCandidate.objects.filter(
+            test_day__branch=branch, test_day__date__lte=today, test_day__status="planned"
+        )
+        for td_id, td_date in pending.values_list("test_day_id", "test_day__date").distinct():
+            out.append(
+                _task(
+                    "Record test day results and promotions",
+                    "سجّل نتائج يوم الاختبار والترقيات",
+                    reverse("desk:test_day", args=[td_id]),
+                    td_date,
+                )
+            )
+
     if branch is not None and can(request, "leads.manage"):
         n = TrialRequest.objects.filter(branch=branch, status="new").count()
         if n:

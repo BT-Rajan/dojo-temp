@@ -25,11 +25,13 @@ def daily_jobs():
     from apps.inventory.services import auto_create_counts
     from apps.operations.services import close_leaver_accounts
     from apps.payroll.services import remind_expiring_documents
+    from apps.training.services import daily_jobs as training_jobs
 
     return {
         "leavers_closed": close_leaver_accounts(),
         "document_reminders": remind_expiring_documents(),
         "stock_counts_created": auto_create_counts(),
+        **training_jobs(),
     }
 
 

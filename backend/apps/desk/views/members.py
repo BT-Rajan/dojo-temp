@@ -214,6 +214,11 @@ def member_detail(request, pk):
         else [],
         "can_edit": has_perm(request.user, "members.update", member.branch_id),
     }
+    if any(has_perm(request.user, p, member.branch_id) for p in ("training.view", "training.teach", "training.manage")):
+        from apps.training.services import arts_for, member_rank
+
+        ranks = [(art, member_rank(member, art, create=False)) for art in arts_for(member)]
+        ctx["belts"] = [(art, mr.rank if mr else art.first_rank()) for art, mr in ranks]
     return render(request, "desk/members/detail.html", ctx)
 
 

@@ -14,6 +14,7 @@ from .views import (
     payroll,
     reports,
     sales,
+    training,
 )
 
 app_name = "desk"
@@ -151,4 +152,13 @@ urlpatterns = [
     path("mindbody/pricing-options/", mindbody.option_map, name="option_map"),
     path("mindbody/parallel-run/", mindbody.parallel_run, name="parallel_run"),
     path("mindbody/cut-over/", mindbody.cutover, name="cutover"),
+    # Training and progression (M7)
+    path("training/", training.students, name="training"),
+    path("training/curriculum/", training.curriculum, name="curriculum"),
+    path("training/students/<int:pk>/<int:art_id>/", training.progress_card, name="progress_card"),
+    path("training/students/<int:pk>/<int:art_id>/evaluate/", training.evaluate, name="evaluate"),
+    path("training/test-days/", training.test_days, name="test_days"),
+    path("training/test-days/<int:pk>/", training.test_day, name="test_day"),
+    path("training/belts/", training.belts, name="belts"),
+    path("training/progress-notes/", training.notes, name="progress_notes"),
 ]

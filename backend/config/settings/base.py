@@ -53,6 +53,7 @@ INSTALLED_APPS = [
     "apps.payroll",
     "apps.inventory",
     "apps.mindbody",
+    "apps.training",
     "apps.desk",
     # Wagtail CMS (website content, gallery, events) — EA-SYS-SCOPE-01 M14
     "wagtail.contrib.forms",

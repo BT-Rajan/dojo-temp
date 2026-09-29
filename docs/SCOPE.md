@@ -4,7 +4,7 @@
 |---|---|
 | Document Number | EA-SYS-SCOPE-01 |
 | Title | Elite Academy System — Scope of Work |
-| Version | 0.5 (Draft for review) |
+| Version | 0.6 (Draft for review) |
 | Date | 29-Sep-2026 |
 | Document Owner | Systems & IT Lead |
 | Reviewed By | Operations Lead (COO); Training Lead; Marketing Lead |
@@ -17,6 +17,7 @@
 |---|---|---|
 | 0.1 | 28-Sep-2026 | First draft from Elite procedures, reports and meeting notes. |
 | 0.5 | 29-Sep-2026 | Phase 3 started at the CEO's request; Phase 2 demo and every open decision gathered in Section 8.1, to be closed one by one at the end of the project. Phase 3 working decisions P3-1 to P3-10. |
+| 0.6 | 29-Sep-2026 | Phase 3 built in test. Phase 4 (Training and Progression) started; working decisions P4-1 to P4-10; open items O-18 and O-19. |
 | 0.4 | 29-Sep-2026 | Phase 1 signed off. Phase 2 decisions P2-1 to P2-17 recorded: pay options for any staff member or coach, OM prepares and Accountant approves payroll, freelance coaches paid through payroll, report layouts from the current forms. |
 | 0.3 | 28-Sep-2026 | Added Section 11 Technology and Non-Functional Requirements: Python (Django) back end, MySQL 8 database, front end from the Claude Design template; many simultaneous users; ISO/IEC 27001:2022 alignment; role-based access control. Phase 0 built on the new stack; the clinic codebase becomes a reference only (Section 10). |
 | 0.2 | 28-Sep-2026 | Added: website content management (CMS) with events photo gallery (M14); online shop for equipment (M19); payroll for directly hired coaches and staff (M20); Kuwait test data package (M21); first run, test and change requests (Section 7.1). Payroll and online shop moved out of "Out of Scope". |
@@ -400,7 +401,7 @@ Each phase ends with a demo to the leads and sign-off before the next begins. Th
 | **1** | Members, Classes and Sales | M1 Programs & pricing, M2 Members & families, M4 Schedule, bookings & check-in, M5 POS, payments, receipts & cash-up, M6 Renewals list | Front desk can run a full day without Mindbody (in test) — **built and signed off 29-Sep-2026** |
 | **2** | Operations, Reporting and Payroll | M9 Daily operations forms, M10 Weekly Sales, Weekly Branch, Active Members & dashboards, M11 Finance & Accountant, **M20 Payroll** | Weekly reports build themselves; OM verification online; first payroll run in test — **built**; demo and sign-off moved to the end of the project (Section 8.1) |
 | **3** | Inventory and Migration | M8 Inventory, purchasing, vendors, counts; **online-shop provision (M19 catalogue and stock reservation)**; M18 Mindbody import; parallel run; cut-over | **Mindbody replaced** — then the first run and test (7.1). **Built in test**; demo and sign-off moved to the end of the project (O-16); going live waits on the Mindbody exports and cut-over date (O-11, O-12) |
-| **4** | Training and Progression | M7 Curriculum, evaluations, test days, promotions, progress cards | Belt path tracked for every member |
+| **4** | Training and Progression | M7 Curriculum, evaluations, test days, promotions, progress cards | Belt path tracked for every member — **built in test**; demo and sign-off moved to the end of the project (O-19) |
 | **5** | Growth: Leads, Website, CMS, AI | M3 Leads & group sales, M13 Marketing, **M14 Website with CMS and events gallery** (built on the approved design template), M16 Knowledge base, SAQR chat & Staff Assistant | One funnel from ad to membership; staff edit the website themselves; AI on the homepage and inside the app |
 | **6** | Members, Shop and Messaging | M15 Member & parent portal, online payments, **M19 Online shop storefront**, M17 WhatsApp/SMS notifications | Members self-serve; equipment sold online; automatic reminders |
 | **7** | Management | M12 Communication & cascade, meetings, procedure library, Quarterly Business Report (RPT-01) | The whole Elite operating system in one place |
@@ -473,6 +474,21 @@ This scope is the starting point, not the final list. More needs will appear onc
 | P3-9 | Cleaning | Test products are skipped; possible duplicate clients are listed for a person to merge; each Mindbody pricing option is mapped to a system pricing option (or skipped) before memberships are imported; the stock baseline is confirmed with the first monthly count. |
 | P3-10 | Staff | Staff accounts are set up in the system by Systems & IT (not imported), since roles and access must be assigned by a person. |
 
+**Phase 4 working decisions (29 Sep 2026)** — sensible defaults so building can continue; each can be changed at the end-of-project review.
+
+| # | Topic | Working decision |
+|---|---|---|
+| P4-1 | Belt systems | The Kajukenbo scalable curriculum is loaded from the Master Curriculum workbook: one belt (Kajukenbo rank + Kickboxing level), one stripe (Jiu-Jitsu / BJJ level), seminar points for Self-Defence & Traditional. The "suggested additions" (orange) are not loaded; the Training Lead adds them in the curriculum builder if wanted. Kyokushin, Shin-Kyokushin and Taekwondo get their own belt lists, without skills until the Training Lead fills them in. A member follows an art through the programs they are enrolled in or attend. |
+| P4-2 | Reading the workbook | Skills listed under a belt are what the student works on while wearing it and are tested to earn the next belt. Seminar numbers are the total seminars attended needed to be awarded that belt. |
+| P4-3 | Eligibility for the next belt | Minimum classes since the last promotion, minimum weeks at the current belt, seminar total reached, and at least 2 evaluations since the last promotion with the latest marked "ready for test". Defaults per belt (editable): classes 24, 24, 36, 36, 48, 60, 72 and weeks 12, 12, 16, 16, 24, 36, 52 for Yellow to Black. |
+| P4-4 | Evaluations | Due 4 weeks after the last one (or the last promotion), overdue after 6 weeks, with reminders to the member's instructors. Each skill scored 1 Not yet, 2 Developing, 3 Competent, 4 Strong; a skill scored 3 or 4 is ticked off on the progress card. |
+| P4-5 | Who evaluates | The member's instructors (their regular class, or a class they taught the member in the last 90 days) and the Training and Track Leads. Seminar points come from check-ins at seminar sessions; earlier seminars are added by a Training or Track Lead with a note. |
+| P4-6 | Test days | A Training or Track Lead creates the test day and adds eligible students (anyone not eligible only with a written reason). Examiners record each component — Kickboxing, Jiu-Jitsu, seminar points check (automatic), Self-Defence demo; other arts have one practical component. A pass needs every component passed; the promotion is confirmed by a Training or Track Lead. |
+| P4-7 | Belts | A promotion puts the belt on the branch's hand-over list; the front desk issues it from branch stock as a 0 KD free issue ("Grading belt"), so stock reduces. The guardian (or adult member) is told by WhatsApp. The Google review request comes with Phase 5 (M13). |
+| P4-8 | Existing students | Their current belt is set once by a Training or Track Lead ("placement") with a note, and kept in the belt history. |
+| P4-9 | Monthly progress note | Drafted automatically on the 1st of the month for each child who trained the month before (skills ticked, what's next); the instructor edits it and sends it to the guardian. |
+| P4-10 | Tournament eligibility | Shown from the belt: striking level = belt; BJJ equivalent from the stripe; Kajukenbo rank. |
+
 **Carried from Elite documents**
 1. Receiving owner for group-sales handoffs (Playbook item 1).
 2. Elite Member tier: eligibility rules and rate (Playbook item 3).
@@ -519,6 +535,8 @@ This scope is the starting point, not the final list. More needs will appear onc
 | O-15 | Remaining earlier decisions: 1, 4, 7, 11–14, 16–17 | Section 8 |
 | O-16 | Phase 3 demo and sign-off (inventory, purchasing, counts, online stock, Mindbody import, parallel run, cut-over) | Phase 3 |
 | O-17 | Stock settings to confirm: customs/clearance % and target margin (P3-5), reorder and maximum levels per item, which items are sold online | P3-5, P3-1 |
+| O-18 | Training Lead confirms the Phase 4 numbers (classes, weeks, seminar totals, evaluation cadence and scores), the suggested additions, and the belt lists for Kyokushin, Shin-Kyokushin and Taekwondo | P4-1 to P4-4 |
+| O-19 | Phase 4 demo and sign-off (curriculum, progress cards, evaluations, test days, promotions, progress notes) | Phase 4 |
 
 ## 9. Out of Scope (for now)
 

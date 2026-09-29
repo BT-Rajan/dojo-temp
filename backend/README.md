@@ -114,6 +114,21 @@ run with the Phase 2 jobs.
 | Mindbody import (M18) | Clients, families, inventory on hand, pricing option expirations, visits and sales from Mindbody's CSV, Excel or ".xls" (HTML) exports. Each file is a dry run first with a report (what would change, rows skipped, warnings); nothing changes until Apply. Re-running is safe (matched by Mindbody ID), so the final delta uses the same screen. Pricing options are mapped (or skipped) before memberships come across; test products are skipped. |
 | Parallel run and cut-over | Mindbody's weekly KNET, card, cash and active members typed next to the system's figures, with differences explained; the cut-over checklist with who ticked each step. |
 
+## Phase 4: training and progression
+
+Code: `apps/training` (M7), screens in `apps/desk/views/training.py`. Load the curriculum once with
+`python manage.py load_curriculum` (safe to run again; it never overwrites edits made in the desk). Evaluation
+reminders (Sundays) and the monthly progress-note drafts (the 1st) run with the daily jobs.
+
+| Area | What the desk does |
+| --- | --- |
+| Curriculum | The Kajukenbo scalable curriculum from the Master Curriculum workbook: 8 belts with their Jiu-Jitsu stripe, BJJ equivalent and seminar total, and the skills of the Kickboxing, Jiu-Jitsu and Self-Defence & Traditional tracks by category. Kyokushin, Shin-Kyokushin and Taekwondo have their belt lists. Coaches see the track sheet for what they teach; Training and Track Leads edit skills, the numbers needed for each belt, and which belt in stock goes with it. |
+| Students and progress cards | Every student's belt per art (followed through their programs), classes since the last belt, seminar points (check-ins at seminars plus earlier seminars added by a lead), evaluation due/overdue, skills ticked off, what's still needed for the next belt, tournament eligibility and the belt history. Existing students' belts are set once (placement) with a note. |
+| Evaluations | Every 4–6 weeks, by the member's own instructors or a lead: each skill scored 1 Not yet – 4 Strong (3 or 4 ticks it off), notes, "ready for test". |
+| Test days | A lead plans the day and examiners; eligible students are listed (anyone else only with a reason); examiners record each part (Kickboxing, Jiu-Jitsu, Self-Defence demo; the seminar check is automatic); a lead confirms each promotion. |
+| Belts | A promotion tells the family by WhatsApp and puts the belt on the branch's hand-over list; the front desk issues it from stock as a 0 KD free issue ("Grading belt"). |
+| Progress notes | Drafted on the 1st for each child who trained last month (classes, new skills, what's next); the instructor edits and sends it to the guardian. |
+
 ## The website (elitemaacademy.com)
 
 Built with Wagtail from the Elite Academy design system (direction B · The Path). Code lives in

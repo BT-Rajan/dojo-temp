@@ -55,8 +55,9 @@ PERMISSIONS: dict[str, str] = {
     "inventory.purchase": "Place purchase orders with vendors and receive deliveries at Promenade",
     "inventory.approve": "Approve purchase requests and stock corrections; edit the catalogue, costs and prices",
     "data.import": "Import data from Mindbody and run the parallel-run comparison",
-    "training.manage": "Curriculum, evaluations and promotions",
-    "training.teach": "Take attendance and evaluate own classes",
+    "training.view": "See the curriculum, members' belts and progress cards, and test days",
+    "training.manage": "Edit the curriculum, place belts, run test days and confirm promotions",
+    "training.teach": "Evaluate own students, tick off skills and write monthly progress notes",
     "marketing.manage": "Campaigns, leads and media library",
     "cms.edit": "Draft website content",
     "cms.publish": "Publish website content",
@@ -341,4 +342,17 @@ PHASE3 = {
     "it_admin": {"data.import"},
 }
 for _code, _perms in PHASE3.items():
+    ROLES[_code][4].update(_perms)
+
+# Phase 4 (decisions P4-5 to P4-7): everyone who teaches or leads training sees the curriculum and cards;
+# the front desk sees belts and hands them over; the OM follows progress.
+PHASE4 = {
+    "training_lead": {"training.view"},
+    "track_lead": {"training.view"},
+    "instructor": {"training.view"},
+    "operations_manager": {"training.view"},
+    "branch_admin": {"training.view"},
+    "operations_support": {"training.view"},
+}
+for _code, _perms in PHASE4.items():
     ROLES[_code][4].update(_perms)

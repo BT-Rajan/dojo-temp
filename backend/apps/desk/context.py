@@ -58,6 +58,7 @@ MENU = [
     ("desk:stock_counts", "Stock count", "الجرد", "check", ["inventory.manage", "inventory.approve"]),
     ("desk:online_orders", "Online orders", "الطلبات الإلكترونية", "bag", ["inventory.manage"]),
     ("desk:imports", "Mindbody", "مايندبودي", "arrow", ["data.import"]),
+    ("desk:training", "Training", "التدريب", "check", ["training.view", "training.teach", "training.manage"]),
     ("desk:my_pay", "My pay", "راتبي", "user", ["payroll.self"]),
 ]
 
