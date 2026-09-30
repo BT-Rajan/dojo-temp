@@ -262,6 +262,21 @@ def staff_pay(request, pk):
                 valid_from=_date(p.get("valid_from"), timezone.localdate()),
             )
             messages.success(request, L("Pay item added.", "تمت إضافة بند الأجر."))
+        elif action == "change_component":
+            comp = get_object_or_404(PayComponent, pk=p.get("component"), profile__staff=staff)
+            pay.change_component(
+                comp,
+                request.user,
+                effective_from=_date(p.get("effective_from")),
+                name=p.get("name", comp.name)[:80],
+                name_ar=p.get("name_ar", comp.name_ar)[:80],
+                amount=_money(p.get("amount")) if p.get("amount") else comp.amount,
+                percent=Decimal(p.get("percent")) if p.get("percent") else comp.percent,
+                program=Program.objects.filter(pk=p.get("program") or 0).first(),
+                session_kinds=p.getlist("session_kinds"),
+                sale_categories=p.getlist("sale_categories"),
+            )
+            messages.success(request, L("Pay item changed.", "تم تعديل بند الأجر."))
         elif action == "end_component":
             comp = get_object_or_404(PayComponent, pk=p.get("component"), profile__staff=staff)
             pay.end_component(comp, request.user, _date(p.get("last_day"), timezone.localdate()))
@@ -332,6 +347,17 @@ def staff_pay(request, pk):
         settings = PayrollSettings.get()
         ctx.update(
             components=profile.components.all() if profile else [],
+            locked={
+                c.pk: (lk, (lk + datetime.timedelta(days=1)) if lk else c.valid_from)
+                for c in (profile.components.all() if profile else [])
+                for lk in [pay.component_locked_until(c)]
+            },
+            session_kind_labels=[
+                ("class", "Classes", "حصص"),
+                ("seminar", "Seminars", "ندوات"),
+                ("private", "Privates", "حصص خاصة"),
+                ("camp", "Camps", "معسكرات"),
+            ],
             kinds=[(v, KIND_AR[v] if lang() == "ar" else label) for v, label in PayComponent.Kind.choices],
             programs=Program.objects.filter(is_active=True).select_related("branch"),
             categories=SaleLine.Category.choices,

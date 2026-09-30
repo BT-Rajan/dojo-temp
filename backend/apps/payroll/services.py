@@ -843,6 +843,59 @@ def save_component(profile: PayProfile, user, component: PayComponent | None = N
     return component
 
 
+def component_locked_until(component: PayComponent):
+    """The last day already paid (or sent for approval) with this pay item, or None if it hasn't been used yet."""
+    runs = PayrollRun.objects.filter(
+        payslips__lines__source__component=component.pk,
+    ).exclude(status=PayrollRun.Status.DRAFT)
+    last = runs.order_by("-month").first()
+    return month_end(last.month) if last else None
+
+
+@transaction.atomic
+def change_component(component: PayComponent, user, effective_from=None, **data) -> PayComponent:
+    """
+    Changes a pay item. If it hasn't been used in a submitted payroll yet it is corrected in place; otherwise the old
+    item ends the day before `effective_from` and a new one starts then, so paid months keep the rate they were paid.
+    The type (salary, hourly…) is not changed here: end the item and add a new one.
+    """
+    _check_edit(user, component.profile.staff)
+    component = PayComponent.objects.select_for_update().get(pk=component.pk)
+    if component.valid_to is not None and component.valid_to < timezone.localdate():
+        raise ValidationError("This pay item has ended; add a new one instead.")
+    data.pop("kind", None)
+    locked = component_locked_until(component)
+    if locked is None:
+        if effective_from:
+            data["valid_from"] = effective_from
+        return save_component(component.profile, user, component, **data)
+    earliest = locked + datetime.timedelta(days=1)
+    effective_from = effective_from or max(earliest, timezone.localdate())
+    if effective_from < earliest:
+        raise ValidationError(
+            f"Payroll up to {locked:%d/%m/%Y} already used this rate; the change can start from {earliest:%d/%m/%Y}."
+        )
+    if effective_from <= component.valid_from:
+        return save_component(component.profile, user, component, **data)
+    new = PayComponent(
+        profile=component.profile,
+        kind=component.kind,
+        name=component.name,
+        name_ar=component.name_ar,
+        amount=component.amount,
+        percent=component.percent,
+        program=component.program,
+        session_kinds=component.session_kinds,
+        sale_categories=component.sale_categories,
+        counts_for_pifss=component.counts_for_pifss,
+        valid_to=component.valid_to,
+        created_by=user,
+    )
+    component.valid_to, component.updated_by = effective_from - datetime.timedelta(days=1), user
+    component.save(update_fields=["valid_to", "updated_by", "updated_at"])
+    return save_component(component.profile, user, new, valid_from=effective_from, **data)
+
+
 @transaction.atomic
 def end_component(component: PayComponent, user, last_day) -> PayComponent:
     _check_edit(user, component.profile.staff)
