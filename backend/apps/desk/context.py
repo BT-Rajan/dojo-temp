@@ -45,6 +45,7 @@ MENU = [
     ("desk:reports", "Class use", "استخدام الحصص", "clock", ["reports.branch", "reports.all"]),
     ("desk:income_statement", "Finance", "المالية", "bag", ["finance.manage"]),
     ("desk:payroll", "Payroll", "الرواتب", "bag", ["payroll.view", "payroll.prepare", "payroll.approve"]),
+    ("desk:branches", "Branches", "الفروع", "pin", ["branches.manage"]),
     (
         "desk:staff_list",
         "Staff & access",
@@ -100,6 +101,7 @@ def desk(request):
         "desk_branches": allowed_branches(request.user).order_by("code").reverse(),
         "desk_branch": request.branch,
         "desk_counts": waiting_counts(request),
+        "perms_branches": can(request, "branches.manage"),
         # Management permissions for the management screens' navigation and buttons.
         "mp": {
             code: can(request, f"mgmt.{code}")

@@ -23,7 +23,7 @@ Document: EA-SYS-SEC-02 · Generated from `backend/apps/rbac/catalog.py` (the si
 | Permission | Meaning | CEO | OM | Train | Track | Coach | Mkt | MktI | IT | BrAdm | OpsSp | Purch | Acct | Parent |
 |---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|
 | `branches.view` | View branches | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ |  |
-| `branches.manage` | Create and edit branches | ✓ |  |  |  |  |  |  | ✓ |  |  |  |  |  |
+| `branches.manage` | Create and edit branches | ✓ | ✓ |  |  |  |  |  | ✓ |  |  |  |  |  |
 | `programs.view` | View disciplines, programs and pricing options | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ |  |
 | `programs.manage` | Create and edit programs | ✓ | ✓ | ✓ |  |  |  |  |  |  |  |  |  |  |
 | `pricing.manage` | Create and edit pricing options (price changes need approval) | ✓ | ✓ |  |  |  |  |  |  |  |  |  |  |  |

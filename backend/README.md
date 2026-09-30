@@ -194,6 +194,7 @@ before the sender lets go of it.
 | Quarterly Business Report | RPT-01, all 11 sections for Promenade, Bedaya and Combined; live while in draft, frozen when the OM submits it; the headline-sales check must be explained; the CEO approves or returns it; PDF and Excel; a "quarter so far" view; reminders up to the due date (15 days after quarter end). |
 | Staff & access | Desk → Staff & access: the CEO or OM adds a staff member (the login gets a one-time password shown once, changed at first sign-in) and gives roles per branch with a reason; Systems & IT manages access too. No one changes their own access or hands out powers they don't hold; ending a role signs the person out at once. |
 | Coaches | Desk → Coaches (CEO and OM): everyone with a teaching role, their weekly classes, classes and hours taught in the month, check-ins in their classes, evaluations, pay arrangement and alerts (no pay set up, not on the timetable, document expiring), with a profile page per coach. |
+| Branches | Desk → Branches (CEO, OM, Systems & IT): add a branch (code, names, area, address, phone, open days, Google review link), edit it, add and edit its programs, close or reopen it (history stays in reports), and a set-up checklist — rooms, programs, approved prices, timetable with coaches, front-desk staff, opening stock, website page (created as a draft for Marketing). |
 
 ## The website (elitemaacademy.com)
 

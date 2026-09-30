@@ -391,7 +391,7 @@ for _code in ("operations_manager", "it_admin", "marketing_lead"):
 # function leads post, report and ask; the OM keeps the records; the CEO approves.
 PHASE7 = {
     "operations_manager": {"mgmt.announce", "mgmt.report", "mgmt.meetings", "mgmt.escalations", "mgmt.procedures",
-                           "mgmt.qbr"},
+                           "mgmt.qbr", "branches.manage"},
     "training_lead": {"mgmt.announce", "mgmt.report"},
     "marketing_lead": {"mgmt.announce", "mgmt.report"},
     "it_admin": {"mgmt.announce", "mgmt.report", "mgmt.procedures"},

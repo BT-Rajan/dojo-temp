@@ -1,0 +1,11 @@
+{% load elite %}<div class="dk-fields">
+<div class="ea-field"><label for="bn">{% t "Name (English)" "الاسم (بالإنجليزية)" %}</label><input id="bn" name="name" value="{{ b.name }}" maxlength="100" required placeholder="Elite Khaitan"></div>
+<div class="ea-field"><label for="bna">{% t "Name (Arabic)" "الاسم (بالعربية)" %}</label><input id="bna" name="name_ar" value="{{ b.name_ar }}" maxlength="100" dir="rtl" required></div>
+<div class="ea-field"><label for="ba">{% t "Area" "المنطقة" %}</label><input id="ba" name="area" value="{{ b.area }}" maxlength="100" required></div>
+<div class="ea-field"><label for="baa">{% t "Area (Arabic)" "المنطقة (بالعربية)" %}</label><input id="baa" name="area_ar" value="{{ b.area_ar }}" maxlength="100" dir="rtl"></div>
+<div class="ea-field dk-wide"><label for="bad">{% t "Address" "العنوان" %}</label><textarea id="bad" name="address" rows="2">{{ b.address }}</textarea></div>
+<div class="ea-field"><label for="bp">{% t "Phone" "الهاتف" %}</label><input id="bp" name="phone" value="{{ b.phone }}" inputmode="tel" dir="ltr" maxlength="16"></div>
+<div class="ea-field"><label for="bg">{% t "Google review link" "رابط تقييم Google" %}</label><input id="bg" name="google_review_url" value="{{ b.google_review_url }}" type="url" dir="ltr" placeholder="https://g.page/r/…/review"></div>
+<div class="ea-field dk-wide"><label for="bpo">{% t "Positioning line (website)" "العبارة التعريفية (الموقع)" %}</label><input id="bpo" name="positioning" value="{{ b.positioning }}" maxlength="150" placeholder="Choose Your Discipline"></div>
+<fieldset class="ea-field dk-wide"><legend>{% t "Open days" "أيام العمل" %}</legend><div class="dk-row">{% for n, en, ar in days %}<label class="dk-check"><input type="checkbox" name="open_days" value="{{ n }}"{% if n in open_days %} checked{% endif %}> {% if lang == "ar" %}{{ ar }}{% else %}{{ en }}{% endif %}</label>{% endfor %}</div></fieldset>
+</div>

@@ -1,0 +1,9 @@
+{% extends "desk/base.html" %}{% load elite %}
+{% block title %}{% t "Add a branch" "إضافة فرع" %}{% endblock %}
+{% block content %}<div class="dk-head"><div><h1>{% t "Add a branch" "إضافة فرع" %}</h1><p>{% t "After saving, a checklist shows what the branch still needs (rooms, programs, prices, timetable, staff, stock, website page) before it opens." "بعد الحفظ تظهر قائمة بما يحتاجه الفرع قبل الافتتاح (القاعات والبرامج والأسعار والجدول والموظفون والمخزون وصفحة الموقع)." %}</p></div><a class="ea-btn ea-btn--ghost ea-btn--sm" href="{% url "desk:branches" %}">{% t "All branches" "كل الفروع" %}</a></div>
+<form method="post" class="dk-card dk-form" style="max-width:860px">{% csrf_token %}
+<div class="ea-field" style="max-width:260px"><label for="bc">{% t "Branch code (2–5 letters, fixed once saved)" "رمز الفرع (2–5 أحرف، لا يتغير بعد الحفظ)" %}</label><input id="bc" name="code" maxlength="5" dir="ltr" required placeholder="KHT" style="text-transform:uppercase"></div>
+{% include "desk/branches/_fields.html" %}
+<div class="ea-note ea-note--info">{% icon "alert" %}<span>{% t "The branch appears in the desk's branch switcher straight away, so staff can set up its timetable and prices. Its website page is created as a draft and only goes live when Marketing publishes it." "يظهر الفرع فوراً في مبدّل الفروع في المكتب ليتمكن الموظفون من تجهيز جدوله وأسعاره. تُنشأ صفحة الموقع كمسودة ولا تظهر إلا عند نشرها من التسويق." %}</span></div>
+<button class="ea-btn ea-btn--primary">{% t "Add branch" "إضافة الفرع" %}</button></form>
+{% endblock %}

@@ -3,6 +3,7 @@ from django.urls import path
 from .views import (
     assistant,
     auth,
+    branches,
     checkin,
     classes,
     coaches,
@@ -210,6 +211,9 @@ urlpatterns = [
     path("management/procedures/<int:pk>/", management.procedure, name="procedure"),
     path("management/procedures/file/<int:pk>/", management.procedure_file, name="procedure_file"),
     path("management/directory/", management.directory, name="directory"),
+    path("management/branches/", branches.branches, name="branches"),
+    path("management/branches/new/", branches.branch_new, name="branch_new"),
+    path("management/branches/<int:pk>/", branches.branch, name="branch"),
     path("management/quarterly/", management.quarterly, name="quarterly"),
     path("management/quarterly/so-far/", management.quarterly_preview, name="quarterly_preview"),
     path("management/quarterly/<int:pk>/", management.quarterly_report, name="quarterly_report"),
