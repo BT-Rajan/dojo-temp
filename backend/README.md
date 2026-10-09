@@ -44,6 +44,20 @@ docker compose --env-file .env.staging -f docker-compose.staging.yml up -d --bui
 With a domain, add a Reverse Proxy site in CloudPanel pointing to `http://127.0.0.1:8090` and issue a Let's Encrypt
 certificate. Portal sign-in codes appear in `docker compose … logs -f web`.
 
+**Without Docker** (a CloudPanel Python site, using CloudPanel's MySQL; no Redis needed — the cache and sessions
+then live in the database). As root, install the build packages once
+(`apt install -y python3-venv python3-dev build-essential pkg-config default-libmysqlclient-dev`), create the
+database and its user in CloudPanel, then as the site user, in the cloned folder:
+
+```bash
+sh backend/scripts/make_review_env.sh review.example.com native   # asks for the CloudPanel database details
+sh backend/scripts/review_setup.sh                                 # venv, packages, database, test data (once)
+```
+
+Install `backend/scripts/elite-review.service` as root (instructions at the top of the file). It runs gunicorn on
+`127.0.0.1:8090`, which is the app port to give the CloudPanel site. After a `git pull`, run `review_setup.sh`
+again and `systemctl restart elite-review`. Portal sign-in codes appear in `journalctl -u elite-review -f`.
+
 ## Run it locally
 
 Requirements: Python 3.11+, MySQL 8, Redis, and the MySQL client headers (`libmysqlclient-dev pkg-config` on Ubuntu).

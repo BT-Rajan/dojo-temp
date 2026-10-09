@@ -28,6 +28,17 @@ if env.bool("STAGING_HTTPS", default=False):
 # Test accounts are used by several reviewers; two-step sign-in is switched on with the live system.
 ENFORCE_PRIVILEGED_MFA = env.bool("ENFORCE_PRIVILEGED_MFA", default=False)
 
+# Without Redis (a plain CloudPanel Python site): cache and sessions in MySQL, shared by all gunicorn workers.
+if not env("REDIS_URL", default=""):
+    CACHES = {
+        "default": {
+            "BACKEND": "django.core.cache.backends.db.DatabaseCache",
+            "LOCATION": "elite_cache",
+            "KEY_PREFIX": "elite",
+        }
+    }
+    SESSION_ENGINE = "django.contrib.sessions.backends.db"
+
 # Static files served by the app itself (no separate web server needed for a review).
 MIDDLEWARE = [*MIDDLEWARE]
 MIDDLEWARE.insert(
