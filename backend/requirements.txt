@@ -14,6 +14,7 @@ django-redis>=5.4,<8
 redis>=5.0,<9
 celery>=5.4,<5.7
 gunicorn>=22,<24
+whitenoise>=6.7,<7
 # Website CMS (pages, gallery, events, shop catalogue) — EA-SYS-SCOPE-01 M14/M19
 wagtail>=7.4.3,<7.5
 # Image processing for the CMS; kept at a release without known vulnerabilities (pip-audit in CI)

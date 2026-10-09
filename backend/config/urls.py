@@ -42,6 +42,12 @@ if settings.DEBUG:
     from django.conf.urls.static import static
 
     urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+elif getattr(settings, "ENVIRONMENT", "") == "staging":
+    # Review server only: public website images (CMS uploads). Private member files are never under MEDIA_ROOT.
+    from django.urls import re_path
+    from django.views.static import serve
+
+    urlpatterns += [re_path(r"^media/(?P<path>.*)$", serve, {"document_root": settings.MEDIA_ROOT})]
 
 # The public website: /en/… and /ar/… (the last pattern catches every CMS page).
 urlpatterns += i18n_patterns(

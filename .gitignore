@@ -35,3 +35,4 @@ backend/private_media/
 ~$*
 dump.rdb
 !.env.example
+!.env.staging.example

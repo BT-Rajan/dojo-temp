@@ -47,6 +47,10 @@ def test_payment(request, reference):
 
 
 def robots_txt(request):
+    from django.conf import settings
+
+    if getattr(settings, "ENVIRONMENT", "") == "staging":  # the review server is not for search engines
+        return HttpResponse("User-agent: *\nDisallow: /\n", content_type="text/plain")
     lines = [
         "User-agent: *",
         "Disallow: /cms/",

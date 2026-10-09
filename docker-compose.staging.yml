@@ -1,0 +1,52 @@
+# Review server: the system with fictional test data, for staff to try before go-live.
+# On the server, in this folder:
+#   sh backend/scripts/make_review_env.sh review.example.com     writes .env.staging with random secrets
+#   docker compose --env-file .env.staging -f docker-compose.staging.yml up -d --build
+#   docker compose --env-file .env.staging -f docker-compose.staging.yml logs -f web   (portal sign-in codes)
+# With a domain the app listens on 127.0.0.1:8090 and CloudPanel's nginx (Reverse Proxy site) publishes it with
+# HTTPS; with only the IP it listens on port 8090 (open it in CloudPanel's firewall).
+services:
+  db:
+    image: mysql:8.0
+    restart: unless-stopped
+    command: --character-set-server=utf8mb4 --collation-server=utf8mb4_0900_ai_ci
+    environment:
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD:?set it in .env.staging}
+      MYSQL_DATABASE: elite
+      MYSQL_USER: elite
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD:?set it in .env.staging}
+    volumes:
+      - db:/var/lib/mysql
+    healthcheck:
+      test: ["CMD-SHELL", "mysqladmin ping -h 127.0.0.1 -uroot -p$$MYSQL_ROOT_PASSWORD"]
+      interval: 5s
+      retries: 30
+
+  redis:
+    image: redis:7-alpine
+    restart: unless-stopped
+
+  web:
+    build: ./backend
+    restart: unless-stopped
+    env_file: .env.staging
+    environment:
+      DJANGO_SETTINGS_MODULE: config.settings.staging
+      DATABASE_URL: mysql://elite:${MYSQL_PASSWORD}@db:3306/elite
+      REDIS_URL: redis://redis:6379/0
+      AI_ENABLED: "false"
+    ports:
+      - "${ELITE_BIND:-127.0.0.1:8090}:8000"
+    volumes:
+      - media:/app/media
+      - private:/app/private_media
+    depends_on:
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_started
+
+volumes:
+  db:
+  media:
+  private:

@@ -1,5 +1,6 @@
 #!/bin/sh
-# Local trial: wait for MySQL, build the tables, load the fictional test data once, then start the site.
+# Starts the app: waits for MySQL, builds the tables, loads the fictional test data once, then serves.
+# Local trial (config.settings.dev): Django's development server. Review server (config.settings.staging): gunicorn.
 set -e
 
 echo "Waiting for the database..."
@@ -13,6 +14,14 @@ if [ ! -f /app/media/.seeded ]; then
     python manage.py seed_website
     python manage.py run_daily_jobs || true
     mkdir -p /app/media && touch /app/media/.seeded
+fi
+
+if [ "$DJANGO_SETTINGS_MODULE" = "config.settings.staging" ]; then
+    python manage.py collectstatic --noinput >/dev/null
+    python manage.py set_review_password
+    echo "Elite Academy review server is running (test data only)."
+    exec gunicorn config.wsgi:application --bind 0.0.0.0:8000 --workers 3 --timeout 120 \
+        --access-logfile - --forwarded-allow-ips "*"
 fi
 
 echo ""

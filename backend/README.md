@@ -29,6 +29,21 @@ parent's mobile are printed in the window; portal sign-in codes appear there too
 `docker compose down` stops it; `docker compose down -v` also deletes the trial database. The passwords and keys in
 `docker-compose.yml` are for this local trial only.
 
+## Review server (staff try the system before go-live)
+
+`docker-compose.staging.yml` runs the system with the fictional test data on a Linux server, production-like:
+gunicorn, no debug pages, real random secrets, search engines blocked, and every test account given a private
+password (`REVIEW_PASSWORD`) instead of the published trial one. On the server, clone only the `backend` folder
+(the documents folder holds real member data and must not be copied), then:
+
+```bash
+sh backend/scripts/make_review_env.sh review.example.com     # or the server IP for a quick look over HTTP
+docker compose --env-file .env.staging -f docker-compose.staging.yml up -d --build
+```
+
+With a domain, add a Reverse Proxy site in CloudPanel pointing to `http://127.0.0.1:8090` and issue a Let's Encrypt
+certificate. Portal sign-in codes appear in `docker compose … logs -f web`.
+
 ## Run it locally
 
 Requirements: Python 3.11+, MySQL 8, Redis, and the MySQL client headers (`libmysqlclient-dev pkg-config` on Ubuntu).
