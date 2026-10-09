@@ -7,7 +7,7 @@ and search engines are told to stay away. Never holds real member data.
 from django.core.exceptions import ImproperlyConfigured
 
 from .base import *  # noqa: F401,F403
-from .base import MIDDLEWARE, env
+from .base import LOGGING, MIDDLEWARE, env
 
 ENVIRONMENT = "staging"
 DEBUG = False
@@ -48,3 +48,7 @@ STORAGES = {
     "default": {"BACKEND": "django.core.files.storage.FileSystemStorage"},
     "staticfiles": {"BACKEND": "whitenoise.storage.CompressedStaticFilesStorage"},
 }
+
+# Nothing is really sent here (console messaging): show the would-be WhatsApp/SMS texts, such as portal sign-in
+# codes, in the service log (journalctl -u elite-review) so reviewers can sign in to the parent portal.
+LOGGING["loggers"]["elite.messaging"] = {"handlers": ["console"], "level": "INFO", "propagate": False}
