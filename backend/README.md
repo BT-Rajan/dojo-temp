@@ -54,8 +54,9 @@ sh backend/scripts/make_review_env.sh review.example.com native   # asks for the
 sh backend/scripts/review_setup.sh                                 # venv, packages, database, test data (once)
 ```
 
-Install `backend/scripts/elite-review.service` as root (instructions at the top of the file). It runs gunicorn on
-`127.0.0.1:8090`, which is the app port to give the CloudPanel site. After a `git pull`, run `review_setup.sh`
+Without a domain, give the IP and a free port instead (`make_review_env.sh 169.58.13.213:8095 native`) and open that
+port in the CloudPanel firewall. Install `backend/scripts/elite-review.service` as root (instructions at the top of the file). It runs gunicorn on
+`127.0.0.1:8090` by default, which is the app port to give the CloudPanel site. After a `git pull`, run `review_setup.sh`
 again and `systemctl restart elite-review`. Portal sign-in codes appear in `journalctl -u elite-review -f`.
 
 ## Run it locally

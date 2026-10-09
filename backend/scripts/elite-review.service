@@ -1,4 +1,5 @@
-# systemd service for the review server without Docker. Install as root:
+# systemd service for the review server without Docker. It listens on ELITE_BIND from .env.staging
+# (127.0.0.1:8090 behind a CloudPanel domain site, or 0.0.0.0:<port> on the bare IP). Install as root:
 #   sed -e "s#SITEUSER#<site user>#g" -e "s#REPO#<repository folder>#g" backend/scripts/elite-review.service \
 #       > /etc/systemd/system/elite-review.service
 #   systemctl daemon-reload && systemctl enable --now elite-review
@@ -12,7 +13,7 @@ Group=SITEUSER
 WorkingDirectory=REPO/backend
 EnvironmentFile=REPO/.env.staging
 Environment=DJANGO_SETTINGS_MODULE=config.settings.staging
-ExecStart=REPO/backend/.venv/bin/gunicorn config.wsgi:application --bind 127.0.0.1:8090 --workers 3 --timeout 120 --access-logfile - --forwarded-allow-ips 127.0.0.1
+ExecStart=REPO/backend/.venv/bin/gunicorn config.wsgi:application --bind ${ELITE_BIND} --workers 3 --timeout 120 --access-logfile - --forwarded-allow-ips 127.0.0.1
 Restart=always
 NoNewPrivileges=true
 PrivateTmp=true

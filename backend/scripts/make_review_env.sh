@@ -2,15 +2,19 @@
 # Creates .env.staging for the review server with random secrets. Run it from the repository folder.
 #   sh backend/scripts/make_review_env.sh review.example.com          Docker, domain with HTTPS through CloudPanel
 #   sh backend/scripts/make_review_env.sh 169.58.13.213               Docker, server IP over HTTP (quick look only)
+#   sh backend/scripts/make_review_env.sh 169.58.13.213:8095 native   no Docker, server IP on a chosen port (HTTP)
 #   sh backend/scripts/make_review_env.sh review.example.com native   no Docker: CloudPanel Python site + its MySQL
 # It asks for the shared password the reviewers will use (and, for "native", the CloudPanel database details).
 set -e
 ADDRESS="$1"; MODE="$2"
 if [ -z "$ADDRESS" ]; then echo "Give the domain or IP address, e.g.: sh $0 review.example.com"; exit 1; fi
 if [ -f .env.staging ]; then echo ".env.staging already exists; delete it first if you really want new secrets."; exit 1; fi
+PORT=8090
+case "$ADDRESS" in *:*) PORT="${ADDRESS##*:}"; ADDRESS="${ADDRESS%%:*}" ;; esac
+case "$PORT" in ''|*[!0-9]*) echo "The port must be a number, e.g. 169.58.13.213:8095"; exit 1 ;; esac
 case "$ADDRESS" in
-  *[a-zA-Z]*) HTTPS=true; ORIGIN="https://$ADDRESS"; BIND=127.0.0.1:8090 ;;
-  *) HTTPS=false; ORIGIN="http://$ADDRESS:8090"; BIND=0.0.0.0:8090 ;;
+  *[a-zA-Z]*) HTTPS=true; ORIGIN="https://$ADDRESS"; BIND=127.0.0.1:$PORT ;;
+  *) HTTPS=false; ORIGIN="http://$ADDRESS:$PORT"; BIND=0.0.0.0:$PORT ;;
 esac
 ask() { printf "%s" "$1"; stty -echo 2>/dev/null || true; read -r REPLY; stty echo 2>/dev/null || true; echo; }
 ask "Password for the test accounts on this server (min 12 characters, no ' quote): "
@@ -36,6 +40,7 @@ if [ "$MODE" = "native" ]; then
   {
     echo "DATABASE_URL='$URL'"
     echo "REDIS_URL="
+    echo "ELITE_BIND=$BIND"
   } >> .env.staging
 else
   {
