@@ -131,9 +131,14 @@ say "Database updates, cache table, static files"
 python manage.py migrate --noinput
 python manage.py createcachetable
 python manage.py collectstatic --noinput >/dev/null
-if ! python manage.py shell -c "from apps.members.models import Member; list(Member.objects.all()[:1])" >/dev/null 2>&1; then
-    die "Member records can't be decrypted: FIELD_ENCRYPTION_KEYS in .env.staging is not the key the dump was made
-with. Put the source server's FIELD_ENCRYPTION_KEYS and BLIND_INDEX_KEY in .env.staging and run ./runonce.sh again."
+if ! CHECK=$(python manage.py shell -c "from apps.members.models import Member; list(Member.objects.all()[:1])" 2>&1); then
+    case "$CHECK" in
+        *"could not be decrypted"*)
+            die "Member records can't be decrypted: FIELD_ENCRYPTION_KEYS in .env.staging is not the key the dump was
+made with. For deploy/db/elite.sql use the demo keys (the defaults at the top of this script): delete .env.staging, or
+set FIELD_ENCRYPTION_KEYS and BLIND_INDEX_KEY in it, then run ./runonce.sh again." ;;
+        *) printf '%s\n' "$CHECK" | tail -5 >&2; die "Reading the member records failed (error above)." ;;
+    esac
 fi
 if [ -n "$REVIEW_PASSWORD" ] && [ "$DJANGO_SETTINGS_MODULE" != "config.settings.prod" ]; then
     python manage.py set_review_password
