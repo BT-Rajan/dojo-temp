@@ -5,7 +5,7 @@ How to put the Elite Academy system (Django back end, website, staff desk and fa
 
 | Script | When | What it does |
 |---|---|---|
-| `runonce.sh` | First install, and again after every `git pull` | Writes `.env.staging`, builds the Python environment, loads the database dump into an empty database, applies newer migrations, collects static files, sets the test-account password |
+| `runonce.sh` | First install, and again after every `git pull` | Runs silently (no questions): writes `.env.staging`, builds the Python environment, loads the database dump into an empty database, applies newer migrations, collects static files |
 | `start.sh` | To start | Starts gunicorn in the background (and Celery worker + beat when Redis is configured), then runs a health check |
 | `stop.sh` | To stop | Stops everything `start.sh` started (gracefully, forced after 30 s) |
 
@@ -23,7 +23,7 @@ test payment page and console messaging. It is for the fictional test data only.
 | OS | Linux, Ubuntu 22.04/24.04 or Debian 12 (CloudPanel servers work) |
 | CPU / RAM / disk | 2 vCPU, 4 GB RAM, 10 GB free disk (minimum for review use) |
 | Python | 3.11 or newer, with `venv` |
-| Database | **MySQL 8.0** (the dump uses `utf8mb4_0900_ai_ci`; MariaDB will not import it) |
+| Database | **MariaDB 10.6+** (this dev server: `localhost:3306`, database `dojomanager`) or MySQL 8.0. The dump is from MySQL 8; on MariaDB `runonce.sh` loads it with `utf8mb4_unicode_ci` |
 | Redis | Optional. Without it, the cache and sessions are kept in MySQL and the scheduled jobs run from cron |
 | Network | Outbound HTTPS to pypi.org during `runonce.sh`. Inbound: 443 via a reverse proxy (domain), or the chosen app port (IP only) |
 | Account | A normal (non-root) user that owns the repository folder; root only for installing packages and cron/systemd |
@@ -33,24 +33,33 @@ Packages (as root, once):
 ```bash
 apt update
 apt install -y git python3 python3-venv python3-dev build-essential pkg-config \
-               default-libmysqlclient-dev default-mysql-client openssl curl
-# Only if MySQL is not already on the server (CloudPanel has it):
-apt install -y mysql-server
+               default-libmysqlclient-dev mariadb-client openssl curl
+# Only if the database server is not already installed:
+apt install -y mariadb-server
 # Optional:
 apt install -y redis-server
 ```
 
 ## 2. Database
 
-Create an empty database and user (in CloudPanel: **Databases → Add Database**; or as MySQL root):
+Create the database and user by hand, once (as the MariaDB root user, `sudo mariadb`). The dev server uses database
+`dojomanager`, user `dojomanager`, password `Chennai#44`, on `localhost:3306`. These are the defaults in `runonce.sh`:
 
 ```sql
-CREATE DATABASE elite CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci;
-CREATE USER 'elite'@'127.0.0.1' IDENTIFIED BY 'a-long-random-password';
-GRANT ALL PRIVILEGES ON elite.* TO 'elite'@'127.0.0.1';
+CREATE DATABASE dojomanager CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+CREATE USER 'dojomanager'@'localhost' IDENTIFIED BY 'Chennai#44';
+CREATE USER 'dojomanager'@'127.0.0.1' IDENTIFIED BY 'Chennai#44';
+GRANT ALL PRIVILEGES ON dojomanager.* TO 'dojomanager'@'localhost';
+GRANT ALL PRIVILEGES ON dojomanager.* TO 'dojomanager'@'127.0.0.1';
+-- for the unit tests (step 8):
+GRANT ALL PRIVILEGES ON test_dojomanager.* TO 'dojomanager'@'localhost';
+GRANT ALL PRIVILEGES ON test_dojomanager.* TO 'dojomanager'@'127.0.0.1';
 ```
 
-The dump (`deploy/db/elite.sql`, a `mysqldump` of MySQL 8.0.46, 216 tables) contains the full schema **and** the
+`runonce.sh` connects over TCP to `127.0.0.1`, hence the `@'127.0.0.1'` user. If the database already exists with
+another character set, `runonce.sh` switches its default to utf8mb4 (needed for Arabic).
+
+The dump (`deploy/db/elite.sql`, a `mysqldump` of MySQL 8.0.46, 216 tables; loads into MariaDB too) contains the full schema **and** the
 fictional Kuwait test data: test staff accounts (`…@test.elite.local`), members, families, classes, sales, website
 pages. `runonce.sh` loads it only when the database has no tables, so re-running never overwrites data. To start
 over, drop and re-create the database, then run `runonce.sh` again.
@@ -58,14 +67,14 @@ over, drop and re-create the database, then run `runonce.sh` again.
 > **Encryption keys.** Civil IDs and medical notes in the dump are encrypted with the demo keys of the dev
 > instance, which are also the defaults in `config/settings/dev.py`:
 > `FIELD_ENCRYPTION_KEYS=bG9jYWwtZGV2LW9ubHkta2V5LTMyLWJ5dGVzLWxvbmc=` and
-> `BLIND_INDEX_KEY=local-dev-only-blind-index-key`. `runonce.sh` uses them when you press Enter. With other keys the
+> `BLIND_INDEX_KEY=local-dev-only-blind-index-key`. `runonce.sh` uses them by default. With other keys the
 > member pages fail, and `runonce.sh` stops with an error that says so. These keys are public: never use them with
 > real member data.
 
 ## 3. Get the code
 
 ```bash
-git clone https://github.com/BT-Rajan/dojo-temp.git elite
+git clone -b main https://github.com/BT-Rajan/dojo-temp.git elite
 cd elite
 ```
 
@@ -79,16 +88,20 @@ member documents to a review server.
 ./runonce.sh /path/to/elite.sql   # or another dump
 ```
 
-The first time, it asks for:
+It asks nothing. On the first run it writes `.env.staging` (mode 600, never committed) from these defaults, with a
+new random `DJANGO_SECRET_KEY`. To change one, set it on the command line, e.g.
+`ELITE_PORT=8095 ./runonce.sh`, or delete `.env.staging` and run again:
 
-| Question | Example | Notes |
+| Variable | Default | Meaning |
 |---|---|---|
-| Address | `review.example.com` or `169.58.13.213:8095` | A domain means HTTPS through a reverse proxy, app on `127.0.0.1:8090`. An IP means plain HTTP on `0.0.0.0:<port>` |
-| MySQL host / port / database / user / password | `127.0.0.1` / `3306` / `elite` / `elite` / … | From step 2 |
-| Test-account password | Enter, or at least 12 characters | Enter keeps the demo password `Elite-Test-2026!`; anything else replaces it on every `…@test.elite.local` account |
-| `FIELD_ENCRYPTION_KEYS`, `BLIND_INDEX_KEY` | Enter | Demo keys of the dump (step 2) |
+| `DB_HOST` / `DB_PORT` | `127.0.0.1` / `3306` | Database server |
+| `DB_NAME` / `DB_USER` / `DB_PASSWORD` | `dojomanager` / `dojomanager` / `Chennai#44` | From step 2 |
+| `ELITE_PORT` | `8090` | App port |
+| `ELITE_DOMAIN` | empty | Empty: plain HTTP on `0.0.0.0:<port>`, reachable by every IP and the host name of the server. A domain: HTTPS through a reverse proxy, app on `127.0.0.1:<port>` |
+| `FIELD_ENCRYPTION_KEYS`, `BLIND_INDEX_KEY` | demo keys | Keys of the dump (step 2) |
+| `REVIEW_PASSWORD` | empty | Empty keeps the demo password `Elite-Test-2026!`; otherwise (12+ characters) it replaces it on every `…@test.elite.local` account |
 
-It writes the answers to `.env.staging` (mode 600, never committed), with a new random `DJANGO_SECRET_KEY`.
+It also detects MariaDB vs MySQL and records the collation it uses (`DB_COLLATION`).
 
 ### `.env.staging` reference
 
@@ -101,7 +114,8 @@ It writes the answers to `.env.staging` (mode 600, never committed), with a new 
 | `DJANGO_SECRET_KEY` | yes | 50+ random characters |
 | `FIELD_ENCRYPTION_KEYS` | yes | Fernet key(s), comma separated, newest first. Must match the dump |
 | `BLIND_INDEX_KEY` | yes | Must match the dump |
-| `DATABASE_URL` | yes | `mysql://user:password@127.0.0.1:3306/elite` (URL-encoded) |
+| `DATABASE_URL` | yes | `mysql://user:password@127.0.0.1:3306/dojomanager` (URL-encoded, so `#` is `%23`) |
+| `DB_COLLATION` | no | `utf8mb4_unicode_ci` on MariaDB, `utf8mb4_0900_ai_ci` on MySQL 8 (used for the unit-test database) |
 | `REVIEW_PASSWORD` | no | New shared password of the test accounts; empty keeps `Elite-Test-2026!` |
 | `ELITE_BIND` | yes | Where gunicorn listens, e.g. `127.0.0.1:8090` or `0.0.0.0:8095` |
 | `WEB_WORKERS` | no | gunicorn workers, default 3 (about 2 × CPU + 1) |
@@ -127,7 +141,7 @@ It writes the answers to `.env.staging` (mode 600, never committed), with a new 
 
 - *With a domain (CloudPanel):* add a **Reverse Proxy** site pointing to `http://127.0.0.1:8090`, then issue a
   Let's Encrypt certificate. Use `STAGING_HTTPS=true`.
-- *IP only:* open the chosen port (e.g. 8095) in the firewall and browse to `http://IP:8095/en/`.
+- *IP only (default):* open port 8090 in the firewall and browse to `http://IP:8090/en/`.
 
 URLs: website `/en/` and `/ar/`, staff desk `/en/desk/`, family portal `/en/portal/`, CMS `/cms/`, health `/healthz`.
 Sign in to the desk with a test account, e.g. `ops@test.elite.local`, `ceo@test.elite.local`,
@@ -163,12 +177,9 @@ git pull
 ## 8. Unit tests
 
 `runonce.sh` installs the test tools (`requirements-dev.txt`). The unit tests do **not** touch the loaded data: pytest
-creates its own empty database `test_<database name>` (e.g. `test_elite`), fills it from fixtures, and keeps it for
-the next run (`--reuse-db`). The database user therefore also needs rights on that database (as MySQL root):
-
-```sql
-GRANT ALL PRIVILEGES ON test_elite.* TO 'elite'@'127.0.0.1';
-```
+creates its own empty database `test_<database name>` (`test_dojomanager`), fills it from fixtures, and keeps it for
+the next run (`--reuse-db`). The database user therefore also needs rights on that database (the last two `GRANT`s
+in step 2).
 
 Then:
 
@@ -184,15 +195,15 @@ The loaded dump is for testing the running system by hand (desk, portal, reports
 
 ## 9. Backups
 
-- Database, daily: `mysqldump --single-transaction --routines elite | gzip > elite-$(date +%F).sql.gz`, kept off the server.
+- Database, daily: `mariadb-dump --single-transaction --routines dojomanager | gzip > dojomanager-$(date +%F).sql.gz`, kept off the server.
   Test a restore regularly.
 - Keep `.env.staging` in a password manager (on a live system, above all its own `FIELD_ENCRYPTION_KEYS` and `BLIND_INDEX_KEY`).
 - `backend/media` and `backend/private_media` (uploaded images, member photos and signatures), once people upload files.
 
 ## 10. Checklist
 
-- [ ] MySQL 8.0, Python 3.11+, build packages installed
-- [ ] Empty `utf8mb4_0900_ai_ci` database and user created (plus rights on `test_elite` for unit tests)
+- [ ] MariaDB 10.6+ (or MySQL 8.0), Python 3.11+, build packages installed
+- [ ] Database `dojomanager` and its user created (plus rights on `test_dojomanager` for unit tests)
 - [ ] Dump present at `deploy/db/elite.sql`
 - [ ] `./runonce.sh` finished with "Done"
 - [ ] `./start.sh` printed "Health check OK"

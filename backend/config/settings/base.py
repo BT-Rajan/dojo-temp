@@ -138,7 +138,10 @@ DATABASES["default"]["ATOMIC_REQUESTS"] = True
 DATABASES["default"]["CONN_MAX_AGE"] = env.int("DB_CONN_MAX_AGE", default=60)
 DATABASES["default"]["CONN_HEALTH_CHECKS"] = True
 DATABASES["default"].setdefault("TEST", {})
-DATABASES["default"]["TEST"].update({"CHARSET": "utf8mb4", "COLLATION": "utf8mb4_0900_ai_ci"})
+# MySQL 8 collation by default; runonce.sh sets DB_COLLATION=utf8mb4_unicode_ci on MariaDB, which lacks it.
+DATABASES["default"]["TEST"].update(
+    {"CHARSET": "utf8mb4", "COLLATION": env("DB_COLLATION", default="utf8mb4_0900_ai_ci")}
+)
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
