@@ -43,17 +43,17 @@ apt install -y redis-server
 ## 2. Database
 
 Create the database and user by hand, once (as the MariaDB root user, `sudo mariadb`). The dev server uses database
-`dojomanager`, user `dojomanager`, password `Chennai#44`, on `localhost:3306`. These are the defaults in `runonce.sh`:
+`dojomanager`, user `app_user`, password `Chennai#44`, on `localhost:3306`. These are the defaults in `runonce.sh`:
 
 ```sql
 CREATE DATABASE dojomanager CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
-CREATE USER 'dojomanager'@'localhost' IDENTIFIED BY 'Chennai#44';
-CREATE USER 'dojomanager'@'127.0.0.1' IDENTIFIED BY 'Chennai#44';
-GRANT ALL PRIVILEGES ON dojomanager.* TO 'dojomanager'@'localhost';
-GRANT ALL PRIVILEGES ON dojomanager.* TO 'dojomanager'@'127.0.0.1';
+CREATE USER 'app_user'@'localhost' IDENTIFIED BY 'Chennai#44';
+CREATE USER 'app_user'@'127.0.0.1' IDENTIFIED BY 'Chennai#44';
+GRANT ALL PRIVILEGES ON dojomanager.* TO 'app_user'@'localhost';
+GRANT ALL PRIVILEGES ON dojomanager.* TO 'app_user'@'127.0.0.1';
 -- for the unit tests (step 8):
-GRANT ALL PRIVILEGES ON test_dojomanager.* TO 'dojomanager'@'localhost';
-GRANT ALL PRIVILEGES ON test_dojomanager.* TO 'dojomanager'@'127.0.0.1';
+GRANT ALL PRIVILEGES ON test_dojomanager.* TO 'app_user'@'localhost';
+GRANT ALL PRIVILEGES ON test_dojomanager.* TO 'app_user'@'127.0.0.1';
 ```
 
 `runonce.sh` connects over TCP to `127.0.0.1`, hence the `@'127.0.0.1'` user. If the database already exists with
@@ -95,7 +95,7 @@ new random `DJANGO_SECRET_KEY`. To change one, set it on the command line, e.g.
 | Variable | Default | Meaning |
 |---|---|---|
 | `DB_HOST` / `DB_PORT` | `127.0.0.1` / `3306` | Database server |
-| `DB_NAME` / `DB_USER` / `DB_PASSWORD` | `dojomanager` / `dojomanager` / `Chennai#44` | From step 2 |
+| `DB_NAME` / `DB_USER` / `DB_PASSWORD` | `dojomanager` / `app_user` / `Chennai#44` | From step 2 |
 | `ELITE_PORT` | `8090` | App port |
 | `ELITE_DOMAIN` | empty | Empty: plain HTTP on `0.0.0.0:<port>`, reachable by every IP and the host name of the server. A domain: HTTPS through a reverse proxy, app on `127.0.0.1:<port>` |
 | `FIELD_ENCRYPTION_KEYS`, `BLIND_INDEX_KEY` | demo keys | Keys of the dump (step 2) |

@@ -18,7 +18,7 @@ DUMP="${1:-$ROOT/deploy/db/elite.sql}"
 DB_HOST="${DB_HOST:-127.0.0.1}"
 DB_PORT="${DB_PORT:-3306}"
 DB_NAME="${DB_NAME:-dojomanager}"
-DB_USER="${DB_USER:-dojomanager}"
+DB_USER="${DB_USER:-app_user}"
 DB_PASSWORD="${DB_PASSWORD:-Chennai#44}"
 ELITE_PORT="${ELITE_PORT:-8090}"
 # A domain served over HTTPS by a reverse proxy (the app then listens on 127.0.0.1 only). Empty: plain HTTP by IP.
