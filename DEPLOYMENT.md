@@ -9,6 +9,7 @@ How to put the Elite Academy system (Django back end, website, staff desk and fa
 | `start.sh` | To start | Starts gunicorn in the background (and Celery worker + beat when Redis is configured), then runs a health check |
 | `stop.sh` | To stop | Stops everything `start.sh` started (gracefully, forced after 30 s) |
 
+This is a **dev instance**: the dump, its keys and its passwords are demo values and are kept in git on purpose.
 The settings used are `config.settings.staging`: production-like (no debug pages, real secrets, gunicorn), with the
 test payment page and console messaging. It is for the fictional test data only. Going live with real members uses
 `config.settings.prod`, which refuses to start until a payment gateway, email and messaging provider are set.
@@ -54,17 +55,18 @@ fictional Kuwait test data: test staff accounts (`…@test.elite.local`), member
 pages. `runonce.sh` loads it only when the database has no tables, so re-running never overwrites data. To start
 over, drop and re-create the database, then run `runonce.sh` again.
 
-> **Encryption keys: required.** Civil IDs and medical notes in the dump are encrypted with the
-> `FIELD_ENCRYPTION_KEYS` (and searched with the `BLIND_INDEX_KEY`) of the server the dump was taken from. Use those
-> same two values on the new server. With different keys the member pages fail, and `runonce.sh` stops with an
-> error that says so. Keep a copy of the keys somewhere safe: without them the encrypted data is lost.
+> **Encryption keys.** Civil IDs and medical notes in the dump are encrypted with the demo keys of the dev
+> instance, which are also the defaults in `config/settings/dev.py`:
+> `FIELD_ENCRYPTION_KEYS=bG9jYWwtZGV2LW9ubHkta2V5LTMyLWJ5dGVzLWxvbmc=` and
+> `BLIND_INDEX_KEY=local-dev-only-blind-index-key`. `runonce.sh` uses them when you press Enter. With other keys the
+> member pages fail, and `runonce.sh` stops with an error that says so. These keys are public: never use them with
+> real member data.
 
 ## 3. Get the code
 
 ```bash
 git clone https://github.com/BT-Rajan/dojo-temp.git elite
 cd elite
-# Put the dump at deploy/db/elite.sql, or pass its path to runonce.sh
 ```
 
 Only the `backend` folder, the three scripts and the dump are needed on the server. Do not copy any folder of real
@@ -83,8 +85,8 @@ The first time, it asks for:
 |---|---|---|
 | Address | `review.example.com` or `169.58.13.213:8095` | A domain means HTTPS through a reverse proxy, app on `127.0.0.1:8090`. An IP means plain HTTP on `0.0.0.0:<port>` |
 | MySQL host / port / database / user / password | `127.0.0.1` / `3306` / `elite` / `elite` / … | From step 2 |
-| Test-account password | at least 12 characters | Replaces the published trial password on every `…@test.elite.local` account |
-| `FIELD_ENCRYPTION_KEYS`, `BLIND_INDEX_KEY` | from the source server | See the warning in step 2 |
+| Test-account password | Enter, or at least 12 characters | Enter keeps the demo password `Elite-Test-2026!`; anything else replaces it on every `…@test.elite.local` account |
+| `FIELD_ENCRYPTION_KEYS`, `BLIND_INDEX_KEY` | Enter | Demo keys of the dump (step 2) |
 
 It writes the answers to `.env.staging` (mode 600, never committed), with a new random `DJANGO_SECRET_KEY`.
 
@@ -100,7 +102,7 @@ It writes the answers to `.env.staging` (mode 600, never committed), with a new 
 | `FIELD_ENCRYPTION_KEYS` | yes | Fernet key(s), comma separated, newest first. Must match the dump |
 | `BLIND_INDEX_KEY` | yes | Must match the dump |
 | `DATABASE_URL` | yes | `mysql://user:password@127.0.0.1:3306/elite` (URL-encoded) |
-| `REVIEW_PASSWORD` | yes (review) | Shared password of the test accounts |
+| `REVIEW_PASSWORD` | no | New shared password of the test accounts; empty keeps `Elite-Test-2026!` |
 | `ELITE_BIND` | yes | Where gunicorn listens, e.g. `127.0.0.1:8090` or `0.0.0.0:8095` |
 | `WEB_WORKERS` | no | gunicorn workers, default 3 (about 2 × CPU + 1) |
 | `REDIS_URL` | no | e.g. `redis://127.0.0.1:6379/0`. Empty means MySQL cache/sessions and no Celery |
@@ -128,7 +130,8 @@ It writes the answers to `.env.staging` (mode 600, never committed), with a new 
 - *IP only:* open the chosen port (e.g. 8095) in the firewall and browse to `http://IP:8095/en/`.
 
 URLs: website `/en/` and `/ar/`, staff desk `/en/desk/`, family portal `/en/portal/`, CMS `/cms/`, health `/healthz`.
-Sign in to the desk with a test account, e.g. `ops@test.elite.local` and the `REVIEW_PASSWORD`.
+Sign in to the desk with a test account, e.g. `ops@test.elite.local`, `ceo@test.elite.local`,
+`admin.prm@test.elite.local`, with `Elite-Test-2026!` (or your `REVIEW_PASSWORD`).
 
 **Start after a reboot:** as the site user, `crontab -e` and add
 `@reboot /path/to/elite/start.sh >> /path/to/elite/logs/boot.log 2>&1`.
@@ -157,19 +160,40 @@ git pull
 ./start.sh
 ```
 
-## 8. Backups
+## 8. Unit tests
+
+`runonce.sh` installs the test tools (`requirements-dev.txt`). The unit tests do **not** touch the loaded data: pytest
+creates its own empty database `test_<database name>` (e.g. `test_elite`), fills it from fixtures, and keeps it for
+the next run (`--reuse-db`). The database user therefore also needs rights on that database (as MySQL root):
+
+```sql
+GRANT ALL PRIVILEGES ON test_elite.* TO 'elite'@'127.0.0.1';
+```
+
+Then:
+
+```bash
+cd backend
+set -a; . ../.env.staging; set +a
+.venv/bin/pytest                    # whole suite
+.venv/bin/pytest tests/test_x.py -k name   # one file / test
+.venv/bin/pytest --create-db        # rebuild the test database after new migrations
+```
+
+The loaded dump is for testing the running system by hand (desk, portal, reports) with realistic data.
+
+## 9. Backups
 
 - Database, daily: `mysqldump --single-transaction --routines elite | gzip > elite-$(date +%F).sql.gz`, kept off the server.
   Test a restore regularly.
-- Keep `.env.staging` (above all `FIELD_ENCRYPTION_KEYS` and `BLIND_INDEX_KEY`) in a password manager.
+- Keep `.env.staging` in a password manager (on a live system, above all its own `FIELD_ENCRYPTION_KEYS` and `BLIND_INDEX_KEY`).
 - `backend/media` and `backend/private_media` (uploaded images, member photos and signatures), once people upload files.
 
-## 9. Checklist
+## 10. Checklist
 
 - [ ] MySQL 8.0, Python 3.11+, build packages installed
-- [ ] Empty `utf8mb4_0900_ai_ci` database and user created
-- [ ] Dump at `deploy/db/elite.sql`
-- [ ] Source server's `FIELD_ENCRYPTION_KEYS` and `BLIND_INDEX_KEY` at hand
+- [ ] Empty `utf8mb4_0900_ai_ci` database and user created (plus rights on `test_elite` for unit tests)
+- [ ] Dump present at `deploy/db/elite.sql`
 - [ ] `./runonce.sh` finished with "Done"
 - [ ] `./start.sh` printed "Health check OK"
 - [ ] Reverse proxy + HTTPS (domain) or firewall port (IP) set up

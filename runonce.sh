@@ -43,13 +43,14 @@ if [ ! -f "$ENV_FILE" ]; then
     ask "Database user [elite]: "; DBUSER="${REPLY:-elite}"
     ask_secret "Database user password: "; DBPASS="$REPLY"
     [ -n "$DBPASS" ] || die "The database password is needed."
-    ask_secret "Password for the test accounts on this server (min 12 characters, no ' quote): "; REVIEW="$REPLY"
-    [ ${#REVIEW} -ge 12 ] || die "Too short."
+    ask_secret "New password for the test accounts (min 12 characters; Enter keeps the demo Elite-Test-2026!): "
+    REVIEW="$REPLY"
+    [ -z "$REVIEW" ] || [ ${#REVIEW} -ge 12 ] || die "Too short."
     case "$REVIEW" in *"'"*) die "Please choose a password without the ' character." ;; esac
-    echo "Encryption keys: the dump's Civil IDs and medical notes can only be read with the keys of the server it"
-    echo "was taken from. Paste them. Press Enter to generate new ones only for a database without members."
-    ask_secret "FIELD_ENCRYPTION_KEYS [generate]: "; FEK="${REPLY:-$(openssl rand -base64 32 | tr '+/' '-_')}"
-    ask_secret "BLIND_INDEX_KEY [generate]: "; BIK="${REPLY:-$(rand 48)}"
+    # Demo keys of the dev instance: deploy/db/elite.sql was encrypted with them (same as config/settings/dev.py).
+    echo "Encryption keys: Enter uses the demo keys deploy/db/elite.sql was made with."
+    ask_secret "FIELD_ENCRYPTION_KEYS [demo]: "; FEK="${REPLY:-bG9jYWwtZGV2LW9ubHkta2V5LTMyLWJ5dGVzLWxvbmc=}"
+    ask_secret "BLIND_INDEX_KEY [demo]: "; BIK="${REPLY:-local-dev-only-blind-index-key}"
     URL=$(DBUSER="$DBUSER" DBPASS="$DBPASS" DBNAME="$DBNAME" DBHOST="$DBHOST" DBPORT="$DBPORT" python3 -c "
 import os, urllib.parse as u
 q = lambda k: u.quote(os.environ[k], safe='')
@@ -109,7 +110,7 @@ cd "$ROOT/backend"
 [ -d .venv ] || python3 -m venv .venv
 . .venv/bin/activate
 pip install -q --upgrade pip
-pip install -q -r requirements.txt
+pip install -q -r requirements-dev.txt   # includes requirements.txt, plus pytest for the unit tests
 
 say "Database updates, cache table, static files"
 python manage.py migrate --noinput
