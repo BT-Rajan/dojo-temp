@@ -6,8 +6,8 @@ How to put the Elite Academy system (Django back end, website, staff desk and fa
 | Script | When | What it does |
 |---|---|---|
 | `runonce.sh` | First install, and again after every `git pull` | Runs silently (no questions): writes `.env.staging`, builds the Python environment, loads the database dump into an empty database, applies newer migrations, collects static files |
-| `start.sh` | To start | Starts gunicorn in the background (and Celery worker + beat when Redis is configured), then runs a health check |
-| `stop.sh` | To stop | Stops everything `start.sh` started (gracefully, forced after 30 s) |
+| `start.sh` | To start | Starts gunicorn under **pm2** as `dojomanager` (plus `dojomanager-worker` and `dojomanager-beat` for Celery when Redis is configured), saves the pm2 list, then runs a health check |
+| `stop.sh` | To stop | Removes those processes from pm2 (and stops an instance left by the older pid-file scripts) |
 
 This is a **dev instance**: the dump, its keys and its passwords are demo values and are kept in git on purpose.
 The settings used are `config.settings.staging`: production-like (no debug pages, real secrets, gunicorn), with the
@@ -23,6 +23,7 @@ test payment page and console messaging. It is for the fictional test data only.
 | OS | Linux, Ubuntu 22.04/24.04 or Debian 12 (CloudPanel servers work) |
 | CPU / RAM / disk | 2 vCPU, 4 GB RAM, 10 GB free disk (minimum for review use) |
 | Python | 3.11 or newer, with `venv` |
+| pm2 | `npm install -g pm2` (Node.js 18+) |
 | Database | **MariaDB 10.6+** (this dev server: `localhost:3306`, database `dojomanager`) or MySQL 8.0. The dump is from MySQL 8; on MariaDB `runonce.sh` loads it with `utf8mb4_unicode_ci` |
 | Redis | Optional. Without it, the cache and sessions are kept in MySQL and the scheduled jobs run from cron |
 | Network | Outbound HTTPS to pypi.org during `runonce.sh`. Inbound: 443 via a reverse proxy (domain), or the chosen app port (IP only) |
@@ -126,16 +127,25 @@ It also detects MariaDB vs MySQL and records the collation it uses (`DB_COLLATIO
 ## 5. Start and stop
 
 ```bash
-./start.sh     # web app in the background; prints "Health check OK"
+./start.sh     # starts pm2 process "dojomanager"; prints "Health check OK"
 ./stop.sh
 ```
+
+Day to day you can also use pm2 directly:
+
+```bash
+pm2 status                  # dojomanager online, its pid, memory, restarts
+pm2 logs dojomanager        # live log
+pm2 restart dojomanager     # restart (keeps the settings it was started with)
+```
+
+After changing `.env.staging`, use `./stop.sh && ./start.sh` so the new settings are picked up.
 
 | Path | Contents |
 |---|---|
 | `logs/app.log` | Application log and errors. **Portal sign-in codes** (WhatsApp is not sent on a review server) appear here |
 | `logs/access.log` | Requests |
 | `logs/celery-*.log` | Background jobs (only with Redis) |
-| `run/*.pid` | Process ids used by `stop.sh` |
 
 **Publishing it**
 
@@ -147,9 +157,9 @@ URLs: website `/en/` and `/ar/`, staff desk `/en/desk/`, family portal `/en/port
 Sign in to the desk with a test account, e.g. `ops@test.elite.local`, `ceo@test.elite.local`,
 `admin.prm@test.elite.local`, with `Elite-Test-2026!` (or your `REVIEW_PASSWORD`).
 
-**Start after a reboot:** as the site user, `crontab -e` and add
-`@reboot /path/to/elite/start.sh >> /path/to/elite/logs/boot.log 2>&1`.
-(Or use `backend/scripts/elite-review.service` with systemd instead of `start.sh`/`stop.sh`; don't use both.)
+**Start after a reboot:** `start.sh` runs `pm2 save`, so once pm2's boot service is installed it brings
+`dojomanager` back by itself. Install it once with `pm2 startup` (it prints a command to run as root).
+Don't also use `backend/scripts/elite-review.service`: both would start the app on the same port.
 
 ## 6. Scheduled jobs
 
@@ -209,5 +219,5 @@ The loaded dump is for testing the running system by hand (desk, portal, reports
 - [ ] `./start.sh` printed "Health check OK"
 - [ ] Reverse proxy + HTTPS (domain) or firewall port (IP) set up
 - [ ] Scheduled jobs: Redis + Celery, or the cron lines
-- [ ] Start on reboot configured
+- [ ] pm2 installed; `pm2 startup` run once (start on reboot)
 - [ ] Daily database backup configured

@@ -1,12 +1,16 @@
 #!/bin/sh
-# Elite Academy: start the web app (gunicorn) in the background, plus Celery worker and beat when REDIS_URL is set.
-# Run ./runonce.sh first. Logs go to logs/, process ids to run/. Stop with ./stop.sh
+# Elite Academy: start the web app (gunicorn) under pm2 as "dojomanager", plus "dojomanager-worker" and
+# "dojomanager-beat" (Celery) when REDIS_URL is set. Run ./runonce.sh first. Stop with ./stop.sh
+#   pm2 status | pm2 logs dojomanager | pm2 restart dojomanager
+# Logs also go to logs/app.log (application, errors, portal sign-in codes) and logs/access.log (requests).
 set -e
 ROOT=$(cd "$(dirname "$0")" && pwd)
 ENV_FILE="$ROOT/.env.staging"
 RUN="$ROOT/run"
 LOGS="$ROOT/logs"
+NAME=dojomanager
 
+command -v pm2 >/dev/null || { echo "pm2 is missing: npm install -g pm2"; exit 1; }
 [ -f "$RUN/.runonce-done" ] || { echo "Run ./runonce.sh first."; exit 1; }
 [ -f "$ENV_FILE" ] || { echo "$ENV_FILE is missing: run ./runonce.sh"; exit 1; }
 set -a; . "$ENV_FILE"; set +a
@@ -14,49 +18,44 @@ export DJANGO_SETTINGS_MODULE="${DJANGO_SETTINGS_MODULE:-config.settings.staging
 BIND="${ELITE_BIND:-127.0.0.1:8090}"
 mkdir -p "$RUN" "$LOGS"
 
-running() { [ -f "$1" ] && kill -0 "$(cat "$1")" 2>/dev/null; }
+online() { [ "$(pm2 pid "$1" 2>/dev/null | tail -1)" -gt 0 ] 2>/dev/null; }
 
-cd "$ROOT/backend"
-. .venv/bin/activate
-
-if running "$RUN/gunicorn.pid"; then
-    echo "The web app is already running (pid $(cat "$RUN/gunicorn.pid"))."
-else
-    gunicorn config.wsgi:application --daemon --pid "$RUN/gunicorn.pid" \
-        --bind "$BIND" --workers "${WEB_WORKERS:-3}" --timeout 120 --forwarded-allow-ips 127.0.0.1 \
-        --access-logfile "$LOGS/access.log" --error-logfile "$LOGS/app.log" --capture-output
-    i=0
-    until running "$RUN/gunicorn.pid"; do
-        i=$((i + 1)); [ $i -le 20 ] || { echo "The web app did not start: see $LOGS/app.log"; exit 1; }
-        sleep 1
-    done
-    echo "Web app started on $BIND (pid $(cat "$RUN/gunicorn.pid"))."
+if online "$NAME"; then
+    echo "$NAME is already running under pm2 (pid $(pm2 pid "$NAME" | tail -1)). Restart: ./stop.sh && ./start.sh"
+    exit 0
 fi
+# Clear a stopped pm2 entry, or an instance started by the older pid-file version of these scripts.
+"$ROOT/stop.sh" >/dev/null
+
+VENV="$ROOT/backend/.venv/bin"
+# pm2 keeps the environment of this shell (the settings from .env.staging) for its restarts.
+pm2 start "$VENV/gunicorn" --name "$NAME" --interpreter none --cwd "$ROOT/backend" \
+    --output "$LOGS/access.log" --error "$LOGS/app.log" --time \
+    -- config.wsgi:application --bind "$BIND" --workers "${WEB_WORKERS:-3}" --timeout 120 \
+    --forwarded-allow-ips 127.0.0.1 --access-logfile - --error-logfile - >/dev/null
 
 if [ -n "$REDIS_URL" ]; then
-    if running "$RUN/celery-worker.pid"; then
-        echo "Celery worker already running."
-    else
-        celery -A config worker --detach --pidfile "$RUN/celery-worker.pid" --logfile "$LOGS/celery-worker.log" -l info
-        echo "Celery worker started."
-    fi
-    if running "$RUN/celery-beat.pid"; then
-        echo "Celery beat already running."
-    else
-        celery -A config beat --detach --pidfile "$RUN/celery-beat.pid" --logfile "$LOGS/celery-beat.log" \
-            --schedule "$RUN/celerybeat-schedule" -l info
-        echo "Celery beat (scheduled jobs) started."
-    fi
+    pm2 start "$VENV/celery" --name "$NAME-worker" --interpreter none --cwd "$ROOT/backend" \
+        --output "$LOGS/celery-worker.log" --error "$LOGS/celery-worker.log" --time \
+        -- -A config worker -l info >/dev/null
+    pm2 start "$VENV/celery" --name "$NAME-beat" --interpreter none --cwd "$ROOT/backend" \
+        --output "$LOGS/celery-beat.log" --error "$LOGS/celery-beat.log" --time \
+        -- -A config beat -l info --schedule "$RUN/celerybeat-schedule" >/dev/null
+    echo "Celery worker and beat (scheduled jobs) started as $NAME-worker and $NAME-beat."
 else
     echo "No REDIS_URL: scheduled jobs run from cron instead (DEPLOYMENT.md, step 6)."
 fi
+# Remember the process list, so `pm2 resurrect` (or pm2's boot service, `pm2 startup`) brings it back.
+pm2 save >/dev/null
 
-if command -v curl >/dev/null; then
-    HOST="${BIND%%:*}"; [ "$HOST" = "0.0.0.0" ] && HOST=127.0.0.1
-    sleep 2
-    if curl -fsS -o /dev/null -H "Host: ${DJANGO_ALLOWED_HOSTS%%,*}" "http://$HOST:${BIND##*:}/healthz"; then
-        echo "Health check OK."
-    else
-        echo "Health check failed: see $LOGS/app.log"
+HOST="${BIND%%:*}"; [ "$HOST" = "0.0.0.0" ] && HOST=127.0.0.1
+i=0
+until curl -fsS -o /dev/null -H "Host: ${DJANGO_ALLOWED_HOSTS%%,*}" "http://$HOST:${BIND##*:}/healthz" 2>/dev/null; do
+    i=$((i + 1))
+    if [ $i -gt 30 ] || ! online "$NAME"; then
+        echo "The web app did not come up: see $LOGS/app.log or pm2 logs $NAME"
+        exit 1
     fi
-fi
+    sleep 1
+done
+echo "Web app started under pm2 as $NAME on $BIND (pid $(pm2 pid "$NAME" | tail -1)). Health check OK."
