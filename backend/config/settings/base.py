@@ -124,10 +124,14 @@ TEMPLATES = [
 # behaviour under many simultaneous users (Django's recommended level for MySQL).
 # ---------------------------------------------------------------------------
 DATABASES = {"default": env.db("DATABASE_URL")}
+# MySQL 8 collation by default; runonce.sh sets DB_COLLATION=utf8mb4_unicode_ci on MariaDB, which lacks it.
+# The connection uses the same collation as the tables, or comparing them fails ("Illegal mix of collations").
+DB_COLLATION = env("DB_COLLATION", default="utf8mb4_0900_ai_ci")
 DATABASES["default"].setdefault("OPTIONS", {})
 DATABASES["default"]["OPTIONS"].update(
     {
         "charset": "utf8mb4",
+        "collation": DB_COLLATION,
         "isolation_level": "read committed",
         "init_command": "SET sql_mode='STRICT_TRANS_TABLES', time_zone='+03:00'",
     }
@@ -138,10 +142,7 @@ DATABASES["default"]["ATOMIC_REQUESTS"] = True
 DATABASES["default"]["CONN_MAX_AGE"] = env.int("DB_CONN_MAX_AGE", default=60)
 DATABASES["default"]["CONN_HEALTH_CHECKS"] = True
 DATABASES["default"].setdefault("TEST", {})
-# MySQL 8 collation by default; runonce.sh sets DB_COLLATION=utf8mb4_unicode_ci on MariaDB, which lacks it.
-DATABASES["default"]["TEST"].update(
-    {"CHARSET": "utf8mb4", "COLLATION": env("DB_COLLATION", default="utf8mb4_0900_ai_ci")}
-)
+DATABASES["default"]["TEST"].update({"CHARSET": "utf8mb4", "COLLATION": DB_COLLATION})
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
