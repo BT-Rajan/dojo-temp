@@ -37,7 +37,7 @@ say "Checking the server"
 command -v python3 >/dev/null || die "python3 is missing (3.11 or newer)."
 python3 -c 'import sys; sys.exit(sys.version_info < (3, 11))' || die "Python 3.11 or newer is needed (found $(python3 -V))."
 python3 -c 'import venv' 2>/dev/null || die "python3-venv is missing: apt install -y python3-venv"
-command -v mysql >/dev/null || die "The mysql client is missing: apt install -y mariadb-client (or default-mysql-client)"
+command -v mariadb >/dev/null || command -v mysql >/dev/null || die "The mysql client is missing: apt install -y mariadb-client (or default-mysql-client)"
 command -v openssl >/dev/null || die "openssl is missing: apt install -y openssl"
 command -v pkg-config >/dev/null || die "Build packages are missing: apt install -y python3-dev build-essential pkg-config default-libmysqlclient-dev"
 
@@ -93,7 +93,8 @@ with open(sys.argv[1], "w") as f:
     f.write('[mysql]\ndatabase="%s"\ndefault-character-set=utf8mb4\n' % esc(p.path.lstrip("/")))
 EOF
 chmod 600 "$MYCNF"
-sql() { mysql --defaults-extra-file="$MYCNF" "$@"; }
+MYSQL=$(command -v mariadb || command -v mysql)
+sql() { "$MYSQL" --defaults-extra-file="$MYCNF" "$@"; }
 
 # 2. Database ---------------------------------------------------------------------------------------------------------
 say "Checking the database"
